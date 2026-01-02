@@ -12,20 +12,45 @@ import {
   formatPayoff,
   formatTokens,
   formatHours,
+  getDeveloperList,
+  getModelsByDeveloper,
 } from '../lib/calculations.js';
 
-const modelSizes = Object.keys(models.models);
+const developerList = getDeveloperList(models);
 const ramOptions = Object.keys(hardware.mac.configs).map(Number);
 const cadToUsd = hardware.cadToUsd;
 
 export default function PayoffCalculator() {
-  const [modelSize, setModelSize] = useState('70B');
+  const [developerId, setDeveloperId] = useState('meta');
+  const [modelId, setModelId] = useState('llama-3.1-70b');
   const [dailyHours, setDailyHours] = useState(8);
   const [macRAM, setMacRAM] = useState(512);
   const [selectedHardware, setSelectedHardware] = useState('mac');
 
+  // Get models for selected developer
+  const developerModels = useMemo(
+    () => getModelsByDeveloper(models, developerId),
+    [developerId]
+  );
+
+  // When developer changes, select first compatible model
+  const handleDeveloperChange = (newDevId) => {
+    setDeveloperId(newDevId);
+    const devModels = getModelsByDeveloper(models, newDevId);
+    if (devModels.length > 0) {
+      // Find first model that can run on current hardware
+      const currentMemory = selectedHardware === 'mac' ? macRAM : hardware.dgxSpark.memory;
+      const compatible = devModels.find(m =>
+        currentMemory >= m.minRAM &&
+        (selectedHardware === 'mac' || m.dgxSparkTokPerSec > 0)
+      );
+      setModelId(compatible ? compatible.id : devModels[0].id);
+    }
+  };
+
   const calculations = useMemo(() => computeComparison({
-    modelSize,
+    developerId,
+    modelId,
     dailyHours,
     macRAM,
     selectedHardware,
@@ -33,7 +58,7 @@ export default function PayoffCalculator() {
     hardware,
     cloudProviders,
     apiProviders,
-  }), [modelSize, dailyHours, macRAM, selectedHardware]);
+  }), [developerId, modelId, dailyHours, macRAM, selectedHardware]);
 
   const cheapest = calculations.providers[0];
 
@@ -110,37 +135,56 @@ export default function PayoffCalculator() {
             )}
           </div>
 
-          {/* Model Size */}
+          {/* Developer & Model Selection */}
           <div className="bg-gray-900 rounded-xl p-4 border border-gray-800">
             <label className="block text-sm font-medium text-gray-400 mb-3">Model</label>
-            <div className="grid grid-cols-3 gap-1">
-              {modelSizes.map((size) => {
-                const model = models.models[size];
+
+            {/* Developer tabs */}
+            <div className="flex flex-wrap gap-1 mb-3">
+              {developerList.map((dev) => (
+                <button
+                  key={dev.id}
+                  onClick={() => handleDeveloperChange(dev.id)}
+                  className={`px-2 py-1 rounded text-xs font-medium transition-all ${
+                    developerId === dev.id
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                  }`}
+                >
+                  {dev.name.split(' ')[0]}
+                </button>
+              ))}
+            </div>
+
+            {/* Model dropdown */}
+            <select
+              value={modelId}
+              onChange={(e) => setModelId(e.target.value)}
+              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              {developerModels.map((model) => {
                 const currentMemory = selectedHardware === 'mac' ? macRAM : hardware.dgxSpark.memory;
                 const canRun = currentMemory >= model.minRAM &&
                   (selectedHardware === 'mac' || model.dgxSparkTokPerSec > 0);
                 const tps = selectedHardware === 'mac' ? model.localTokPerSec : model.dgxSparkTokPerSec;
                 return (
-                  <button
-                    key={size}
-                    onClick={() => canRun && setModelSize(size)}
+                  <option
+                    key={model.id}
+                    value={model.id}
                     disabled={!canRun}
-                    className={`p-2 rounded-lg text-sm font-medium transition-all ${
-                      modelSize === size
-                        ? 'bg-blue-600 text-white'
-                        : canRun
-                        ? 'bg-gray-800 text-gray-300 hover:bg-gray-700'
-                        : 'bg-gray-800/50 text-gray-600 cursor-not-allowed'
-                    }`}
                   >
-                    {size}
-                    <span className="block text-xs opacity-75">
-                      {canRun ? `${tps}t/s` : `>${model.minRAM}GB`}
-                    </span>
-                  </button>
+                    {model.name} ({model.params}) — {canRun ? `${tps} tok/s` : `needs ${model.minRAM}GB+`}
+                  </option>
                 );
               })}
-            </div>
+            </select>
+
+            {/* Model info */}
+            {calculations.modelName && (
+              <div className="mt-2 text-xs text-gray-500">
+                {calculations.quantization} • {calculations.notes}
+              </div>
+            )}
           </div>
 
           {/* Daily Hours */}
@@ -167,7 +211,12 @@ export default function PayoffCalculator() {
         {/* Workload Summary */}
         {calculations.canRun && (
           <div className="bg-gray-800/50 rounded-xl p-4 mb-6 border border-gray-700">
-            <div className="text-sm text-gray-400 mb-2">Daily workload on local hardware</div>
+            <div className="text-sm text-gray-400 mb-2">
+              Daily workload: <span className="text-white font-medium">{calculations.modelName}</span>
+              {calculations.activeParams && (
+                <span className="text-gray-500"> ({calculations.modelParams} total, {calculations.activeParams} active)</span>
+              )}
+            </div>
             <div className="flex flex-wrap items-center gap-4">
               <div className="text-center">
                 <div className="text-xl font-bold text-white">{dailyHours}h × {calculations.localTPS} tok/s</div>
@@ -211,7 +260,7 @@ export default function PayoffCalculator() {
                 </>
               ) : (
                 <div className="text-red-400">
-                  Cannot run {modelSize} — needs {calculations.minRAM}GB+ RAM
+                  Cannot run {calculations.modelName || 'model'} — needs {calculations.minRAM}GB+ RAM
                 </div>
               )}
             </div>
@@ -318,7 +367,7 @@ export default function PayoffCalculator() {
               <div className="mt-8">
                 <h2 className="text-lg font-semibold text-white mb-2">API Provider Comparison</h2>
                 <p className="text-sm text-gray-500 mb-4">
-                  Pay-per-token pricing for {modelSize} models — {formatTokens(calculations.tokensPerDay)} tokens/day
+                  Pay-per-token pricing for {calculations.modelName} — {formatTokens(calculations.tokensPerDay)} tokens/day
                 </p>
 
                 <div className="overflow-x-auto">
@@ -395,7 +444,7 @@ export default function PayoffCalculator() {
               <h3 className="font-semibold text-blue-300 mb-3">Bottom Line</h3>
               <div className="space-y-2 text-sm text-blue-200/80">
                 <p>
-                  Running <strong>{modelSize}</strong> for <strong>{dailyHours}h/day</strong> on <strong>{calculations.localName}</strong>:
+                  Running <strong>{calculations.modelName}</strong> for <strong>{dailyHours}h/day</strong> on <strong>{calculations.localName}</strong>:
                 </p>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-3">
                   <div className="bg-black/20 rounded-lg p-3">
@@ -446,25 +495,35 @@ export default function PayoffCalculator() {
 
         {!calculations.canRun && (
           <div className="bg-red-900/20 border border-red-800/50 rounded-xl p-5">
-            <h3 className="font-semibold text-red-300 mb-2">Cannot Run {modelSize}</h3>
+            <h3 className="font-semibold text-red-300 mb-2">Cannot Run {calculations.modelName || 'Model'}</h3>
             <p className="text-sm text-red-200/70">
               {selectedHardware === 'mac'
-                ? `${modelSize} requires at least ${calculations.minRAM}GB RAM. Select a larger Mac configuration or smaller model.`
-                : `DGX Spark (${hardware.dgxSpark.memory}GB) cannot run ${modelSize}. Try the Mac Studio with 256GB+ RAM.`
+                ? `This model requires at least ${calculations.minRAM}GB RAM. Select a larger Mac configuration or smaller model.`
+                : `DGX Spark (${hardware.dgxSpark.memory}GB) cannot run this model. Try the Mac Studio with more RAM.`
               }
             </p>
           </div>
         )}
 
+        {/* Footer with sources */}
         <div className="mt-4 bg-gray-900/50 rounded-xl p-4 border border-gray-800">
           <p className="text-xs text-gray-500">
-            <strong className="text-gray-400">Benchmark sources:</strong> {models.source}
+            <strong className="text-gray-400">Benchmark sources:</strong> {models.methodology}
             <br/>
             <strong className="text-gray-400">GPU rental:</strong> {cloudProviders.providers.map(p => `${p.name} $${p.ratePerGPUHour}`).join(', ')} per {cloudProviders.gpuType}/hr.
             <br/>
-            <strong className="text-gray-400">API pricing:</strong> {apiProviders.providers['70B'].map(p => p.name).join(', ')} ({apiProviders.updatedAt}). Blended = 50% input + 50% output rate.
-            <br/>
             <strong className="text-gray-400">Data updated:</strong> {models.updatedAt} • Mac prices in CAD converted at {cadToUsd}.
+            <br/>
+            <strong className="text-gray-400">Sources:</strong>{' '}
+            {models.sources.slice(0, 3).map((s, i) => (
+              <span key={s.id}>
+                <a href={s.url} className="text-blue-400 hover:underline" target="_blank" rel="noopener noreferrer">
+                  {s.name}
+                </a>
+                {i < 2 && ', '}
+              </span>
+            ))}
+            {models.sources.length > 3 && ` +${models.sources.length - 3} more`}
           </p>
         </div>
       </div>

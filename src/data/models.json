@@ -1,46 +1,241 @@
 {
-  "updatedAt": "2025-12-31",
-  "source": "llama.cpp discussions, vLLM benchmarks (Q4_K_M quantization, batch=1)",
-  "models": {
-    "7B": {
-      "minRAM": 8,
-      "localTokPerSec": 95,
-      "cloudTokPerSec": 120,
-      "cloudGPUs": 1,
-      "dgxSparkTokPerSec": 45,
-      "notes": "~4GB weights + KV cache"
+  "updatedAt": "2026-01-01",
+  "methodology": "Q4_K_M quantization unless noted, batch=1 decode speed, interactive use case",
+  "developers": {
+    "openai": {
+      "name": "OpenAI",
+      "models": {
+        "gpt-oss-20b": {
+          "name": "gpt-oss-20b",
+          "params": "21B",
+          "activeParams": "3.6B",
+          "minRAM": 16,
+          "localTokPerSec": 80,
+          "dgxSparkTokPerSec": 86,
+          "cloudTokPerSec": 150,
+          "cloudGPUs": 1,
+          "quantization": "MXFP4",
+          "notes": "MoE architecture, fits 16GB VRAM"
+        },
+        "gpt-oss-120b": {
+          "name": "gpt-oss-120b",
+          "params": "117B",
+          "activeParams": "5.1B",
+          "minRAM": 80,
+          "localTokPerSec": 50,
+          "dgxSparkTokPerSec": 58,
+          "cloudTokPerSec": 100,
+          "cloudGPUs": 1,
+          "quantization": "MXFP4",
+          "notes": "MoE, single 80GB H100"
+        }
+      }
     },
-    "13B": {
-      "minRAM": 16,
-      "localTokPerSec": 55,
-      "cloudTokPerSec": 75,
-      "cloudGPUs": 1,
-      "dgxSparkTokPerSec": 30,
-      "notes": "~8GB weights + KV cache"
+    "meta": {
+      "name": "Meta",
+      "models": {
+        "llama-3.1-8b": {
+          "name": "Llama 3.1 8B",
+          "params": "8B",
+          "minRAM": 8,
+          "localTokPerSec": 90,
+          "dgxSparkTokPerSec": 45,
+          "cloudTokPerSec": 120,
+          "cloudGPUs": 1,
+          "quantization": "Q4_K_M",
+          "notes": "~5GB weights + KV cache"
+        },
+        "llama-3.1-70b": {
+          "name": "Llama 3.1 70B",
+          "params": "70B",
+          "minRAM": 48,
+          "localTokPerSec": 12,
+          "dgxSparkTokPerSec": 6,
+          "cloudTokPerSec": 35,
+          "cloudGPUs": 2,
+          "quantization": "Q4_K_M",
+          "notes": "~40GB weights, TP=2"
+        },
+        "llama-3.1-405b": {
+          "name": "Llama 3.1 405B",
+          "params": "405B",
+          "minRAM": 256,
+          "localTokPerSec": 2.5,
+          "dgxSparkTokPerSec": 0,
+          "cloudTokPerSec": 15,
+          "cloudGPUs": 8,
+          "quantization": "FP8",
+          "notes": "~200GB weights, 8× H100"
+        }
+      }
     },
-    "34B": {
-      "minRAM": 24,
-      "localTokPerSec": 28,
-      "cloudTokPerSec": 40,
-      "cloudGPUs": 1,
-      "dgxSparkTokPerSec": 15,
-      "notes": "~20GB weights + KV cache"
+    "deepseek": {
+      "name": "DeepSeek",
+      "models": {
+        "deepseek-coder-33b": {
+          "name": "DeepSeek Coder 33B",
+          "params": "33B",
+          "minRAM": 24,
+          "localTokPerSec": 26,
+          "dgxSparkTokPerSec": 14,
+          "cloudTokPerSec": 42,
+          "cloudGPUs": 1,
+          "quantization": "Q4_K_M",
+          "notes": "Code-focused model"
+        },
+        "deepseek-v3": {
+          "name": "DeepSeek V3",
+          "params": "671B",
+          "activeParams": "37B",
+          "minRAM": 384,
+          "localTokPerSec": 20,
+          "dgxSparkTokPerSec": 0,
+          "cloudTokPerSec": 25,
+          "cloudGPUs": 8,
+          "quantization": "Q4_K_M",
+          "notes": "MoE, 671B total / 37B active"
+        }
+      }
     },
-    "70B": {
-      "minRAM": 48,
-      "localTokPerSec": 12,
-      "cloudTokPerSec": 35,
-      "cloudGPUs": 2,
-      "dgxSparkTokPerSec": 6,
-      "notes": "~40GB weights + KV cache, 2× H100 TP=2"
+    "alibaba": {
+      "name": "Alibaba (Qwen)",
+      "models": {
+        "qwen2.5-7b": {
+          "name": "Qwen2.5 7B",
+          "params": "7B",
+          "minRAM": 8,
+          "localTokPerSec": 85,
+          "dgxSparkTokPerSec": 42,
+          "cloudTokPerSec": 110,
+          "cloudGPUs": 1,
+          "quantization": "Q4_K_M",
+          "notes": "~4GB weights + KV cache"
+        },
+        "qwen2.5-32b": {
+          "name": "Qwen2.5 32B",
+          "params": "32B",
+          "minRAM": 24,
+          "localTokPerSec": 28,
+          "dgxSparkTokPerSec": 15,
+          "cloudTokPerSec": 45,
+          "cloudGPUs": 1,
+          "quantization": "Q4_K_M",
+          "notes": "~18GB weights + KV cache"
+        },
+        "qwen2.5-72b": {
+          "name": "Qwen2.5 72B",
+          "params": "72B",
+          "minRAM": 48,
+          "localTokPerSec": 11,
+          "dgxSparkTokPerSec": 5,
+          "cloudTokPerSec": 33,
+          "cloudGPUs": 2,
+          "quantization": "Q4_K_M",
+          "notes": "~40GB weights, TP=2"
+        }
+      }
     },
-    "405B": {
-      "minRAM": 256,
-      "localTokPerSec": 2.5,
-      "cloudTokPerSec": 15,
-      "cloudGPUs": 8,
-      "dgxSparkTokPerSec": 0,
-      "notes": "~200GB weights (FP8), 8× H100"
+    "moonshot": {
+      "name": "Moonshot (Kimi)",
+      "models": {
+        "kimi-k2": {
+          "name": "Kimi K2",
+          "params": "1T",
+          "activeParams": "32B",
+          "minRAM": 64,
+          "localTokPerSec": 25,
+          "dgxSparkTokPerSec": 20,
+          "cloudTokPerSec": 50,
+          "cloudGPUs": 2,
+          "quantization": "FP8",
+          "notes": "MoE, 1T total / 32B active, 256k context"
+        }
+      }
+    },
+    "defog": {
+      "name": "Defog (SQLCoder)",
+      "models": {
+        "sqlcoder-7b": {
+          "name": "SQLCoder 7B",
+          "params": "7B",
+          "minRAM": 8,
+          "localTokPerSec": 88,
+          "dgxSparkTokPerSec": 45,
+          "cloudTokPerSec": 115,
+          "cloudGPUs": 1,
+          "quantization": "Q4_K_M",
+          "notes": "Mistral-7B based, text-to-SQL"
+        },
+        "sqlcoder-34b": {
+          "name": "SQLCoder 34B",
+          "params": "34B",
+          "minRAM": 24,
+          "localTokPerSec": 26,
+          "dgxSparkTokPerSec": 14,
+          "cloudTokPerSec": 40,
+          "cloudGPUs": 1,
+          "quantization": "Q4_K_M",
+          "notes": "Code Llama based, text-to-SQL"
+        },
+        "sqlcoder-70b": {
+          "name": "SQLCoder 70B",
+          "params": "70B",
+          "minRAM": 48,
+          "localTokPerSec": 11,
+          "dgxSparkTokPerSec": 5,
+          "cloudTokPerSec": 32,
+          "cloudGPUs": 2,
+          "quantization": "Q4_K_M",
+          "notes": "Highest accuracy, text-to-SQL"
+        }
+      }
     }
-  }
+  },
+  "sources": [
+    {
+      "id": "llama-cpp-m-series",
+      "name": "llama.cpp Apple Silicon Discussion",
+      "url": "https://github.com/ggml-org/llama.cpp/discussions/4167"
+    },
+    {
+      "id": "llama-cpp-dgx-spark",
+      "name": "llama.cpp DGX Spark Discussion",
+      "url": "https://github.com/ggml-org/llama.cpp/discussions/16578"
+    },
+    {
+      "id": "dlewis-h100-eval",
+      "name": "H100 vs A100 Llama 3.3 70B Evaluation",
+      "url": "https://dlewis.io/evaluating-llama-33-70b-inference-h100-a100/"
+    },
+    {
+      "id": "hardware-corner-deepseek",
+      "name": "DeepSeek V3 Mac Studio Benchmarks",
+      "url": "https://www.hardware-corner.net/studio-m3-ultra-running-deepseek-v3/"
+    },
+    {
+      "id": "macrumors-deepseek-r1",
+      "name": "DeepSeek R1 on M3 Ultra",
+      "url": "https://www.macrumors.com/2025/03/17/apples-m3-ultra-runs-deepseek-r1-efficiently/"
+    },
+    {
+      "id": "nvidia-gpt-oss",
+      "name": "NVIDIA gpt-oss Acceleration",
+      "url": "https://blogs.nvidia.com/blog/rtx-ai-garage-openai-oss/"
+    },
+    {
+      "id": "openai-gpt-oss",
+      "name": "OpenAI gpt-oss Introduction",
+      "url": "https://openai.com/index/introducing-gpt-oss/"
+    },
+    {
+      "id": "moonshot-kimi-k2",
+      "name": "Kimi K2 Announcement",
+      "url": "https://moonshotai.github.io/Kimi-K2/"
+    },
+    {
+      "id": "valdi-h100",
+      "name": "VALDI H100 Performance Docs",
+      "url": "https://docs.valdi.ai/llms/performance/gpu/H100/llama3.1-inference-testing/"
+    }
+  ]
 }

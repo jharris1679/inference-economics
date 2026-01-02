@@ -3,6 +3,50 @@
  * No React, no side effects — just math.
  */
 
+/**
+ * Developer/Model data helpers
+ */
+
+export function getDeveloperList(modelsData) {
+  return Object.entries(modelsData.developers).map(([id, dev]) => ({
+    id,
+    name: dev.name,
+    modelCount: Object.keys(dev.models).length,
+  }));
+}
+
+export function getModelsByDeveloper(modelsData, developerId) {
+  const developer = modelsData.developers[developerId];
+  if (!developer) return [];
+  return Object.entries(developer.models).map(([id, model]) => ({
+    id,
+    ...model,
+  }));
+}
+
+export function getModel(modelsData, developerId, modelId) {
+  return modelsData.developers[developerId]?.models[modelId] || null;
+}
+
+export function flattenAllModels(modelsData) {
+  const result = [];
+  for (const [devId, dev] of Object.entries(modelsData.developers)) {
+    for (const [modelId, model] of Object.entries(dev.models)) {
+      result.push({
+        developerId: devId,
+        developerName: dev.name,
+        modelId,
+        ...model,
+      });
+    }
+  }
+  return result;
+}
+
+/**
+ * Core calculation functions
+ */
+
 export function calculateTokensPerDay(tokPerSec, hours) {
   return tokPerSec * 3600 * hours;
 }
@@ -61,9 +105,12 @@ export function formatHours(hours) {
 /**
  * Main calculation that combines everything.
  * Returns all derived data for the UI.
+ *
+ * Now accepts developerId + modelId (new structure) or modelId alone (for compatibility).
  */
 export function computeComparison({
-  modelSize,
+  developerId,
+  modelId,
   dailyHours,
   macRAM,
   selectedHardware,
@@ -72,7 +119,25 @@ export function computeComparison({
   cloudProviders,
   apiProviders
 }) {
-  const model = models.models[modelSize];
+  // Get model from new developer-based structure
+  const model = getModel(models, developerId, modelId);
+  if (!model) {
+    return {
+      localName: '',
+      localPrice: 0,
+      localTPS: 0,
+      canRun: false,
+      tokensPerDay: 0,
+      bandwidth: 0,
+      memory: 0,
+      minRAM: 0,
+      modelName: '',
+      modelParams: '',
+      providers: [],
+      apiProviders: [],
+    };
+  }
+
   const macConfig = hardware.mac.configs[macRAM];
   const cadToUsd = hardware.cadToUsd;
 
@@ -124,8 +189,8 @@ export function computeComparison({
     };
   }).sort((a, b) => a.dailyCost - b.dailyCost);
 
-  // API provider calculations
-  const apiList = apiProviders.providers[modelSize] || [];
+  // API provider calculations - now keyed by modelId
+  const apiList = apiProviders.providers[modelId] || [];
   const apiResults = apiList.map(api => {
     const blendedRatePer1M = calculateBlendedRate(api.inputPer1M, api.outputPer1M);
     const dailyCost = calculateApiDailyCost(tokensPerDay, blendedRatePer1M);
@@ -153,6 +218,11 @@ export function computeComparison({
     bandwidth: localBandwidth,
     memory: localMemory,
     minRAM: model.minRAM,
+    modelName: model.name,
+    modelParams: model.params,
+    activeParams: model.activeParams,
+    quantization: model.quantization,
+    notes: model.notes,
     providers: cloudResults,
     apiProviders: apiResults,
   };
