@@ -103,6 +103,58 @@ export function formatHours(hours) {
 }
 
 /**
+ * Map model params string to proprietary tier.
+ */
+export function getProprietaryTier(paramsString) {
+  if (!paramsString) return 'medium';
+  const num = parseInt(paramsString.replace(/[^\d]/g, ''), 10);
+  if (num <= 10) return 'small';
+  if (num <= 80) return 'medium';
+  if (num <= 200) return 'large';
+  return 'frontier';
+}
+
+/**
+ * Compute proprietary API alternatives for a given model.
+ */
+export function computeProprietaryAlternatives({
+  tier,
+  tokensPerDay,
+  localTPS,
+  localPrice,
+  apiProviders
+}) {
+  const tierData = apiProviders.proprietaryAlternatives?.[tier];
+  if (!tierData?.models) return [];
+
+  return tierData.models.map(model => {
+    const blendedRatePer1M = calculateBlendedRate(model.inputPer1M, model.outputPer1M);
+    const dailyCost = calculateApiDailyCost(tokensPerDay, blendedRatePer1M);
+    const monthlyCost = dailyCost * 30;
+    const payoffDays = calculatePayoffDays(localPrice, dailyCost);
+    const tokPerSec = model.tokPerSec || 100;
+    const hoursNeeded = calculateCloudHoursNeeded(tokensPerDay, tokPerSec);
+    const speedRatio = localTPS > 0 ? tokPerSec / localTPS : Infinity;
+
+    return {
+      name: model.name,
+      provider: model.provider,
+      inputPer1M: model.inputPer1M,
+      outputPer1M: model.outputPer1M,
+      blendedPer1M: blendedRatePer1M,
+      tokPerSec,
+      contextWindow: model.contextWindow,
+      hoursNeeded,
+      speedRatio,
+      dailyCost,
+      monthlyCost,
+      payoffDays: Math.ceil(payoffDays),
+      payoffMonths: payoffDays / 30,
+    };
+  }).sort((a, b) => a.dailyCost - b.dailyCost);
+}
+
+/**
  * Main calculation that combines everything.
  * Returns all derived data for the UI.
  *
@@ -209,6 +261,16 @@ export function computeComparison({
     };
   }).sort((a, b) => a.dailyCost - b.dailyCost);
 
+  // Proprietary alternatives based on model size
+  const proprietaryTier = getProprietaryTier(model.params);
+  const proprietaryResults = computeProprietaryAlternatives({
+    tier: proprietaryTier,
+    tokensPerDay,
+    localTPS,
+    localPrice,
+    apiProviders,
+  });
+
   return {
     localName,
     localPrice,
@@ -225,5 +287,7 @@ export function computeComparison({
     notes: model.notes,
     providers: cloudResults,
     apiProviders: apiResults,
+    proprietaryAlternatives: proprietaryResults,
+    proprietaryTier,
   };
 }

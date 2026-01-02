@@ -439,6 +439,85 @@ export default function PayoffCalculator() {
               </div>
             )}
 
+            {/* Proprietary API Alternatives */}
+            {calculations.proprietaryAlternatives?.length > 0 && (
+              <div className="mt-8">
+                <h2 className="text-lg font-semibold text-white mb-2">Proprietary API Alternatives</h2>
+                <p className="text-sm text-gray-500 mb-4">
+                  Commercial models with comparable capability ({calculations.proprietaryTier} tier) — {formatTokens(calculations.tokensPerDay)} tokens/day
+                </p>
+
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="text-gray-400 border-b border-gray-800">
+                        <th className="text-left py-3 px-3">Provider</th>
+                        <th className="text-left py-3 px-2">Model</th>
+                        <th className="text-center py-3 px-2">tok/s</th>
+                        <th className="text-center py-3 px-2">vs Local</th>
+                        <th className="text-right py-3 px-2 bg-purple-900/20">$/1M tok</th>
+                        <th className="text-right py-3 px-2 bg-red-900/20">$/day</th>
+                        <th className="text-right py-3 px-2">$/mo</th>
+                        <th className="text-right py-3 px-3 bg-green-900/20">Payoff</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {calculations.proprietaryAlternatives.map((api, idx) => {
+                        const payoffColor =
+                          api.payoffMonths < 3 ? 'text-green-400' :
+                          api.payoffMonths < 6 ? 'text-emerald-400' :
+                          api.payoffMonths < 12 ? 'text-yellow-400' :
+                          api.payoffMonths < 24 ? 'text-orange-400' : 'text-red-400';
+
+                        return (
+                          <tr key={`${api.provider}-${api.name}`} className={`border-b border-gray-800/50 ${idx === 0 ? 'bg-indigo-900/10' : ''}`}>
+                            <td className="py-3 px-3">
+                              <a
+                                href={apiProviders.sources?.[api.provider]}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="font-medium text-white hover:text-blue-400 transition-colors"
+                              >
+                                {api.provider}
+                              </a>
+                            </td>
+                            <td className="py-3 px-2">
+                              <div className="text-gray-200">{api.name}</div>
+                            </td>
+                            <td className="text-center py-3 px-2 text-gray-300">
+                              {api.tokPerSec}
+                            </td>
+                            <td className="text-center py-3 px-2 text-gray-400">
+                              {api.speedRatio.toFixed(1)}×
+                            </td>
+                            <td className="text-right py-3 px-2 bg-purple-900/10 font-mono text-purple-400">
+                              ${api.blendedPer1M.toFixed(2)}
+                            </td>
+                            <td className="text-right py-3 px-2 bg-red-900/10 font-mono text-red-400">
+                              ${api.dailyCost.toFixed(2)}
+                            </td>
+                            <td className="text-right py-3 px-2 font-mono text-red-400">
+                              ${api.monthlyCost.toFixed(0)}
+                            </td>
+                            <td className={`text-right py-3 px-3 bg-green-900/10 font-bold ${payoffColor}`}>
+                              {formatPayoff(api.payoffMonths)}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+
+                <div className="mt-4 bg-indigo-900/20 border border-indigo-800/30 rounded-lg p-4">
+                  <div className="font-medium text-indigo-300 mb-1">Why consider proprietary alternatives?</div>
+                  <div className="text-indigo-200/70 text-sm">
+                    Different models with comparable quality. Trade-offs include: API lock-in, no local control, but often faster inference and no hardware investment.
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Summary */}
             <div className="mt-6 bg-blue-900/20 border border-blue-800/50 rounded-xl p-5">
               <h3 className="font-semibold text-blue-300 mb-3">Bottom Line</h3>

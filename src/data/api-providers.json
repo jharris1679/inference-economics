@@ -1,6 +1,17 @@
 {
   "updatedAt": "2026-01-01",
-  "note": "Prices per 1M tokens. Blended rate assumes 50% input, 50% output. Keyed by model ID.",
+  "note": "Prices per 1M tokens. Blended rate assumes 50% input, 50% output.",
+  "sources": {
+    "OpenAI": "https://openai.com/api/pricing/",
+    "Anthropic": "https://www.anthropic.com/pricing",
+    "Google": "https://ai.google.dev/gemini-api/docs/pricing",
+    "Mistral": "https://mistral.ai/pricing",
+    "Groq": "https://groq.com/pricing",
+    "Together": "https://www.together.ai/pricing",
+    "Fireworks": "https://fireworks.ai/pricing",
+    "DeepInfra": "https://deepinfra.com/pricing",
+    "Cerebras": "https://www.cerebras.ai/pricing"
+  },
   "providers": {
     "llama-3.1-8b": [
       { "name": "Groq", "inputPer1M": 0.05, "outputPer1M": 0.08 },
@@ -63,5 +74,43 @@
     "sqlcoder-70b": [
       { "name": "Together", "inputPer1M": 0.90, "outputPer1M": 0.90 }
     ]
+  },
+  "proprietaryAlternatives": {
+    "small": {
+      "description": "Models comparable to 7-8B parameter OSS models",
+      "models": [
+        { "name": "GPT-5 Nano", "provider": "OpenAI", "inputPer1M": 0.05, "outputPer1M": 0.40, "tokPerSec": 150, "contextWindow": 128000 },
+        { "name": "Gemini 2.0 Flash", "provider": "Google", "inputPer1M": 0.10, "outputPer1M": 0.40, "tokPerSec": 300, "contextWindow": 1000000 },
+        { "name": "Claude 3 Haiku", "provider": "Anthropic", "inputPer1M": 0.25, "outputPer1M": 1.25, "tokPerSec": 160, "contextWindow": 200000 }
+      ]
+    },
+    "medium": {
+      "description": "Models comparable to 30-70B parameter OSS models",
+      "models": [
+        { "name": "GPT-4o-mini", "provider": "OpenAI", "inputPer1M": 0.15, "outputPer1M": 0.60, "tokPerSec": 103, "contextWindow": 128000 },
+        { "name": "Gemini 2.5 Flash", "provider": "Google", "inputPer1M": 0.15, "outputPer1M": 0.60, "tokPerSec": 274, "contextWindow": 1000000 },
+        { "name": "Claude Haiku 4.5", "provider": "Anthropic", "inputPer1M": 1.00, "outputPer1M": 5.00, "tokPerSec": 150, "contextWindow": 200000 },
+        { "name": "Mistral Small", "provider": "Mistral", "inputPer1M": 0.10, "outputPer1M": 0.30, "tokPerSec": 120, "contextWindow": 32000 }
+      ]
+    },
+    "large": {
+      "description": "Models comparable to 70B+ parameter OSS models",
+      "models": [
+        { "name": "GPT-5", "provider": "OpenAI", "inputPer1M": 1.25, "outputPer1M": 10.00, "tokPerSec": 100, "contextWindow": 256000 },
+        { "name": "Gemini 3 Flash", "provider": "Google", "inputPer1M": 0.50, "outputPer1M": 3.00, "tokPerSec": 350, "contextWindow": 1000000 },
+        { "name": "Claude Sonnet 4.5", "provider": "Anthropic", "inputPer1M": 3.00, "outputPer1M": 15.00, "tokPerSec": 90, "contextWindow": 200000 },
+        { "name": "GPT-4o", "provider": "OpenAI", "inputPer1M": 2.50, "outputPer1M": 10.00, "tokPerSec": 80, "contextWindow": 128000 },
+        { "name": "Mistral Large", "provider": "Mistral", "inputPer1M": 2.00, "outputPer1M": 6.00, "tokPerSec": 80, "contextWindow": 128000 }
+      ]
+    },
+    "frontier": {
+      "description": "Flagship models comparable to 400B+ or reasoning models",
+      "models": [
+        { "name": "Claude Opus 4.5", "provider": "Anthropic", "inputPer1M": 5.00, "outputPer1M": 25.00, "tokPerSec": 50, "contextWindow": 200000 },
+        { "name": "o1", "provider": "OpenAI", "inputPer1M": 15.00, "outputPer1M": 60.00, "tokPerSec": 30, "contextWindow": 200000 },
+        { "name": "o3-mini", "provider": "OpenAI", "inputPer1M": 1.10, "outputPer1M": 4.40, "tokPerSec": 60, "contextWindow": 200000 },
+        { "name": "Gemini 2.5 Pro", "provider": "Google", "inputPer1M": 1.25, "outputPer1M": 10.00, "tokPerSec": 150, "contextWindow": 1000000 }
+      ]
+    }
   }
 }
