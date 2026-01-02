@@ -1,0 +1,33 @@
+{
+  "updatedAt": "2025-12-31",
+  "note": "Prices per 1M tokens. Blended rate assumes 50% input, 50% output.",
+  "providers": {
+    "7B": [
+      { "name": "Groq", "inputPer1M": 0.05, "outputPer1M": 0.08 },
+      { "name": "Together", "inputPer1M": 0.18, "outputPer1M": 0.18 },
+      { "name": "Fireworks", "inputPer1M": 0.10, "outputPer1M": 0.10 },
+      { "name": "DeepInfra", "inputPer1M": 0.05, "outputPer1M": 0.05 }
+    ],
+    "13B": [
+      { "name": "Groq (Qwen3 32B)", "inputPer1M": 0.29, "outputPer1M": 0.59 },
+      { "name": "Together", "inputPer1M": 0.20, "outputPer1M": 0.20 },
+      { "name": "Fireworks", "inputPer1M": 0.20, "outputPer1M": 0.20 }
+    ],
+    "34B": [
+      { "name": "Groq (Qwen3 32B)", "inputPer1M": 0.29, "outputPer1M": 0.59 },
+      { "name": "Together", "inputPer1M": 0.80, "outputPer1M": 0.80 },
+      { "name": "Fireworks", "inputPer1M": 0.90, "outputPer1M": 0.90 }
+    ],
+    "70B": [
+      { "name": "Groq", "inputPer1M": 0.59, "outputPer1M": 0.79 },
+      { "name": "Together", "inputPer1M": 0.88, "outputPer1M": 0.88 },
+      { "name": "Fireworks", "inputPer1M": 0.90, "outputPer1M": 0.90 },
+      { "name": "DeepInfra", "inputPer1M": 0.35, "outputPer1M": 0.40 }
+    ],
+    "405B": [
+      { "name": "Together", "inputPer1M": 3.50, "outputPer1M": 3.50 },
+      { "name": "Fireworks", "inputPer1M": 0.90, "outputPer1M": 0.90 },
+      { "name": "DeepInfra", "inputPer1M": 1.79, "outputPer1M": 1.79 }
+    ]
+  }
+}

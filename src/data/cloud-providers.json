@@ -1,0 +1,11 @@
+{
+  "updatedAt": "2025-12-31",
+  "gpuType": "H100",
+  "providers": [
+    { "id": "runpod", "name": "RunPod", "ratePerGPUHour": 1.99 },
+    { "id": "denvr", "name": "Denvr", "ratePerGPUHour": 2.10 },
+    { "id": "lambda", "name": "Lambda", "ratePerGPUHour": 2.99 },
+    { "id": "gcp", "name": "GCP", "ratePerGPUHour": 3.00 },
+    { "id": "aws", "name": "AWS", "ratePerGPUHour": 3.90 }
+  ]
+}

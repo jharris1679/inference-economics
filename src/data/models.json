@@ -1,0 +1,46 @@
+{
+  "updatedAt": "2025-12-31",
+  "source": "llama.cpp discussions, vLLM benchmarks (Q4_K_M quantization, batch=1)",
+  "models": {
+    "7B": {
+      "minRAM": 8,
+      "localTokPerSec": 95,
+      "cloudTokPerSec": 120,
+      "cloudGPUs": 1,
+      "dgxSparkTokPerSec": 45,
+      "notes": "~4GB weights + KV cache"
+    },
+    "13B": {
+      "minRAM": 16,
+      "localTokPerSec": 55,
+      "cloudTokPerSec": 75,
+      "cloudGPUs": 1,
+      "dgxSparkTokPerSec": 30,
+      "notes": "~8GB weights + KV cache"
+    },
+    "34B": {
+      "minRAM": 24,
+      "localTokPerSec": 28,
+      "cloudTokPerSec": 40,
+      "cloudGPUs": 1,
+      "dgxSparkTokPerSec": 15,
+      "notes": "~20GB weights + KV cache"
+    },
+    "70B": {
+      "minRAM": 48,
+      "localTokPerSec": 12,
+      "cloudTokPerSec": 35,
+      "cloudGPUs": 2,
+      "dgxSparkTokPerSec": 6,
+      "notes": "~40GB weights + KV cache, 2× H100 TP=2"
+    },
+    "405B": {
+      "minRAM": 256,
+      "localTokPerSec": 2.5,
+      "cloudTokPerSec": 15,
+      "cloudGPUs": 8,
+      "dgxSparkTokPerSec": 0,
+      "notes": "~200GB weights (FP8), 8× H100"
+    }
+  }
+}

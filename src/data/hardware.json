@@ -1,0 +1,23 @@
+{
+  "updatedAt": "2025-12-31",
+  "cadToUsd": 0.72,
+  "mac": {
+    "name": "Mac Studio M3 Ultra",
+    "bandwidth": 800,
+    "source": "Apple.ca pricing",
+    "configs": {
+      "96": { "priceCAD": 5499 },
+      "128": { "priceCAD": 6999 },
+      "192": { "priceCAD": 8999 },
+      "256": { "priceCAD": 10499 },
+      "512": { "priceCAD": 13749 }
+    }
+  },
+  "dgxSpark": {
+    "name": "NVIDIA DGX Spark",
+    "priceUSD": 3999,
+    "memory": 128,
+    "bandwidth": 273,
+    "source": "NVIDIA pricing, GB10 Grace Blackwell"
+  }
+}

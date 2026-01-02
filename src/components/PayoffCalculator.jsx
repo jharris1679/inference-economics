@@ -1,98 +1,22 @@
 import React, { useState, useMemo } from 'react';
 
-// Memory required per model for inference (Q4 quantization + KV cache headroom)
-// These are practical minimums for comfortable inference
-const modelRequirements = {
-  '7B': { minRAM: 8, tokPerSec: 95 },      // ~4GB weights + KV cache
-  '13B': { minRAM: 16, tokPerSec: 55 },    // ~8GB weights + KV cache  
-  '34B': { minRAM: 24, tokPerSec: 28 },    // ~20GB weights + KV cache
-  '70B': { minRAM: 48, tokPerSec: 12 },    // ~40GB weights + KV cache, confirmed 12-15 tok/s
-  '405B': { minRAM: 256, tokPerSec: 2.5 }, // ~200GB weights (FP8) + KV cache
-};
+// Data
+import models from '../data/models.json';
+import hardware from '../data/hardware.json';
+import cloudProviders from '../data/cloud-providers.json';
+import apiProviders from '../data/api-providers.json';
 
-// Mac Studio configurations
-// Sources: Apple.ca pricing, 800 GB/s unified memory bandwidth
-const macConfigs = {
-  96: { price: 5499, currency: 'CAD', bandwidth: 800 },
-  128: { price: 6999, currency: 'CAD', bandwidth: 800 },
-  192: { price: 8999, currency: 'CAD', bandwidth: 800 },
-  256: { price: 10499, currency: 'CAD', bandwidth: 800 },
-  512: { price: 13749, currency: 'CAD', bandwidth: 800 },
-};
+// Calculations
+import {
+  computeComparison,
+  formatPayoff,
+  formatTokens,
+  formatHours,
+} from '../lib/calculations.js';
 
-// DGX Spark specs (GB10 Grace Blackwell, 128GB, 273 GB/s)
-// Lower bandwidth = proportionally lower tok/s (273/800 ≈ 0.34× Mac bandwidth)
-const dgxSparkConfig = {
-  name: 'NVIDIA DGX Spark',
-  price: 3999,
-  currency: 'USD',
-  memory: 128,
-  bandwidth: 273,
-};
-
-// DGX Spark throughput - scaled by bandwidth ratio vs Mac (273/800 ≈ 0.34)
-// But Blackwell tensor cores help, so roughly 0.4-0.5× Mac throughput
-const dgxSparkThroughput = {
-  '7B': 45,
-  '13B': 30,
-  '34B': 15,
-  '70B': 6,     // ~6-8 tok/s confirmed in benchmarks
-  '405B': 0,    // Won't fit in 128GB
-};
-
-// Cloud GPU requirements and throughput per model
-// GPU count determined by VRAM needed, same for all providers
-// Sources: vLLM benchmarks, NVIDIA TensorRT-LLM, SemiAnalysis
-const cloudConfigs = {
-  '7B': { gpus: 1, tokPerSec: 120, source: '1× H100, vLLM batch=1' },
-  '13B': { gpus: 1, tokPerSec: 75, source: '1× H100, vLLM batch=1' },
-  '34B': { gpus: 1, tokPerSec: 40, source: '1× H100, vLLM batch=1' },
-  '70B': { gpus: 2, tokPerSec: 35, source: '2× H100 TP=2, vLLM batch=1' },
-  '405B': { gpus: 8, tokPerSec: 15, source: '8× H100 FP8, vLLM batch=1' },
-};
-
-// Cloud provider pricing per GPU-hour
-const cloudPricing = {
-  runpod: { name: 'RunPod', rate: 1.99 },
-  denvr: { name: 'Denvr', rate: 2.10 },
-  lambda: { name: 'Lambda', rate: 2.99 },
-  gcp: { name: 'GCP', rate: 3.00 },
-  aws: { name: 'AWS', rate: 3.90 },
-};
-
-// API provider pricing per million tokens (output tokens, Dec 2025)
-// Assumes 1:1 input:output ratio for simplicity, using blended rate
-const apiPricing = {
-  '7B': [
-    { name: 'Groq', inputPer1M: 0.05, outputPer1M: 0.08 },
-    { name: 'Together', inputPer1M: 0.18, outputPer1M: 0.18 },
-    { name: 'Fireworks', inputPer1M: 0.10, outputPer1M: 0.10 },
-    { name: 'DeepInfra', inputPer1M: 0.05, outputPer1M: 0.05 },
-  ],
-  '13B': [
-    { name: 'Groq (Qwen3 32B)', inputPer1M: 0.29, outputPer1M: 0.59 },
-    { name: 'Together', inputPer1M: 0.20, outputPer1M: 0.20 },
-    { name: 'Fireworks', inputPer1M: 0.20, outputPer1M: 0.20 },
-  ],
-  '34B': [
-    { name: 'Groq (Qwen3 32B)', inputPer1M: 0.29, outputPer1M: 0.59 },
-    { name: 'Together', inputPer1M: 0.80, outputPer1M: 0.80 },
-    { name: 'Fireworks', inputPer1M: 0.90, outputPer1M: 0.90 },
-  ],
-  '70B': [
-    { name: 'Groq', inputPer1M: 0.59, outputPer1M: 0.79 },
-    { name: 'Together', inputPer1M: 0.88, outputPer1M: 0.88 },
-    { name: 'Fireworks', inputPer1M: 0.90, outputPer1M: 0.90 },
-    { name: 'DeepInfra', inputPer1M: 0.35, outputPer1M: 0.40 },
-  ],
-  '405B': [
-    { name: 'Together', inputPer1M: 3.50, outputPer1M: 3.50 },
-    { name: 'Fireworks', inputPer1M: 0.90, outputPer1M: 0.90 }, // Only has 16B+ bucket
-    { name: 'DeepInfra', inputPer1M: 1.79, outputPer1M: 1.79 },
-  ],
-};
-
-const CAD_TO_USD = 0.72;
+const modelSizes = Object.keys(models.models);
+const ramOptions = Object.keys(hardware.mac.configs).map(Number);
+const cadToUsd = hardware.cadToUsd;
 
 export default function PayoffCalculator() {
   const [modelSize, setModelSize] = useState('70B');
@@ -100,133 +24,16 @@ export default function PayoffCalculator() {
   const [macRAM, setMacRAM] = useState(512);
   const [selectedHardware, setSelectedHardware] = useState('mac');
 
-  const modelSizes = ['7B', '13B', '34B', '70B', '405B'];
-  const ramOptions = [96, 128, 192, 256, 512];
-
-  const calculations = useMemo(() => {
-    // Model requirements
-    const modelReq = modelRequirements[modelSize];
-    
-    // Mac hardware specs
-    const macConfig = macConfigs[macRAM];
-    const canMacRun = macRAM >= modelReq.minRAM;
-    const macTPS = canMacRun ? modelReq.tokPerSec : 0;
-    const macPriceUSD = macConfig.price * CAD_TO_USD;
-    
-    // DGX Spark specs
-    const canSparkRun = dgxSparkConfig.memory >= modelReq.minRAM && dgxSparkThroughput[modelSize] > 0;
-    const sparkTPS = canSparkRun ? dgxSparkThroughput[modelSize] : 0;
-    
-    // Local hardware throughput based on selection
-    const localTPS = selectedHardware === 'mac' ? macTPS : sparkTPS;
-    const localPrice = selectedHardware === 'mac' ? macPriceUSD : dgxSparkConfig.price;
-    const localName = selectedHardware === 'mac' 
-      ? `Mac Studio M3 Ultra (${macRAM}GB)`
-      : dgxSparkConfig.name;
-    const localMemory = selectedHardware === 'mac' ? macRAM : dgxSparkConfig.memory;
-    const localBandwidth = selectedHardware === 'mac' ? macConfig.bandwidth : dgxSparkConfig.bandwidth;
-    const canRun = selectedHardware === 'mac' ? canMacRun : canSparkRun;
-    
-    // Tokens generated per day on local hardware
-    const tokensPerDay = localTPS * 3600 * dailyHours;
-    
-    // Cloud configuration for this model (same GPU count for all providers)
-    const cloudSetup = cloudConfigs[modelSize];
-    
-    // Calculate for each cloud provider
-    const results = [];
-    
-    for (const [providerKey, provider] of Object.entries(cloudPricing)) {
-      const hourlyRate = provider.rate * cloudSetup.gpus;
-      
-      // Hours needed to generate same tokens as local
-      const cloudHoursNeeded = tokensPerDay > 0 && cloudSetup.tokPerSec > 0
-        ? tokensPerDay / (cloudSetup.tokPerSec * 3600)
-        : Infinity;
-      
-      const dailyCost = cloudHoursNeeded * hourlyRate;
-      const monthlyCost = dailyCost * 30;
-      
-      // Payoff: hardware cost / daily cloud cost
-      const payoffDays = dailyCost > 0 ? localPrice / dailyCost : Infinity;
-      
-      results.push({
-        provider: provider.name,
-        gpus: cloudSetup.gpus,
-        cloudTPS: cloudSetup.tokPerSec,
-        source: cloudSetup.source,
-        hourlyRatePerGPU: provider.rate,
-        hourlyRateTotal: hourlyRate,
-        cloudHoursNeeded,
-        dailyCost,
-        monthlyCost,
-        payoffDays: Math.ceil(payoffDays),
-        payoffMonths: payoffDays / 30,
-        speedRatio: localTPS > 0 ? cloudSetup.tokPerSec / localTPS : Infinity,
-      });
-    }
-    
-    // Sort by daily cost
-    results.sort((a, b) => a.dailyCost - b.dailyCost);
-    
-    // Calculate API costs (assuming 50% input, 50% output tokens)
-    const apiProviders = apiPricing[modelSize] || [];
-    const apiResults = apiProviders.map(api => {
-      // Blended rate: 50% input + 50% output
-      const blendedRatePer1M = (api.inputPer1M + api.outputPer1M) / 2;
-      const tokensInMillions = tokensPerDay / 1_000_000;
-      const dailyCost = tokensInMillions * blendedRatePer1M;
-      const monthlyCost = dailyCost * 30;
-      const payoffDays = dailyCost > 0 ? localPrice / dailyCost : Infinity;
-      
-      return {
-        name: api.name,
-        inputPer1M: api.inputPer1M,
-        outputPer1M: api.outputPer1M,
-        blendedPer1M: blendedRatePer1M,
-        dailyCost,
-        monthlyCost,
-        payoffDays: Math.ceil(payoffDays),
-        payoffMonths: payoffDays / 30,
-      };
-    });
-    
-    // Sort API results by daily cost
-    apiResults.sort((a, b) => a.dailyCost - b.dailyCost);
-    
-    return {
-      localName,
-      localPrice,
-      localTPS,
-      canRun,
-      tokensPerDay,
-      bandwidth: localBandwidth,
-      memory: localMemory,
-      minRAM: modelReq.minRAM,
-      providers: results,
-      apiProviders: apiResults,
-    };
-  }, [modelSize, dailyHours, macRAM, selectedHardware]);
-
-  const formatPayoff = (months) => {
-    if (!isFinite(months) || isNaN(months)) return 'N/A';
-    if (months >= 12) return `${(months / 12).toFixed(1)}y`;
-    if (months >= 1) return `${months.toFixed(1)}mo`;
-    return `${Math.ceil(months * 30)}d`;
-  };
-
-  const formatTokens = (num) => {
-    if (num >= 1_000_000_000) return `${(num / 1_000_000_000).toFixed(2)}B`;
-    if (num >= 1_000_000) return `${(num / 1_000_000).toFixed(1)}M`;
-    if (num >= 1_000) return `${(num / 1_000).toFixed(1)}K`;
-    return num.toFixed(0);
-  };
-
-  const formatHours = (hours) => {
-    if (!isFinite(hours)) return '—';
-    if (hours < 1) return `${(hours * 60).toFixed(0)}m`;
-    return `${hours.toFixed(1)}h`;
-  };
+  const calculations = useMemo(() => computeComparison({
+    modelSize,
+    dailyHours,
+    macRAM,
+    selectedHardware,
+    models,
+    hardware,
+    cloudProviders,
+    apiProviders,
+  }), [modelSize, dailyHours, macRAM, selectedHardware]);
 
   const cheapest = calculations.providers[0];
 
@@ -237,7 +44,7 @@ export default function PayoffCalculator() {
         <p className="text-gray-400 mb-6">
           Using real benchmark data — cloud hours adjusted to match your local token output
         </p>
-        
+
         {/* Controls */}
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-8">
           {/* Hardware Selection */}
@@ -252,7 +59,7 @@ export default function PayoffCalculator() {
                     : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
                 }`}
               >
-                <div className="font-medium">Mac Studio M3 Ultra</div>
+                <div className="font-medium">{hardware.mac.name}</div>
                 <div className="text-sm opacity-75">Up to 512GB unified</div>
               </button>
               <button
@@ -263,8 +70,8 @@ export default function PayoffCalculator() {
                     : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
                 }`}
               >
-                <div className="font-medium">DGX Spark</div>
-                <div className="text-sm opacity-75">$3,999 • 128GB</div>
+                <div className="font-medium">{hardware.dgxSpark.name}</div>
+                <div className="text-sm opacity-75">${hardware.dgxSpark.priceUSD.toLocaleString()} • {hardware.dgxSpark.memory}GB</div>
               </button>
             </div>
           </div>
@@ -275,7 +82,7 @@ export default function PayoffCalculator() {
               {selectedHardware === 'mac' ? (
                 <>Mac RAM: <span className="text-white font-bold">{macRAM}GB</span></>
               ) : (
-                <>DGX Spark: <span className="text-white font-bold">128GB</span> (fixed)</>
+                <>DGX Spark: <span className="text-white font-bold">{hardware.dgxSpark.memory}GB</span> (fixed)</>
               )}
             </label>
             {selectedHardware === 'mac' ? (
@@ -283,7 +90,7 @@ export default function PayoffCalculator() {
                 <input
                   type="range"
                   min="0"
-                  max="4"
+                  max={ramOptions.length - 1}
                   value={ramOptions.indexOf(macRAM)}
                   onChange={(e) => setMacRAM(ramOptions[Number(e.target.value)])}
                   className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
@@ -292,27 +99,27 @@ export default function PayoffCalculator() {
                   {ramOptions.map(r => <span key={r}>{r}</span>)}
                 </div>
                 <div className="mt-2 text-sm text-green-400">
-                  ${(macConfigs[macRAM].price * CAD_TO_USD).toLocaleString(undefined, {maximumFractionDigits: 0})} USD
+                  ${(hardware.mac.configs[macRAM].priceCAD * cadToUsd).toLocaleString(undefined, {maximumFractionDigits: 0})} USD
                 </div>
               </>
             ) : (
               <div className="text-sm text-gray-500 mt-4">
-                Fixed 128GB unified memory<br/>
-                273 GB/s bandwidth
+                Fixed {hardware.dgxSpark.memory}GB unified memory<br/>
+                {hardware.dgxSpark.bandwidth} GB/s bandwidth
               </div>
             )}
           </div>
-          
+
           {/* Model Size */}
           <div className="bg-gray-900 rounded-xl p-4 border border-gray-800">
             <label className="block text-sm font-medium text-gray-400 mb-3">Model</label>
             <div className="grid grid-cols-3 gap-1">
               {modelSizes.map((size) => {
-                const req = modelRequirements[size];
-                const currentMemory = selectedHardware === 'mac' ? macRAM : dgxSparkConfig.memory;
-                const canRun = currentMemory >= req.minRAM && 
-                  (selectedHardware === 'mac' || dgxSparkThroughput[size] > 0);
-                const tps = selectedHardware === 'mac' ? req.tokPerSec : dgxSparkThroughput[size];
+                const model = models.models[size];
+                const currentMemory = selectedHardware === 'mac' ? macRAM : hardware.dgxSpark.memory;
+                const canRun = currentMemory >= model.minRAM &&
+                  (selectedHardware === 'mac' || model.dgxSparkTokPerSec > 0);
+                const tps = selectedHardware === 'mac' ? model.localTokPerSec : model.dgxSparkTokPerSec;
                 return (
                   <button
                     key={size}
@@ -328,14 +135,14 @@ export default function PayoffCalculator() {
                   >
                     {size}
                     <span className="block text-xs opacity-75">
-                      {canRun ? `${tps}t/s` : `>${req.minRAM}GB`}
+                      {canRun ? `${tps}t/s` : `>${model.minRAM}GB`}
                     </span>
                   </button>
                 );
               })}
             </div>
           </div>
-          
+
           {/* Daily Hours */}
           <div className="bg-gray-900 rounded-xl p-4 border border-gray-800">
             <label className="block text-sm font-medium text-gray-400 mb-3">
@@ -377,7 +184,7 @@ export default function PayoffCalculator() {
 
         {/* Local Hardware Card */}
         <div className={`rounded-xl p-5 border mb-6 ${
-          calculations.canRun 
+          calculations.canRun
             ? 'bg-gradient-to-r from-green-900/30 to-emerald-900/30 border-green-800/50'
             : 'bg-red-900/20 border-red-800/50'
         }`}>
@@ -404,7 +211,7 @@ export default function PayoffCalculator() {
                 </>
               ) : (
                 <div className="text-red-400">
-                  Cannot run {modelSize} — needs {modelRequirements[modelSize].minRAM}GB+ RAM
+                  Cannot run {modelSize} — needs {calculations.minRAM}GB+ RAM
                 </div>
               )}
             </div>
@@ -436,12 +243,12 @@ export default function PayoffCalculator() {
                 </thead>
                 <tbody>
                   {calculations.providers.map((p, idx) => {
-                    const payoffColor = 
+                    const payoffColor =
                       p.payoffMonths < 3 ? 'text-green-400' :
                       p.payoffMonths < 6 ? 'text-emerald-400' :
                       p.payoffMonths < 12 ? 'text-yellow-400' :
                       p.payoffMonths < 24 ? 'text-orange-400' : 'text-red-400';
-                    
+
                     return (
                       <tr key={`${p.provider}-${p.gpus}`} className={`border-b border-gray-800/50 ${idx === 0 ? 'bg-blue-900/10' : ''}`}>
                         <td className="py-3 px-3">
@@ -486,21 +293,21 @@ export default function PayoffCalculator() {
               <div className="bg-yellow-900/20 border border-yellow-800/30 rounded-lg p-4">
                 <div className="font-medium text-yellow-300 mb-1">Hrs needed</div>
                 <div className="text-yellow-200/70">
-                  Cloud is {cheapest?.speedRatio.toFixed(1)}× faster, so you only need {formatHours(cheapest?.cloudHoursNeeded)} 
+                  Cloud is {cheapest?.speedRatio.toFixed(1)}× faster, so you only need {formatHours(cheapest?.cloudHoursNeeded)}
                   to match {dailyHours}h of local output.
                 </div>
               </div>
               <div className="bg-red-900/20 border border-red-800/30 rounded-lg p-4">
                 <div className="font-medium text-red-300 mb-1">$/day</div>
                 <div className="text-red-200/70">
-                  {formatHours(cheapest?.cloudHoursNeeded)} × ${cheapest?.hourlyRateTotal.toFixed(2)}/hr 
+                  {formatHours(cheapest?.cloudHoursNeeded)} × ${cheapest?.hourlyRateTotal.toFixed(2)}/hr
                   = ${cheapest?.dailyCost.toFixed(2)}/day for equivalent work.
                 </div>
               </div>
               <div className="bg-green-900/20 border border-green-800/30 rounded-lg p-4">
                 <div className="font-medium text-green-300 mb-1">Payoff</div>
                 <div className="text-green-200/70">
-                  ${calculations.localPrice.toLocaleString(undefined, {maximumFractionDigits: 0})} ÷ 
+                  ${calculations.localPrice.toLocaleString(undefined, {maximumFractionDigits: 0})} ÷
                   ${cheapest?.dailyCost.toFixed(2)}/day = {cheapest?.payoffDays} days to break even.
                 </div>
               </div>
@@ -529,12 +336,12 @@ export default function PayoffCalculator() {
                     </thead>
                     <tbody>
                       {calculations.apiProviders.map((api, idx) => {
-                        const payoffColor = 
+                        const payoffColor =
                           api.payoffMonths < 3 ? 'text-green-400' :
                           api.payoffMonths < 6 ? 'text-emerald-400' :
                           api.payoffMonths < 12 ? 'text-yellow-400' :
                           api.payoffMonths < 24 ? 'text-orange-400' : 'text-red-400';
-                        
+
                         return (
                           <tr key={api.name} className={`border-b border-gray-800/50 ${idx === 0 ? 'bg-purple-900/10' : ''}`}>
                             <td className="py-3 px-3">
@@ -570,9 +377,9 @@ export default function PayoffCalculator() {
                   <div className="text-purple-200/70 text-sm">
                     {calculations.apiProviders[0] && cheapest && (
                       <>
-                        <strong>Cheapest API:</strong> {calculations.apiProviders[0].name} @ ${calculations.apiProviders[0].dailyCost.toFixed(2)}/day 
-                        ({formatPayoff(calculations.apiProviders[0].payoffMonths)} payoff) — 
-                        {calculations.apiProviders[0].dailyCost < cheapest.dailyCost 
+                        <strong>Cheapest API:</strong> {calculations.apiProviders[0].name} @ ${calculations.apiProviders[0].dailyCost.toFixed(2)}/day
+                        ({formatPayoff(calculations.apiProviders[0].payoffMonths)} payoff) —
+                        {calculations.apiProviders[0].dailyCost < cheapest.dailyCost
                           ? ` ${((cheapest.dailyCost / calculations.apiProviders[0].dailyCost - 1) * 100).toFixed(0)}% cheaper than GPU rental`
                           : ` ${((calculations.apiProviders[0].dailyCost / cheapest.dailyCost - 1) * 100).toFixed(0)}% more expensive than GPU rental`
                         }
@@ -609,7 +416,7 @@ export default function PayoffCalculator() {
                     </div>
                   )}
                 </div>
-                
+
                 {/* Determine best option */}
                 {(() => {
                   const cheapestApi = calculations.apiProviders[0];
@@ -618,14 +425,14 @@ export default function PayoffCalculator() {
                   const minCloudCost = Math.min(gpuCost, apiCost);
                   const payoffDays = calculations.localPrice / minCloudCost;
                   const payoffMonths = payoffDays / 30;
-                  
-                  const bestCloud = apiCost < gpuCost 
+
+                  const bestCloud = apiCost < gpuCost
                     ? { name: cheapestApi.name, type: 'API', cost: apiCost }
                     : { name: cheapest?.provider, type: 'GPU', cost: gpuCost };
-                  
+
                   return (
                     <p className={payoffMonths < 12 ? 'text-green-300 mt-3' : 'text-yellow-300 mt-3'}>
-                      {payoffMonths < 12 
+                      {payoffMonths < 12
                         ? `✓ Hardware pays off in ${Math.ceil(payoffDays)} days (${formatPayoff(payoffMonths)}) vs ${bestCloud.type} (${bestCloud.name}). After that, inference is essentially free.`
                         : `⚠ Hardware takes ${formatPayoff(payoffMonths)} to pay off vs ${bestCloud.type} (${bestCloud.name}) at this utilization level.`
                       }
@@ -641,9 +448,9 @@ export default function PayoffCalculator() {
           <div className="bg-red-900/20 border border-red-800/50 rounded-xl p-5">
             <h3 className="font-semibold text-red-300 mb-2">Cannot Run {modelSize}</h3>
             <p className="text-sm text-red-200/70">
-              {selectedHardware === 'mac' 
-                ? `${modelSize} requires at least ${modelRequirements[modelSize].minRAM}GB RAM. Select a larger Mac configuration or smaller model.`
-                : `DGX Spark (128GB) cannot run ${modelSize}. Try the Mac Studio with 256GB+ RAM.`
+              {selectedHardware === 'mac'
+                ? `${modelSize} requires at least ${calculations.minRAM}GB RAM. Select a larger Mac configuration or smaller model.`
+                : `DGX Spark (${hardware.dgxSpark.memory}GB) cannot run ${modelSize}. Try the Mac Studio with 256GB+ RAM.`
               }
             </p>
           </div>
@@ -651,15 +458,13 @@ export default function PayoffCalculator() {
 
         <div className="mt-4 bg-gray-900/50 rounded-xl p-4 border border-gray-800">
           <p className="text-xs text-gray-500">
-            <strong className="text-gray-400">Benchmark sources:</strong> Mac throughput from llama.cpp discussions (Q4_K_M quantization, batch=1). 
-            Cloud throughput from vLLM benchmarks (batch=1, tensor parallel). 
-            70B on 2× H100: ~35 tok/s. 405B on 8× H100 FP8: ~15 tok/s.
+            <strong className="text-gray-400">Benchmark sources:</strong> {models.source}
             <br/>
-            <strong className="text-gray-400">GPU rental:</strong> RunPod $1.99, Denvr $2.10, Lambda $2.99, GCP $3.00, AWS $3.90 per H100/hr.
+            <strong className="text-gray-400">GPU rental:</strong> {cloudProviders.providers.map(p => `${p.name} $${p.ratePerGPUHour}`).join(', ')} per {cloudProviders.gpuType}/hr.
             <br/>
-            <strong className="text-gray-400">API pricing:</strong> Groq, Together.ai, Fireworks, DeepInfra (Dec 2025). Blended = 50% input + 50% output rate.
+            <strong className="text-gray-400">API pricing:</strong> {apiProviders.providers['70B'].map(p => p.name).join(', ')} ({apiProviders.updatedAt}). Blended = 50% input + 50% output rate.
             <br/>
-            Mac prices in CAD converted at {CAD_TO_USD}.
+            <strong className="text-gray-400">Data updated:</strong> {models.updatedAt} • Mac prices in CAD converted at {cadToUsd}.
           </p>
         </div>
       </div>
