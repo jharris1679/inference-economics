@@ -4,6 +4,8 @@ Compare the costs of running LLM inference on local hardware vs cloud GPU rental
 
 **[Live Demo →](https://jharris1679.github.io/inference-economics)**
 
+A decision-making tool for compute purchases. Demand for AI compute is growing faster than supply, and these markets are becoming more complex. The goal is to help developers make informed decisions using real benchmark data rather than vibes and vendor marketing. See [VISION.md](VISION.md) for more on where this is heading.
+
 ## Features
 
 - **Local Hardware**: Mac Studio M3 Ultra (96GB–512GB), NVIDIA DGX Spark

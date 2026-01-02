@@ -1,0 +1,13 @@
+# Vision
+
+I built this tool to help me decide whether to buy a Mac Studio for running local LLMs or keep renting cloud GPUs. The math wasn't obvious, so I made a calculator. It turned out to be useful, so I'm sharing it.
+
+Inference Economics helps you compare the cost of running AI models across three options: buying local hardware, renting cloud GPUs, or paying for API calls. You adjust your expected usage, pick a model size, and see how long until hardware pays for itself versus the alternatives. That's it — a decision-making tool for compute purchases.
+
+Demand for AI compute is growing faster than supply. GPU rental markets have already become sophisticated enough to warrant financial indices — Silicon Data launched the first daily H100 rental price index (SDH100RT) on Bloomberg terminals in 2025. As compute markets deepen and financialize further, understanding pricing will become increasingly important. Right now, most developers make compute decisions based on vibes and vendor marketing. The goal here is to make those decisions more informed, using real benchmark data and transparent methodology.
+
+The long-term vision is to provide institutional-quality compute pricing data to everyone. Access to compute is becoming a key driver of growth and prosperity. The more participants who have accurate, useful information to navigate and coordinate compute markets, the stronger our economies will be. For now, that means keeping this calculator accurate and useful. Over time, it might mean tracking historical pricing, covering more hardware options, or building an API for programmatic access.
+
+This project builds on existing work. [Silicon Data](https://www.silicondata.com/products/silicon-index) publishes daily GPU rental indices on Bloomberg, backed by 3.5M pricing data points. [Epoch AI](https://epoch.ai/data-insights/llm-inference-price-trends) tracks training and inference cost trends with academic rigor — their research shows GPT-3.5-level inference costs dropped 280× between 2022-2024. [Artificial Analysis](https://artificialanalysis.ai/leaderboards/providers) benchmarks 500+ API endpoints daily. [LLM Price Compass](https://github.com/arc53/llm-price-compass) is an open-source tool comparing GPU benchmarks to per-token costs. Inference Economics fills a specific gap: helping individuals decide between buying hardware versus renting or using APIs, with a focus on local inference options that the other tools don't cover well.
+
+The data in this tool will get stale. Prices change, new hardware ships, benchmarks improve. Corrections and updates are [welcome](https://github.com/jharris1679/inference-economics).
