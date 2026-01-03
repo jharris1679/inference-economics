@@ -96,9 +96,14 @@ export default function PayoffCalculator() {
   }), [workload, dailyHours, macRAM, selectedHardware]);
 
   // Filter results by provider selection (ANS-511)
+  // Map provider names to IDs for filtering
+  const providerNameToId = Object.fromEntries(
+    cloudProviders.providers.map(p => [p.name, p.id])
+  );
+
   const filteredProviders = useMemo(() =>
     calculations.providers.filter(p => {
-      const id = p.provider.toLowerCase().replace(/\s+/g, '');
+      const id = providerNameToId[p.provider] || p.provider.toLowerCase();
       return cloudGPUFilters[id] !== false;
     }),
     [calculations.providers, cloudGPUFilters]
