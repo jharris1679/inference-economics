@@ -385,7 +385,7 @@ export function computeWorkloadComparison({
     return {
       canRun: false,
       memoryInfo,
-      totalTokensPerDay: 0,
+      tokensPerDay: 0,
       localName,
       localPrice,
       localTPS: 0,

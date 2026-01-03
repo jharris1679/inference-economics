@@ -23,10 +23,6 @@ const developerList = getDeveloperList(models);
 const ramOptions = Object.keys(hardware.mac.configs).map(Number);
 const cadToUsd = hardware.cadToUsd;
 
-// Generate unique IDs for workload entries
-let workloadIdCounter = 0;
-const generateId = () => `wl-${++workloadIdCounter}`;
-
 export default function PayoffCalculator() {
   const [dailyHours, setDailyHours] = useState(8);
   const [macRAM, setMacRAM] = useState(512);
@@ -34,7 +30,7 @@ export default function PayoffCalculator() {
 
   // Workload state (ANS-504) - array of models to run
   const [workload, setWorkload] = useState(() => [{
-    id: generateId(),
+    id: crypto.randomUUID(),
     developerId: 'meta',
     modelId: 'llama-3.1-70b',
     quantity: 1,
@@ -70,7 +66,7 @@ export default function PayoffCalculator() {
   // Workload management functions
   const addModelToWorkload = () => {
     setWorkload(prev => [...prev, {
-      id: generateId(),
+      id: crypto.randomUUID(),
       developerId: 'meta',
       modelId: 'llama-3.1-8b',
       quantity: 1,
