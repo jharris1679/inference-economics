@@ -552,6 +552,7 @@ export default function PayoffCalculator() {
                     <th className="text-right py-3 px-2 bg-red-900/20">$/day</th>
                     <th className="text-right py-3 px-2">$/mo</th>
                     <th className="text-right py-3 px-3 bg-green-900/20">Payoff</th>
+                    <th className="w-8 py-3 px-2"></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -593,6 +594,17 @@ export default function PayoffCalculator() {
                         </td>
                         <td className={`text-right py-3 px-3 bg-green-900/10 font-bold ${payoffColor}`}>
                           {formatPayoff(p.payoffMonths)}
+                        </td>
+                        <td className="py-3 px-2">
+                          <button
+                            onClick={() => setCloudGPUFilters(prev => ({ ...prev, [p.provider]: false }))}
+                            className="text-gray-500 hover:text-red-400 transition-colors p-1"
+                            title="Remove from comparison"
+                          >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                          </button>
                         </td>
                       </tr>
                     );
@@ -664,6 +676,7 @@ export default function PayoffCalculator() {
                         <th className="text-right py-3 px-2 bg-red-900/20">$/day</th>
                         <th className="text-right py-3 px-2">$/mo</th>
                         <th className="text-right py-3 px-3 bg-green-900/20">Payoff</th>
+                        <th className="w-8 py-3 px-2"></th>
                       </tr>
                     </thead>
                     <tbody>
@@ -696,6 +709,17 @@ export default function PayoffCalculator() {
                             </td>
                             <td className={`text-right py-3 px-3 bg-green-900/10 font-bold ${payoffColor}`}>
                               {formatPayoff(api.payoffMonths)}
+                            </td>
+                            <td className="py-3 px-2">
+                              <button
+                                onClick={() => setOssAPIFilters(prev => ({ ...prev, [api.name]: false }))}
+                                className="text-gray-500 hover:text-red-400 transition-colors p-1"
+                                title="Remove from comparison"
+                              >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                              </button>
                             </td>
                           </tr>
                         );
@@ -743,7 +767,7 @@ export default function PayoffCalculator() {
               />
             </div>
             <p className="text-sm text-gray-500 mb-4">
-              Commercial models with comparable capability ({calculations.proprietaryTier} tier) — {formatTokens(calculations.tokensPerDay)} tokens/day
+              Commercial API models — {formatTokens(calculations.tokensPerDay)} tokens/day
             </p>
 
             {filteredProprietaryAlternatives.length > 0 ? (
@@ -760,6 +784,7 @@ export default function PayoffCalculator() {
                         <th className="text-right py-3 px-2 bg-red-900/20">$/day</th>
                         <th className="text-right py-3 px-2">$/mo</th>
                         <th className="text-right py-3 px-3 bg-green-900/20">Payoff</th>
+                        <th className="w-8 py-3 px-2"></th>
                       </tr>
                     </thead>
                     <tbody>
@@ -802,6 +827,17 @@ export default function PayoffCalculator() {
                             </td>
                             <td className={`text-right py-3 px-3 bg-green-900/10 font-bold ${payoffColor}`}>
                               {formatPayoff(api.payoffMonths)}
+                            </td>
+                            <td className="py-3 px-2">
+                              <button
+                                onClick={() => setProprietaryModelFilters(prev => ({ ...prev, [api.name]: false }))}
+                                className="text-gray-500 hover:text-red-400 transition-colors p-1"
+                                title="Remove from comparison"
+                              >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                              </button>
                             </td>
                           </tr>
                         );
