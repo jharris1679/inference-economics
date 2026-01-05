@@ -149,8 +149,15 @@ export default function PayoffCalculator() {
     Groq: true, Together: true, Fireworks: true, DeepInfra: true,
     Cerebras: true, OpenAI: true, Moonshot: true
   });
-  const [proprietaryFilters, setProprietaryFilters] = useState({
-    OpenAI: true, Anthropic: true, Google: true, Mistral: true
+  // Proprietary model filters - dynamically built from all tiers
+  const [proprietaryModelFilters, setProprietaryModelFilters] = useState(() => {
+    const allModels = {};
+    Object.values(apiProviders.proprietaryAlternatives || {}).forEach(tier => {
+      tier.models?.forEach(model => {
+        allModels[model.name] = true;
+      });
+    });
+    return allModels;
   });
 
   // Memory info for workload
@@ -219,8 +226,8 @@ export default function PayoffCalculator() {
   );
 
   const filteredProprietaryAlternatives = useMemo(() =>
-    (calculations.proprietaryAlternatives || []).filter(p => proprietaryFilters[p.provider] !== false),
-    [calculations.proprietaryAlternatives, proprietaryFilters]
+    (calculations.proprietaryAlternatives || []).filter(p => proprietaryModelFilters[p.name] !== false),
+    [calculations.proprietaryAlternatives, proprietaryModelFilters]
   );
 
   const cheapest = filteredProviders[0];
@@ -513,8 +520,8 @@ export default function PayoffCalculator() {
         </div>
 
         {/* Cloud Comparison */}
-        {calculations.canRun && filteredProviders.length > 0 && (
-          <>
+        {calculations.canRun && (
+          <div className="mb-8">
             <div className="flex items-center justify-between mb-2">
               <h2 className="text-lg font-semibold text-white">Cloud Alternatives</h2>
               <MultiSelectDropdown
@@ -530,7 +537,9 @@ export default function PayoffCalculator() {
               Hours adjusted to produce {formatTokens(calculations.tokensPerDay)} tokens/day — same as local
             </p>
 
-            <div className="overflow-x-auto">
+            {filteredProviders.length > 0 ? (
+              <>
+                <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="text-gray-400 border-b border-gray-800">
@@ -616,24 +625,34 @@ export default function PayoffCalculator() {
                 </div>
               </div>
             </div>
+              </>
+            ) : (
+              <div className="text-center py-8 text-gray-500 bg-gray-900/50 rounded-lg border border-gray-800">
+                No cloud providers selected. Use the dropdown above to select providers to compare.
+              </div>
+            )}
+          </div>
+        )}
 
-            {/* API Provider Comparison */}
-            {filteredApiProviders.length > 0 && (
-              <div className="mt-8">
-                <div className="flex items-center justify-between mb-2">
-                  <h2 className="text-lg font-semibold text-white">API Provider Comparison</h2>
-                  <MultiSelectDropdown
-                    options={Object.keys(ossAPIFilters).map(name => ({ id: name, name }))}
-                    selected={ossAPIFilters}
-                    onChange={setOssAPIFilters}
-                    getKey={(p) => p.id}
-                    getLabel={(p) => p.name}
-                  />
-                </div>
-                <p className="text-sm text-gray-500 mb-4">
-                  Pay-per-token pricing for workload — {formatTokens(calculations.tokensPerDay)} tokens/day
-                </p>
+        {/* API Provider Comparison */}
+        {calculations.canRun && calculations.apiProviders.length > 0 && (
+          <div className="mb-8">
+            <div className="flex items-center justify-between mb-2">
+              <h2 className="text-lg font-semibold text-white">API Provider Comparison</h2>
+              <MultiSelectDropdown
+                options={Object.keys(ossAPIFilters).map(name => ({ id: name, name }))}
+                selected={ossAPIFilters}
+                onChange={setOssAPIFilters}
+                getKey={(p) => p.id}
+                getLabel={(p) => p.name}
+              />
+            </div>
+            <p className="text-sm text-gray-500 mb-4">
+              Pay-per-token pricing for workload — {formatTokens(calculations.tokensPerDay)} tokens/day
+            </p>
 
+            {filteredApiProviders.length > 0 ? (
+              <>
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead>
@@ -700,26 +719,35 @@ export default function PayoffCalculator() {
                     )}
                   </div>
                 </div>
+              </>
+            ) : (
+              <div className="text-center py-8 text-gray-500 bg-gray-900/50 rounded-lg border border-gray-800">
+                No API providers selected. Use the dropdown above to select providers to compare.
               </div>
             )}
+          </div>
+        )}
 
-            {/* Proprietary API Alternatives */}
-            {filteredProprietaryAlternatives?.length > 0 && (
-              <div className="mt-8">
-                <div className="flex items-center justify-between mb-2">
-                  <h2 className="text-lg font-semibold text-white">Proprietary API Alternatives</h2>
-                  <MultiSelectDropdown
-                    options={Object.keys(proprietaryFilters).map(name => ({ id: name, name }))}
-                    selected={proprietaryFilters}
-                    onChange={setProprietaryFilters}
-                    getKey={(p) => p.id}
-                    getLabel={(p) => p.name}
-                  />
-                </div>
-                <p className="text-sm text-gray-500 mb-4">
-                  Commercial models with comparable capability ({calculations.proprietaryTier} tier) — {formatTokens(calculations.tokensPerDay)} tokens/day
-                </p>
+        {/* Proprietary API Alternatives */}
+        {calculations.canRun && calculations.proprietaryAlternatives?.length > 0 && (
+          <div className="mb-8">
+            <div className="flex items-center justify-between mb-2">
+              <h2 className="text-lg font-semibold text-white">Proprietary API Alternatives</h2>
+              <MultiSelectDropdown
+                options={calculations.proprietaryAlternatives || []}
+                selected={proprietaryModelFilters}
+                onChange={setProprietaryModelFilters}
+                getKey={(p) => p.name}
+                getLabel={(p) => p.name}
+                getDetail={(p) => p.provider}
+              />
+            </div>
+            <p className="text-sm text-gray-500 mb-4">
+              Commercial models with comparable capability ({calculations.proprietaryTier} tier) — {formatTokens(calculations.tokensPerDay)} tokens/day
+            </p>
 
+            {filteredProprietaryAlternatives.length > 0 ? (
+              <>
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead>
@@ -788,11 +816,18 @@ export default function PayoffCalculator() {
                     Different models with comparable quality. Trade-offs include: API lock-in, no local control, but often faster inference and no hardware investment.
                   </div>
                 </div>
+              </>
+            ) : (
+              <div className="text-center py-8 text-gray-500 bg-gray-900/50 rounded-lg border border-gray-800">
+                No proprietary models selected. Use the dropdown above to select models to compare.
               </div>
             )}
+          </div>
+        )}
 
-            {/* Summary */}
-            <div className="mt-6 bg-blue-900/20 border border-blue-800/50 rounded-xl p-5">
+        {/* Summary */}
+        {calculations.canRun && (filteredProviders.length > 0 || filteredApiProviders.length > 0 || filteredProprietaryAlternatives.length > 0) && (
+          <div className="mt-6 bg-blue-900/20 border border-blue-800/50 rounded-xl p-5">
               <h3 className="font-semibold text-blue-300 mb-3">Bottom Line</h3>
               <div className="space-y-2 text-sm text-blue-200/80">
                 <p>
@@ -841,8 +876,7 @@ export default function PayoffCalculator() {
                   );
                 })()}
               </div>
-            </div>
-          </>
+          </div>
         )}
 
         {!calculations.canRun && (
