@@ -1,7 +1,112 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 
 // Data
 import models from '../data/models.json';
+
+/**
+ * Reusable multi-select dropdown component for filtering providers.
+ * Shows selected count when closed, checkboxes with All/Clear when open.
+ */
+function MultiSelectDropdown({ options, selected, onChange, getKey = (o) => o.id, getLabel = (o) => o.name, getDetail = () => null }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setIsOpen(false);
+      }
+    };
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [isOpen]);
+
+  const selectedCount = Object.values(selected).filter(Boolean).length;
+  const totalCount = options.length;
+
+  const selectAll = () => {
+    onChange(Object.fromEntries(options.map(o => [getKey(o), true])));
+  };
+
+  const clearAll = () => {
+    onChange(Object.fromEntries(options.map(o => [getKey(o), false])));
+  };
+
+  const toggleOption = (key) => {
+    onChange({ ...selected, [key]: !selected[key] });
+  };
+
+  return (
+    <div className="relative" ref={dropdownRef}>
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="flex items-center gap-2 px-3 py-1.5 bg-gray-800 border border-gray-700 rounded-lg text-sm text-gray-300 hover:bg-gray-700 hover:border-gray-600 transition-colors"
+      >
+        <span>
+          {selectedCount === totalCount
+            ? 'All'
+            : selectedCount === 0
+              ? 'None'
+              : `${selectedCount}/${totalCount}`}
+        </span>
+        <svg
+          className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+
+      {isOpen && (
+        <div className="absolute right-0 z-20 mt-1 w-56 bg-gray-800 rounded-lg shadow-xl border border-gray-700 overflow-hidden">
+          {/* All/Clear buttons */}
+          <div className="flex gap-2 p-2 border-b border-gray-700 bg-gray-850">
+            <button
+              onClick={selectAll}
+              className="flex-1 px-2 py-1 text-xs font-medium text-blue-400 bg-blue-900/30 rounded hover:bg-blue-900/50 transition-colors"
+            >
+              All
+            </button>
+            <button
+              onClick={clearAll}
+              className="flex-1 px-2 py-1 text-xs font-medium text-gray-400 bg-gray-700 rounded hover:bg-gray-600 transition-colors"
+            >
+              Clear
+            </button>
+          </div>
+
+          {/* Options list */}
+          <div className="max-h-64 overflow-y-auto">
+            {options.map(opt => {
+              const key = getKey(opt);
+              const detail = getDetail(opt);
+              return (
+                <label
+                  key={key}
+                  className="flex items-center gap-2 px-3 py-2 hover:bg-gray-700 cursor-pointer transition-colors"
+                >
+                  <input
+                    type="checkbox"
+                    checked={selected[key] !== false}
+                    onChange={() => toggleOption(key)}
+                    className="rounded border-gray-600 bg-gray-900 text-blue-500 focus:ring-blue-500 focus:ring-offset-0"
+                  />
+                  <span className="text-sm text-gray-200">{getLabel(opt)}</span>
+                  {detail && <span className="text-xs text-gray-500 ml-auto">{detail}</span>}
+                </label>
+              );
+            })}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 import hardware from '../data/hardware.json';
 import cloudProviders from '../data/cloud-providers.json';
 import apiProviders from '../data/api-providers.json';
@@ -36,8 +141,7 @@ export default function PayoffCalculator() {
     quantity: 1,
   }]);
 
-  // Provider filter state (ANS-511)
-  const [filtersExpanded, setFiltersExpanded] = useState(false);
+  // Provider filter state (ANS-511) - multi-select dropdowns in section headers
   const [cloudGPUFilters, setCloudGPUFilters] = useState(() =>
     Object.fromEntries(cloudProviders.providers.map(p => [p.id, true]))
   );
@@ -408,152 +512,20 @@ export default function PayoffCalculator() {
           </div>
         </div>
 
-        {/* Provider Filter Panel (ANS-511) */}
-        {calculations.canRun && (
-          <div className="bg-gray-900 rounded-xl border border-gray-800 mb-6">
-            <button
-              onClick={() => setFiltersExpanded(!filtersExpanded)}
-              className="w-full flex items-center justify-between p-4 text-left"
-            >
-              <div className="flex items-center gap-2">
-                <svg
-                  className={`w-4 h-4 text-gray-400 transition-transform ${filtersExpanded ? 'rotate-90' : ''}`}
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-                <span className="font-medium text-gray-300">Filter Providers</span>
-              </div>
-              <span className="text-sm text-gray-500">
-                {Object.values(cloudGPUFilters).filter(Boolean).length +
-                  Object.values(ossAPIFilters).filter(Boolean).length +
-                  Object.values(proprietaryFilters).filter(Boolean).length} selected
-              </span>
-            </button>
-
-            {filtersExpanded && (
-              <div className="px-4 pb-4 border-t border-gray-800 pt-4">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  {/* Cloud GPU Providers */}
-                  <div>
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm font-medium text-gray-400">Cloud GPU</span>
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => setCloudGPUFilters(Object.fromEntries(
-                            cloudProviders.providers.map(p => [p.id, true])
-                          ))}
-                          className="text-xs text-blue-400 hover:text-blue-300"
-                        >All</button>
-                        <button
-                          onClick={() => setCloudGPUFilters(Object.fromEntries(
-                            cloudProviders.providers.map(p => [p.id, false])
-                          ))}
-                          className="text-xs text-gray-500 hover:text-gray-400"
-                        >None</button>
-                      </div>
-                    </div>
-                    <div className="space-y-1">
-                      {cloudProviders.providers.map(p => (
-                        <label key={p.id} className="flex items-center gap-2 cursor-pointer">
-                          <input
-                            type="checkbox"
-                            checked={cloudGPUFilters[p.id] !== false}
-                            onChange={(e) => setCloudGPUFilters(prev => ({
-                              ...prev, [p.id]: e.target.checked
-                            }))}
-                            className="rounded border-gray-600 bg-gray-800 text-blue-500 focus:ring-blue-500"
-                          />
-                          <span className="text-sm text-gray-300">{p.name}</span>
-                          <span className="text-xs text-gray-500">${p.ratePerGPUHour}/hr</span>
-                        </label>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* OSS API Providers */}
-                  <div>
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm font-medium text-gray-400">OSS API</span>
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => setOssAPIFilters(prev =>
-                            Object.fromEntries(Object.keys(prev).map(k => [k, true]))
-                          )}
-                          className="text-xs text-blue-400 hover:text-blue-300"
-                        >All</button>
-                        <button
-                          onClick={() => setOssAPIFilters(prev =>
-                            Object.fromEntries(Object.keys(prev).map(k => [k, false]))
-                          )}
-                          className="text-xs text-gray-500 hover:text-gray-400"
-                        >None</button>
-                      </div>
-                    </div>
-                    <div className="space-y-1">
-                      {Object.keys(ossAPIFilters).map(name => (
-                        <label key={name} className="flex items-center gap-2 cursor-pointer">
-                          <input
-                            type="checkbox"
-                            checked={ossAPIFilters[name] !== false}
-                            onChange={(e) => setOssAPIFilters(prev => ({
-                              ...prev, [name]: e.target.checked
-                            }))}
-                            className="rounded border-gray-600 bg-gray-800 text-blue-500 focus:ring-blue-500"
-                          />
-                          <span className="text-sm text-gray-300">{name}</span>
-                        </label>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Proprietary Providers */}
-                  <div>
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm font-medium text-gray-400">Proprietary</span>
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => setProprietaryFilters(prev =>
-                            Object.fromEntries(Object.keys(prev).map(k => [k, true]))
-                          )}
-                          className="text-xs text-blue-400 hover:text-blue-300"
-                        >All</button>
-                        <button
-                          onClick={() => setProprietaryFilters(prev =>
-                            Object.fromEntries(Object.keys(prev).map(k => [k, false]))
-                          )}
-                          className="text-xs text-gray-500 hover:text-gray-400"
-                        >None</button>
-                      </div>
-                    </div>
-                    <div className="space-y-1">
-                      {Object.keys(proprietaryFilters).map(name => (
-                        <label key={name} className="flex items-center gap-2 cursor-pointer">
-                          <input
-                            type="checkbox"
-                            checked={proprietaryFilters[name] !== false}
-                            onChange={(e) => setProprietaryFilters(prev => ({
-                              ...prev, [name]: e.target.checked
-                            }))}
-                            className="rounded border-gray-600 bg-gray-800 text-blue-500 focus:ring-blue-500"
-                          />
-                          <span className="text-sm text-gray-300">{name}</span>
-                        </label>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-
         {/* Cloud Comparison */}
         {calculations.canRun && filteredProviders.length > 0 && (
           <>
-            <h2 className="text-lg font-semibold text-white mb-2">Cloud Alternatives</h2>
+            <div className="flex items-center justify-between mb-2">
+              <h2 className="text-lg font-semibold text-white">Cloud Alternatives</h2>
+              <MultiSelectDropdown
+                options={cloudProviders.providers}
+                selected={cloudGPUFilters}
+                onChange={setCloudGPUFilters}
+                getKey={(p) => p.id}
+                getLabel={(p) => p.name}
+                getDetail={(p) => `$${p.ratePerGPUHour}/hr`}
+              />
+            </div>
             <p className="text-sm text-gray-500 mb-4">
               Hours adjusted to produce {formatTokens(calculations.tokensPerDay)} tokens/day — same as local
             </p>
@@ -648,7 +620,16 @@ export default function PayoffCalculator() {
             {/* API Provider Comparison */}
             {filteredApiProviders.length > 0 && (
               <div className="mt-8">
-                <h2 className="text-lg font-semibold text-white mb-2">API Provider Comparison</h2>
+                <div className="flex items-center justify-between mb-2">
+                  <h2 className="text-lg font-semibold text-white">API Provider Comparison</h2>
+                  <MultiSelectDropdown
+                    options={Object.keys(ossAPIFilters).map(name => ({ id: name, name }))}
+                    selected={ossAPIFilters}
+                    onChange={setOssAPIFilters}
+                    getKey={(p) => p.id}
+                    getLabel={(p) => p.name}
+                  />
+                </div>
                 <p className="text-sm text-gray-500 mb-4">
                   Pay-per-token pricing for workload — {formatTokens(calculations.tokensPerDay)} tokens/day
                 </p>
@@ -725,7 +706,16 @@ export default function PayoffCalculator() {
             {/* Proprietary API Alternatives */}
             {filteredProprietaryAlternatives?.length > 0 && (
               <div className="mt-8">
-                <h2 className="text-lg font-semibold text-white mb-2">Proprietary API Alternatives</h2>
+                <div className="flex items-center justify-between mb-2">
+                  <h2 className="text-lg font-semibold text-white">Proprietary API Alternatives</h2>
+                  <MultiSelectDropdown
+                    options={Object.keys(proprietaryFilters).map(name => ({ id: name, name }))}
+                    selected={proprietaryFilters}
+                    onChange={setProprietaryFilters}
+                    getKey={(p) => p.id}
+                    getLabel={(p) => p.name}
+                  />
+                </div>
                 <p className="text-sm text-gray-500 mb-4">
                   Commercial models with comparable capability ({calculations.proprietaryTier} tier) — {formatTokens(calculations.tokensPerDay)} tokens/day
                 </p>
