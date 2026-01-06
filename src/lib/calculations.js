@@ -489,6 +489,14 @@ export function computeWorkloadComparison({
       const payoffDays = calculatePayoffDays(localPrice, p.totalDailyCost);
       // Average blended rate across models
       const avgBlended = p.details.reduce((sum, d) => sum + d.blendedPer1M, 0) / p.details.length;
+      // Calculate per-model breakdown with percentages
+      const totalDailyCost = p.totalDailyCost;
+      const modelBreakdown = p.details.map(d => ({
+        modelId: d.modelId,
+        blendedPer1M: d.blendedPer1M,
+        dailyCost: d.dailyCost,
+        percentage: totalDailyCost > 0 ? (d.dailyCost / totalDailyCost) * 100 : 0,
+      }));
       return {
         name: p.name,
         blendedPer1M: avgBlended,
@@ -498,6 +506,7 @@ export function computeWorkloadComparison({
         monthlyCost,
         payoffDays: Math.ceil(payoffDays),
         payoffMonths: payoffDays / 30,
+        modelBreakdown, // ANS-515: Per-model cost breakdown
       };
     })
     .sort((a, b) => a.dailyCost - b.dailyCost);

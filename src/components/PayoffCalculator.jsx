@@ -686,42 +686,57 @@ export default function PayoffCalculator() {
                           api.payoffMonths < 6 ? 'text-emerald-400' :
                           api.payoffMonths < 12 ? 'text-yellow-400' :
                           api.payoffMonths < 24 ? 'text-orange-400' : 'text-red-400';
+                        const hasBreakdown = api.modelBreakdown && api.modelBreakdown.length > 1;
 
                         return (
-                          <tr key={api.name} className={`border-b border-gray-800/50 ${idx === 0 ? 'bg-purple-900/10' : ''}`}>
-                            <td className="py-3 px-3">
-                              <div className="font-medium text-white">{api.name}</div>
-                            </td>
-                            <td className="text-right py-3 px-2 font-mono text-gray-400">
-                              ${api.inputPer1M.toFixed(2)}
-                            </td>
-                            <td className="text-right py-3 px-2 font-mono text-gray-400">
-                              ${api.outputPer1M.toFixed(2)}
-                            </td>
-                            <td className="text-right py-3 px-2 bg-purple-900/10 font-mono text-purple-400">
-                              ${api.blendedPer1M.toFixed(2)}
-                            </td>
-                            <td className="text-right py-3 px-2 bg-red-900/10 font-mono text-red-400">
-                              ${api.dailyCost.toFixed(2)}
-                            </td>
-                            <td className="text-right py-3 px-2 font-mono text-red-400">
-                              ${api.monthlyCost.toFixed(0)}
-                            </td>
-                            <td className={`text-right py-3 px-3 bg-green-900/10 font-bold ${payoffColor}`}>
-                              {formatPayoff(api.payoffMonths)}
-                            </td>
-                            <td className="py-3 px-2">
-                              <button
-                                onClick={() => setOssAPIFilters(prev => ({ ...prev, [api.name]: false }))}
-                                className="text-gray-500 hover:text-red-400 transition-colors p-1"
-                                title="Remove from comparison"
-                              >
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                </svg>
-                              </button>
-                            </td>
-                          </tr>
+                          <React.Fragment key={api.name}>
+                            <tr className={`border-b border-gray-800/50 ${idx === 0 ? 'bg-purple-900/10' : ''}`}>
+                              <td className="py-3 px-3">
+                                <div className="font-medium text-white">{api.name}</div>
+                                {/* ANS-515: Show model breakdown inline for multi-model workloads */}
+                                {hasBreakdown && (
+                                  <div className="mt-1 text-xs text-gray-500">
+                                    {api.modelBreakdown.map((m, i) => (
+                                      <span key={m.modelId}>
+                                        {m.modelId}: ${m.dailyCost.toFixed(2)} ({m.percentage.toFixed(0)}%)
+                                        {i < api.modelBreakdown.length - 1 ? ' + ' : ''}
+                                      </span>
+                                    ))}
+                                  </div>
+                                )}
+                              </td>
+                              <td className="text-right py-3 px-2 font-mono text-gray-400">
+                                ${api.inputPer1M.toFixed(2)}
+                              </td>
+                              <td className="text-right py-3 px-2 font-mono text-gray-400">
+                                ${api.outputPer1M.toFixed(2)}
+                              </td>
+                              <td className="text-right py-3 px-2 bg-purple-900/10 font-mono text-purple-400">
+                                ${api.blendedPer1M.toFixed(2)}
+                                {hasBreakdown && <span className="text-xs text-gray-500 block">avg</span>}
+                              </td>
+                              <td className="text-right py-3 px-2 bg-red-900/10 font-mono text-red-400">
+                                ${api.dailyCost.toFixed(2)}
+                              </td>
+                              <td className="text-right py-3 px-2 font-mono text-red-400">
+                                ${api.monthlyCost.toFixed(0)}
+                              </td>
+                              <td className={`text-right py-3 px-3 bg-green-900/10 font-bold ${payoffColor}`}>
+                                {formatPayoff(api.payoffMonths)}
+                              </td>
+                              <td className="py-3 px-2">
+                                <button
+                                  onClick={() => setOssAPIFilters(prev => ({ ...prev, [api.name]: false }))}
+                                  className="text-gray-500 hover:text-red-400 transition-colors p-1"
+                                  title="Remove from comparison"
+                                >
+                                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                  </svg>
+                                </button>
+                              </td>
+                            </tr>
+                          </React.Fragment>
                         );
                       })}
                     </tbody>
