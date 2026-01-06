@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-01-01",
+  "updatedAt": "2026-01-05",
   "note": "Prices per 1M tokens. Blended rate assumes 50% input, 50% output.",
   "sources": {
     "OpenAI": "https://openai.com/api/pricing/",
@@ -10,25 +10,29 @@
     "Together": "https://www.together.ai/pricing",
     "Fireworks": "https://fireworks.ai/pricing",
     "DeepInfra": "https://deepinfra.com/pricing",
-    "Cerebras": "https://www.cerebras.ai/pricing"
+    "Cerebras": "https://www.cerebras.ai/pricing",
+    "Amazon Bedrock": "https://aws.amazon.com/bedrock/pricing/"
   },
   "providers": {
     "llama-3.1-8b": [
       { "name": "Groq", "inputPer1M": 0.05, "outputPer1M": 0.08 },
       { "name": "Together", "inputPer1M": 0.18, "outputPer1M": 0.18 },
       { "name": "Fireworks", "inputPer1M": 0.10, "outputPer1M": 0.10 },
-      { "name": "DeepInfra", "inputPer1M": 0.05, "outputPer1M": 0.05 }
+      { "name": "DeepInfra", "inputPer1M": 0.05, "outputPer1M": 0.05 },
+      { "name": "Amazon Bedrock", "inputPer1M": 0.22, "outputPer1M": 0.22 }
     ],
     "llama-3.1-70b": [
       { "name": "Groq", "inputPer1M": 0.59, "outputPer1M": 0.79 },
       { "name": "Together", "inputPer1M": 0.88, "outputPer1M": 0.88 },
       { "name": "Fireworks", "inputPer1M": 0.90, "outputPer1M": 0.90 },
-      { "name": "DeepInfra", "inputPer1M": 0.35, "outputPer1M": 0.40 }
+      { "name": "DeepInfra", "inputPer1M": 0.35, "outputPer1M": 0.40 },
+      { "name": "Amazon Bedrock", "inputPer1M": 0.72, "outputPer1M": 0.72 }
     ],
     "llama-3.1-405b": [
       { "name": "Together", "inputPer1M": 3.50, "outputPer1M": 3.50 },
       { "name": "Fireworks", "inputPer1M": 0.90, "outputPer1M": 0.90 },
-      { "name": "DeepInfra", "inputPer1M": 1.79, "outputPer1M": 1.79 }
+      { "name": "DeepInfra", "inputPer1M": 1.79, "outputPer1M": 1.79 },
+      { "name": "Amazon Bedrock", "inputPer1M": 2.40, "outputPer1M": 2.40 }
     ],
     "qwen2.5-7b": [
       { "name": "Together", "inputPer1M": 0.20, "outputPer1M": 0.20 },
@@ -81,7 +85,8 @@
       "models": [
         { "name": "GPT-5 Nano", "provider": "OpenAI", "inputPer1M": 0.05, "outputPer1M": 0.40, "tokPerSec": 150, "contextWindow": 128000 },
         { "name": "Gemini 2.0 Flash", "provider": "Google", "inputPer1M": 0.10, "outputPer1M": 0.40, "tokPerSec": 300, "contextWindow": 1000000 },
-        { "name": "Claude 3 Haiku", "provider": "Anthropic", "inputPer1M": 0.25, "outputPer1M": 1.25, "tokPerSec": 160, "contextWindow": 200000 }
+        { "name": "Claude 3 Haiku", "provider": "Anthropic", "inputPer1M": 0.25, "outputPer1M": 1.25, "tokPerSec": 160, "contextWindow": 200000 },
+        { "name": "Claude 3 Haiku", "provider": "Amazon Bedrock", "inputPer1M": 0.25, "outputPer1M": 1.25, "tokPerSec": 150, "contextWindow": 200000 }
       ]
     },
     "medium": {
@@ -99,6 +104,7 @@
         { "name": "GPT-5", "provider": "OpenAI", "inputPer1M": 1.25, "outputPer1M": 10.00, "tokPerSec": 100, "contextWindow": 256000 },
         { "name": "Gemini 3 Flash", "provider": "Google", "inputPer1M": 0.50, "outputPer1M": 3.00, "tokPerSec": 350, "contextWindow": 1000000 },
         { "name": "Claude Sonnet 4.5", "provider": "Anthropic", "inputPer1M": 3.00, "outputPer1M": 15.00, "tokPerSec": 90, "contextWindow": 200000 },
+        { "name": "Claude Sonnet 4.5", "provider": "Amazon Bedrock", "inputPer1M": 3.00, "outputPer1M": 15.00, "tokPerSec": 85, "contextWindow": 200000 },
         { "name": "GPT-4o", "provider": "OpenAI", "inputPer1M": 2.50, "outputPer1M": 10.00, "tokPerSec": 80, "contextWindow": 128000 },
         { "name": "Mistral Large", "provider": "Mistral", "inputPer1M": 2.00, "outputPer1M": 6.00, "tokPerSec": 80, "contextWindow": 128000 }
       ]
@@ -107,6 +113,7 @@
       "description": "Flagship models comparable to 400B+ or reasoning models",
       "models": [
         { "name": "Claude Opus 4.5", "provider": "Anthropic", "inputPer1M": 5.00, "outputPer1M": 25.00, "tokPerSec": 50, "contextWindow": 200000 },
+        { "name": "Claude Opus 4.5", "provider": "Amazon Bedrock", "inputPer1M": 5.00, "outputPer1M": 25.00, "tokPerSec": 45, "contextWindow": 200000 },
         { "name": "o1", "provider": "OpenAI", "inputPer1M": 15.00, "outputPer1M": 60.00, "tokPerSec": 30, "contextWindow": 200000 },
         { "name": "o3-mini", "provider": "OpenAI", "inputPer1M": 1.10, "outputPer1M": 4.40, "tokPerSec": 60, "contextWindow": 200000 },
         { "name": "Gemini 2.5 Pro", "provider": "Google", "inputPer1M": 1.25, "outputPer1M": 10.00, "tokPerSec": 150, "contextWindow": 1000000 }
