@@ -122,6 +122,7 @@ import {
   getDeveloperList,
   getModelsByDeveloper,
   getModel,
+  TRAINING_MODES,
 } from '../lib/calculations.js';
 
 const developerList = getDeveloperList(models);
@@ -132,6 +133,7 @@ export default function PayoffCalculator() {
   const [dailyHours, setDailyHours] = useState(8);
   const [macRAM, setMacRAM] = useState(512);
   const [selectedHardware, setSelectedHardware] = useState('mac');
+  const [trainingMode, setTrainingMode] = useState('inference'); // ANS-514: Training mode selector
 
   // Workload state (ANS-504) - array of models to run
   const [workload, setWorkload] = useState(() => [{
@@ -160,10 +162,11 @@ export default function PayoffCalculator() {
     return allModels;
   });
 
-  // Memory info for workload
+  // Memory info for workload (ANS-514: now includes training mode)
   const memoryInfo = useMemo(() => {
     const availableMemory = selectedHardware === 'mac' ? macRAM : hardware.dgxSpark.memory;
-    const { totalRAM, breakdown } = calculateWorkloadMemory(workload, models);
+    const memCalc = calculateWorkloadMemory(workload, models, trainingMode);
+    const { totalRAM, breakdown, trainingMode: modeName, trainingDescription, isTraining } = memCalc;
     const percentage = (totalRAM / availableMemory) * 100;
     return {
       totalRAM,
@@ -171,8 +174,11 @@ export default function PayoffCalculator() {
       breakdown,
       percentage,
       canFit: totalRAM <= availableMemory,
+      trainingMode: modeName,
+      trainingDescription,
+      isTraining,
     };
-  }, [workload, macRAM, selectedHardware]);
+  }, [workload, macRAM, selectedHardware, trainingMode]);
 
   // Workload management functions
   const addModelToWorkload = () => {
@@ -204,7 +210,8 @@ export default function PayoffCalculator() {
     hardware,
     cloudProviders,
     apiProviders,
-  }), [workload, dailyHours, macRAM, selectedHardware]);
+    trainingMode,
+  }), [workload, dailyHours, macRAM, selectedHardware, trainingMode]);
 
   // Filter results by provider selection (ANS-511)
   // Map provider names to IDs for filtering
@@ -445,6 +452,40 @@ export default function PayoffCalculator() {
               <span>12h</span>
               <span>24h</span>
             </div>
+          </div>
+
+          {/* ANS-514: Training Mode Selector */}
+          <div className="bg-gray-900 rounded-xl p-4 border border-gray-800 lg:col-span-2">
+            <label className="block text-sm font-medium text-gray-400 mb-3">
+              Mode: <span className="text-white font-bold">{memoryInfo.trainingMode}</span>
+            </label>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+              {Object.entries(TRAINING_MODES).map(([key, mode]) => (
+                <button
+                  key={key}
+                  onClick={() => setTrainingMode(key)}
+                  className={`p-2 rounded-lg text-left transition-all ${
+                    trainingMode === key
+                      ? key === 'inference'
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-orange-600 text-white'
+                      : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+                  }`}
+                >
+                  <div className="font-medium text-sm">{mode.name}</div>
+                  <div className="text-xs opacity-75 truncate">{mode.multiplier}× RAM</div>
+                </button>
+              ))}
+            </div>
+            {memoryInfo.isTraining && (
+              <div className="mt-3 text-xs text-orange-400 bg-orange-900/20 rounded-lg p-2">
+                <strong>Training mode:</strong> {memoryInfo.trainingDescription}
+                <br />
+                <span className="text-orange-300">
+                  Memory includes: weights + gradients + optimizer states + activations
+                </span>
+              </div>
+            )}
           </div>
         </div>
 

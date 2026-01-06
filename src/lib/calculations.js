@@ -285,40 +285,113 @@ export function computeComparison({
 }
 
 /**
+ * GRPO Training memory estimation (ANS-514)
+ *
+ * Training requires significantly more memory than inference:
+ * - Base model weights (same as inference minRAM)
+ * - Gradients (~= model weights)
+ * - Optimizer states (~2x model weights for Adam)
+ * - Activations (~0.5-1x model weights depending on batch size)
+ *
+ * Total ≈ 4-5x inference memory for full fine-tuning
+ * LoRA/QLoRA variants reduce this to ~1.1-1.5x
+ */
+export const TRAINING_MODES = {
+  inference: { name: 'Inference', multiplier: 1, description: 'Model weights + KV cache only' },
+  grpoFull: { name: 'GRPO (Full)', multiplier: 4.5, description: 'Full fine-tuning with Adam optimizer' },
+  grpoLora: { name: 'GRPO (LoRA)', multiplier: 1.3, description: 'Low-rank adaptation, ~10% trainable params' },
+  grpoQlora: { name: 'GRPO (QLoRA)', multiplier: 1.15, description: '4-bit quantized with LoRA adapters' },
+};
+
+/**
+ * Calculate memory breakdown for training mode
+ */
+export function calculateTrainingMemory(baseRAM, trainingMode) {
+  const mode = TRAINING_MODES[trainingMode] || TRAINING_MODES.inference;
+  const totalRAM = Math.ceil(baseRAM * mode.multiplier);
+
+  if (trainingMode === 'inference') {
+    return {
+      totalRAM,
+      breakdown: {
+        weights: baseRAM,
+        kvCache: 0, // included in baseRAM
+        gradients: 0,
+        optimizer: 0,
+        activations: 0,
+      },
+      mode: mode.name,
+      description: mode.description,
+    };
+  }
+
+  // Training breakdown (approximate)
+  const weights = baseRAM;
+  const gradients = trainingMode === 'grpoFull' ? baseRAM : baseRAM * 0.1; // LoRA/QLoRA only train ~10% of params
+  const optimizer = gradients * 2; // Adam stores momentum + variance
+  const activations = trainingMode === 'grpoFull' ? baseRAM * 0.5 : baseRAM * 0.1;
+
+  return {
+    totalRAM,
+    breakdown: {
+      weights,
+      gradients: Math.ceil(gradients),
+      optimizer: Math.ceil(optimizer),
+      activations: Math.ceil(activations),
+    },
+    mode: mode.name,
+    description: mode.description,
+  };
+}
+
+/**
  * Multi-model workload calculations (ANS-504)
  */
 
 /**
  * Calculate total memory required for a workload.
  * All models assumed loaded simultaneously.
+ * Now supports training mode (ANS-514)
  */
-export function calculateWorkloadMemory(workload, modelsData) {
+export function calculateWorkloadMemory(workload, modelsData, trainingMode = 'inference') {
+  const mode = TRAINING_MODES[trainingMode] || TRAINING_MODES.inference;
   let totalRAM = 0;
   const breakdown = [];
 
   for (const entry of workload) {
     const model = getModel(modelsData, entry.developerId, entry.modelId);
     if (model) {
-      const ramNeeded = model.minRAM * entry.quantity;
-      totalRAM += ramNeeded;
+      const baseRAM = model.minRAM * entry.quantity;
+      const trainingInfo = calculateTrainingMemory(baseRAM, trainingMode);
+      totalRAM += trainingInfo.totalRAM;
       breakdown.push({
         modelId: entry.modelId,
         name: model.name,
         ram: model.minRAM,
         quantity: entry.quantity,
-        subtotal: ramNeeded,
+        baseSubtotal: baseRAM,
+        subtotal: trainingInfo.totalRAM,
+        trainingBreakdown: trainingInfo.breakdown,
       });
     }
   }
 
-  return { totalRAM, breakdown };
+  return {
+    totalRAM,
+    breakdown,
+    trainingMode: mode.name,
+    trainingDescription: mode.description,
+    isTraining: trainingMode !== 'inference',
+  };
 }
 
 /**
  * Check if hardware can run entire workload simultaneously.
+ * Now supports training mode (ANS-514)
  */
-export function canRunWorkload(availableMemory, workload, modelsData, selectedHardware) {
-  const { totalRAM, breakdown } = calculateWorkloadMemory(workload, modelsData);
+export function canRunWorkload(availableMemory, workload, modelsData, selectedHardware, trainingMode = 'inference') {
+  const memInfo = calculateWorkloadMemory(workload, modelsData, trainingMode);
+  const { totalRAM, breakdown } = memInfo;
 
   // Also check if each model is compatible with the hardware
   const incompatibleModels = [];
@@ -337,12 +410,16 @@ export function canRunWorkload(availableMemory, workload, modelsData, selectedHa
     deficit: canRun ? 0 : Math.max(0, totalRAM - availableMemory),
     incompatibleModels,
     breakdown,
+    trainingMode: memInfo.trainingMode,
+    trainingDescription: memInfo.trainingDescription,
+    isTraining: memInfo.isTraining,
   };
 }
 
 /**
  * Compute combined workload costs.
  * Returns aggregated totals across all models in workload.
+ * Now supports training mode (ANS-514)
  */
 export function computeWorkloadComparison({
   workload,
@@ -352,14 +429,15 @@ export function computeWorkloadComparison({
   models,
   hardware,
   cloudProviders,
-  apiProviders
+  apiProviders,
+  trainingMode = 'inference',
 }) {
   const isMac = selectedHardware === 'mac';
   const localMemory = isMac ? macRAM : hardware.dgxSpark.memory;
   const cadToUsd = hardware.cadToUsd;
 
   // Check if workload fits in memory
-  const memoryInfo = canRunWorkload(localMemory, workload, models, selectedHardware);
+  const memoryInfo = canRunWorkload(localMemory, workload, models, selectedHardware, trainingMode);
 
   const localPrice = isMac
     ? hardware.mac.configs[macRAM].priceCAD * cadToUsd
