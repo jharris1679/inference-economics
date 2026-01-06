@@ -242,10 +242,23 @@ export default function PayoffCalculator() {
   return (
     <div className="min-h-screen bg-gray-950 text-gray-100 p-6">
       <div className="max-w-6xl mx-auto">
-        <h1 className="text-2xl font-bold mb-2 text-white">Hardware vs. Cloud Payoff Calculator</h1>
-        <p className="text-gray-400 mb-6">
-          Using real benchmark data — cloud hours adjusted to match your local token output
-        </p>
+        {/* ANS-517: Header with data freshness indicator */}
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
+          <div>
+            <h1 className="text-2xl font-bold mb-2 text-white">Hardware vs. Cloud Payoff Calculator</h1>
+            <p className="text-gray-400">
+              Using real benchmark data — cloud hours adjusted to match your local token output
+            </p>
+          </div>
+          <div className="mt-3 md:mt-0 flex items-center gap-2 bg-gray-800 rounded-lg px-3 py-2 border border-gray-700">
+            <svg className="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span className="text-sm text-gray-300">
+              Data updated: <span className="text-white font-medium">{apiProviders.updatedAt}</span>
+            </span>
+          </div>
+        </div>
 
         {/* Controls */}
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-8">
@@ -607,7 +620,15 @@ export default function PayoffCalculator() {
                     return (
                       <tr key={`${p.provider}-${p.gpus}`} className={`border-b border-gray-800/50 ${idx === 0 ? 'bg-blue-900/10' : ''}`}>
                         <td className="py-3 px-3">
-                          <div className="font-medium text-white">{p.provider}</div>
+                          {/* ANS-517: Link to provider pricing page */}
+                          <a
+                            href={cloudProviders.sources?.[p.provider]}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="font-medium text-white hover:text-blue-400 transition-colors"
+                          >
+                            {p.provider}
+                          </a>
                           <div className="text-xs text-gray-500">${p.hourlyRatePerGPU}/GPU/hr</div>
                         </td>
                         <td className="text-center py-3 px-2">
@@ -733,7 +754,15 @@ export default function PayoffCalculator() {
                           <React.Fragment key={api.name}>
                             <tr className={`border-b border-gray-800/50 ${idx === 0 ? 'bg-purple-900/10' : ''}`}>
                               <td className="py-3 px-3">
-                                <div className="font-medium text-white">{api.name}</div>
+                                {/* ANS-517: Link to provider pricing page */}
+                                <a
+                                  href={apiProviders.sources?.[api.name]}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="font-medium text-white hover:text-blue-400 transition-colors"
+                                >
+                                  {api.name}
+                                </a>
                                 {/* ANS-515: Show model breakdown inline for multi-model workloads */}
                                 {hasBreakdown && (
                                   <div className="mt-1 text-xs text-gray-500">
@@ -985,26 +1014,71 @@ export default function PayoffCalculator() {
           </div>
         )}
 
-        {/* Footer with sources */}
-        <div className="mt-4 bg-gray-900/50 rounded-xl p-4 border border-gray-800">
-          <p className="text-xs text-gray-500">
-            <strong className="text-gray-400">Benchmark sources:</strong> {models.methodology}
-            <br/>
-            <strong className="text-gray-400">GPU rental:</strong> {cloudProviders.providers.map(p => `${p.name} $${p.ratePerGPUHour}`).join(', ')} per {cloudProviders.gpuType}/hr.
-            <br/>
-            <strong className="text-gray-400">Data updated:</strong> {models.updatedAt} • Mac prices in CAD converted at {cadToUsd}.
-            <br/>
-            <strong className="text-gray-400">Sources:</strong>{' '}
-            {models.sources.slice(0, 3).map((s, i) => (
-              <span key={s.id}>
-                <a href={s.url} className="text-blue-400 hover:underline" target="_blank" rel="noopener noreferrer">
-                  {s.name}
-                </a>
-                {i < 2 && ', '}
-              </span>
-            ))}
-            {models.sources.length > 3 && ` +${models.sources.length - 3} more`}
-          </p>
+        {/* ANS-517: Footer with Data Sources & Methodology */}
+        <div className="mt-4 bg-gray-900/50 rounded-xl p-5 border border-gray-800">
+          <h3 className="text-sm font-semibold text-gray-300 mb-3">Data Sources & Methodology</h3>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs text-gray-500">
+            {/* Calculation Methodology */}
+            <div>
+              <h4 className="text-gray-400 font-medium mb-2">How We Calculate</h4>
+              <ul className="space-y-1.5">
+                <li><strong className="text-gray-400">Payoff:</strong> Hardware cost ÷ daily cloud savings = days to break even</li>
+                <li><strong className="text-gray-400">Cloud hours:</strong> Adjusted to match local token output using throughput ratios</li>
+                <li><strong className="text-gray-400">API costs:</strong> 50% input + 50% output tokens (blended rate)</li>
+                <li><strong className="text-gray-400">Memory:</strong> Model weights + KV cache overhead; training modes add optimizer states</li>
+              </ul>
+            </div>
+
+            {/* Data Sources */}
+            <div>
+              <h4 className="text-gray-400 font-medium mb-2">Data Sources</h4>
+              <ul className="space-y-1.5">
+                <li>
+                  <strong className="text-gray-400">Benchmarks:</strong>{' '}
+                  {models.sources.slice(0, 3).map((s, i) => (
+                    <span key={s.id}>
+                      <a href={s.url} className="text-blue-400 hover:underline" target="_blank" rel="noopener noreferrer">
+                        {s.name}
+                      </a>
+                      {i < 2 && ', '}
+                    </span>
+                  ))}
+                  {models.sources.length > 3 && ` +${models.sources.length - 3} more`}
+                </li>
+                <li>
+                  <strong className="text-gray-400">GPU rental:</strong>{' '}
+                  {cloudProviders.providers.slice(0, 3).map((p, i) => (
+                    <span key={p.id}>
+                      <a href={cloudProviders.sources?.[p.name]} className="text-blue-400 hover:underline" target="_blank" rel="noopener noreferrer">
+                        {p.name}
+                      </a>
+                      {i < 2 && ', '}
+                    </span>
+                  ))}
+                  {cloudProviders.providers.length > 3 && ` +${cloudProviders.providers.length - 3} more`}
+                </li>
+                <li>
+                  <strong className="text-gray-400">API pricing:</strong>{' '}
+                  {Object.keys(apiProviders.sources || {}).slice(0, 4).map((name, i, arr) => (
+                    <span key={name}>
+                      <a href={apiProviders.sources[name]} className="text-blue-400 hover:underline" target="_blank" rel="noopener noreferrer">
+                        {name}
+                      </a>
+                      {i < arr.length - 1 && ', '}
+                    </span>
+                  ))}
+                  {Object.keys(apiProviders.sources || {}).length > 4 && ` +${Object.keys(apiProviders.sources).length - 4} more`}
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="mt-3 pt-3 border-t border-gray-800 text-xs text-gray-600">
+            <strong className="text-gray-500">Last updated:</strong> {apiProviders.updatedAt} •{' '}
+            <strong className="text-gray-500">Mac prices:</strong> CAD converted at {cadToUsd} USD •{' '}
+            <strong className="text-gray-500">GPU type:</strong> {cloudProviders.gpuType}
+          </div>
         </div>
       </div>
     </div>
