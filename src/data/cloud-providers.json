@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-01-05",
+  "updatedAt": "2026-01-09",
   "gpuType": "H100",
   "sources": {
     "RunPod": "https://www.runpod.io/gpu-instance/pricing",
@@ -9,7 +9,7 @@
     "AWS": "https://aws.amazon.com/ec2/instance-types/p5/"
   },
   "providers": [
-    { "id": "runpod", "name": "RunPod", "ratePerGPUHour": 1.99 },
+    { "id": "runpod", "name": "RunPod", "ratePerGPUHour": 2.49 },
     { "id": "denvr", "name": "Denvr", "ratePerGPUHour": 2.10 },
     { "id": "lambda", "name": "Lambda", "ratePerGPUHour": 2.99 },
     { "id": "gcp", "name": "GCP", "ratePerGPUHour": 3.00 },

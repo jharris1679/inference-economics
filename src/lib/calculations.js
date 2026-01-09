@@ -551,6 +551,9 @@ export function computeWorkloadComparison({
       apiCostsByProvider[api.name].modelsServed += 1;
       apiCostsByProvider[api.name].details.push({
         modelId: entry.modelId,
+        modelName: model.name,
+        quantity: entry.quantity,
+        tokensPerDay: modelTokensPerDay,  // Track tokens for weighted avg
         inputPer1M: api.inputPer1M,
         outputPer1M: api.outputPer1M,
         blendedPer1M: blendedRate,
@@ -565,26 +568,28 @@ export function computeWorkloadComparison({
     .map(p => {
       const monthlyCost = p.totalDailyCost * 30;
       const payoffDays = calculatePayoffDays(localPrice, p.totalDailyCost);
-      // Average blended rate across models
-      const avgBlended = p.details.reduce((sum, d) => sum + d.blendedPer1M, 0) / p.details.length;
-      // Calculate per-model breakdown with percentages
-      const totalDailyCost = p.totalDailyCost;
-      const modelBreakdown = p.details.map(d => ({
-        modelId: d.modelId,
-        blendedPer1M: d.blendedPer1M,
-        dailyCost: d.dailyCost,
-        percentage: totalDailyCost > 0 ? (d.dailyCost / totalDailyCost) * 100 : 0,
-      }));
+
+      // ANS-515: Calculate weighted averages based on token volume
+      const totalTokens = p.details.reduce((sum, d) => sum + d.tokensPerDay, 0);
+      const weightedInput = totalTokens > 0
+        ? p.details.reduce((sum, d) => sum + (d.inputPer1M * d.tokensPerDay), 0) / totalTokens
+        : p.details[0]?.inputPer1M || 0;
+      const weightedOutput = totalTokens > 0
+        ? p.details.reduce((sum, d) => sum + (d.outputPer1M * d.tokensPerDay), 0) / totalTokens
+        : p.details[0]?.outputPer1M || 0;
+      const weightedBlended = calculateBlendedRate(weightedInput, weightedOutput);
+
       return {
         name: p.name,
-        blendedPer1M: avgBlended,
-        inputPer1M: p.details[0]?.inputPer1M || 0,
-        outputPer1M: p.details[0]?.outputPer1M || 0,
+        blendedPer1M: weightedBlended,
+        inputPer1M: weightedInput,
+        outputPer1M: weightedOutput,
         dailyCost: p.totalDailyCost,
         monthlyCost,
         payoffDays: Math.ceil(payoffDays),
         payoffMonths: payoffDays / 30,
-        modelBreakdown, // ANS-515: Per-model cost breakdown
+        // ANS-515: Expose per-model breakdown for multi-model workloads
+        details: p.details,
       };
     })
     .sort((a, b) => a.dailyCost - b.dailyCost);
