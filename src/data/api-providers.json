@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-01-05",
+  "updatedAt": "2026-01-09",
   "note": "Prices per 1M tokens. Blended rate assumes 50% input, 50% output.",
   "sources": {
     "OpenAI": "https://openai.com/api/pricing/",
@@ -22,10 +22,10 @@
       { "name": "Amazon Bedrock", "inputPer1M": 0.22, "outputPer1M": 0.22 }
     ],
     "llama-3.1-70b": [
-      { "name": "Groq", "inputPer1M": 0.59, "outputPer1M": 0.79 },
+      { "name": "Groq", "inputPer1M": 0.59, "outputPer1M": 0.99 },
       { "name": "Together", "inputPer1M": 0.88, "outputPer1M": 0.88 },
       { "name": "Fireworks", "inputPer1M": 0.90, "outputPer1M": 0.90 },
-      { "name": "DeepInfra", "inputPer1M": 0.35, "outputPer1M": 0.40 },
+      { "name": "DeepInfra", "inputPer1M": 0.10, "outputPer1M": 0.32 },
       { "name": "Amazon Bedrock", "inputPer1M": 0.72, "outputPer1M": 0.72 }
     ],
     "llama-3.1-405b": [
