@@ -1,0 +1,69 @@
+{
+  "updatedAt": "2026-01-11",
+  "note": "Cloud training providers for fine-tuning workloads. Prices per GPU-hour.",
+  "providers": [
+    {
+      "id": "prime-intellect",
+      "name": "Prime Intellect",
+      "description": "Decentralized GPU marketplace with RFT (Reinforcement Fine-Tuning) service",
+      "ratePerGPUHour": 1.65,
+      "gpuType": "H100",
+      "features": [
+        "prime-rl framework",
+        "Environments Hub (500+ tasks)",
+        "Up to 256 GPUs on-demand",
+        "Open-source stack"
+      ],
+      "url": "https://www.primeintellect.ai/",
+      "docsUrl": "https://docs.primeintellect.ai/"
+    },
+    {
+      "id": "lambda-labs",
+      "name": "Lambda Labs",
+      "description": "GPU cloud optimized for ML training workloads",
+      "ratePerGPUHour": 1.99,
+      "gpuType": "H100",
+      "features": [
+        "Jupyter notebooks",
+        "Pre-installed ML frameworks",
+        "Persistent storage"
+      ],
+      "url": "https://lambdalabs.com/",
+      "docsUrl": "https://docs.lambdalabs.com/"
+    },
+    {
+      "id": "runpod",
+      "name": "RunPod",
+      "description": "Serverless GPU platform with training templates",
+      "ratePerGPUHour": 2.49,
+      "gpuType": "H100",
+      "features": [
+        "Serverless endpoints",
+        "Template library",
+        "Spot instances available"
+      ],
+      "url": "https://www.runpod.io/",
+      "docsUrl": "https://docs.runpod.io/"
+    },
+    {
+      "id": "vast-ai",
+      "name": "Vast.ai",
+      "description": "GPU marketplace with community and datacenter options",
+      "ratePerGPUHour": 1.89,
+      "gpuType": "H100",
+      "features": [
+        "Bid pricing",
+        "Wide GPU selection",
+        "Docker containers"
+      ],
+      "url": "https://vast.ai/",
+      "docsUrl": "https://vast.ai/docs/"
+    }
+  ],
+  "sources": {
+    "Prime Intellect": "https://www.primeintellect.ai/blog/compute",
+    "Lambda Labs": "https://lambdalabs.com/service/gpu-cloud",
+    "RunPod": "https://www.runpod.io/gpu-instance/pricing",
+    "Vast.ai": "https://vast.ai/"
+  }
+}

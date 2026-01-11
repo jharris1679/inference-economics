@@ -123,7 +123,10 @@ import {
   getModelsByDeveloper,
   getModel,
   TRAINING_MODES,
+  TRAINING_CATEGORIES,
 } from '../lib/calculations.js';
+
+import trainingProviders from '../data/training-providers.json';
 
 const developerList = getDeveloperList(models);
 const ramOptions = Object.keys(hardware.mac.configs).map(Number);
@@ -133,7 +136,12 @@ export default function PayoffCalculator() {
   const [dailyHours, setDailyHours] = useState(12);
   const [macRAM, setMacRAM] = useState(512);
   const [selectedHardware, setSelectedHardware] = useState('mac');
-  const [trainingMode, setTrainingMode] = useState('inference'); // ANS-514: Training mode selector
+  // ANS-514: Training mode with category/variant selection
+  const [trainingCategory, setTrainingCategory] = useState('inference');
+  const [trainingMode, setTrainingMode] = useState('inference');
+
+  // Helper to check if we're in training mode (not inference)
+  const isTrainingMode = trainingMode !== 'inference';
 
   // Workload state (ANS-504) - array of models to run
   const [workload, setWorkload] = useState(() => [
@@ -460,38 +468,81 @@ export default function PayoffCalculator() {
             </div>
           </div>
 
-          {/* ANS-514: Training Mode Selector */}
+          {/* ANS-514: Training Mode Selector with Category/Variant */}
           <div className="bg-gray-900 rounded-xl p-4 border border-gray-800 lg:col-span-2">
             <label className="block text-sm font-medium text-gray-400 mb-3">
               Mode: <span className="text-white font-bold">{memoryInfo.trainingMode}</span>
+              {isTrainingMode && (
+                <span className="ml-2 text-orange-400 text-xs">({TRAINING_MODES[trainingMode]?.multiplier}× RAM)</span>
+              )}
             </label>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-              {Object.entries(TRAINING_MODES).map(([key, mode]) => (
+
+            {/* Category selector */}
+            <div className="flex flex-wrap gap-2 mb-3">
+              {Object.entries(TRAINING_CATEGORIES).map(([catKey, cat]) => (
                 <button
-                  key={key}
-                  onClick={() => setTrainingMode(key)}
-                  className={`p-2 rounded-lg text-left transition-all ${
-                    trainingMode === key
-                      ? key === 'inference'
+                  key={catKey}
+                  onClick={() => {
+                    setTrainingCategory(catKey);
+                    // Auto-select first variant when changing category
+                    setTrainingMode(cat.variants[0]);
+                  }}
+                  className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                    trainingCategory === catKey
+                      ? catKey === 'inference'
                         ? 'bg-blue-600 text-white'
                         : 'bg-orange-600 text-white'
                       : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
                   }`}
                 >
-                  <div className="font-medium text-sm">{mode.name}</div>
-                  <div className="text-xs opacity-75 truncate">{mode.multiplier}× RAM</div>
+                  {cat.name}
                 </button>
               ))}
             </div>
-            {memoryInfo.isTraining && (
-              <div className="mt-3 text-xs text-orange-400 bg-orange-900/20 rounded-lg p-2">
-                <strong>Training mode:</strong> {memoryInfo.trainingDescription}
-                <br />
-                <span className="text-orange-300">
-                  Memory includes: weights + gradients + optimizer states + activations
-                </span>
+
+            {/* Variant selector (only show if category has multiple variants) */}
+            {TRAINING_CATEGORIES[trainingCategory]?.variants.length > 1 && (
+              <div className="flex flex-wrap gap-2 mb-3">
+                {TRAINING_CATEGORIES[trainingCategory].variants.map((variantKey) => {
+                  const variant = TRAINING_MODES[variantKey];
+                  return (
+                    <button
+                      key={variantKey}
+                      onClick={() => setTrainingMode(variantKey)}
+                      className={`px-3 py-1.5 rounded-lg text-xs transition-all ${
+                        trainingMode === variantKey
+                          ? 'bg-gray-600 text-white ring-2 ring-orange-500'
+                          : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                      }`}
+                    >
+                      {variant.name.replace(`${TRAINING_CATEGORIES[trainingCategory].name} `, '')}
+                      <span className="text-gray-500 ml-1">({variant.multiplier}×)</span>
+                    </button>
+                  );
+                })}
               </div>
             )}
+
+            {/* Description */}
+            <div className={`text-xs rounded-lg p-2 ${
+              isTrainingMode
+                ? 'text-orange-400 bg-orange-900/20'
+                : 'text-gray-500 bg-gray-800/50'
+            }`}>
+              {isTrainingMode ? (
+                <>
+                  <strong>Training mode:</strong> {TRAINING_MODES[trainingMode]?.description}
+                  <br />
+                  <span className="text-orange-300">
+                    Memory includes: weights + gradients + optimizer states + activations
+                  </span>
+                </>
+              ) : (
+                <>
+                  <strong>Inference mode:</strong> {TRAINING_MODES[trainingMode]?.description}
+                </>
+              )}
+            </div>
           </div>
         </div>
 
@@ -701,8 +752,8 @@ export default function PayoffCalculator() {
           </div>
         )}
 
-        {/* API Provider Comparison */}
-        {calculations.canRun && calculations.apiProviders.length > 0 && (
+        {/* API Provider Comparison - Only shown in inference mode */}
+        {calculations.canRun && calculations.apiProviders.length > 0 && !isTrainingMode && (
           <div className="mb-8">
             <div className="flex items-center justify-between mb-2">
               <h2 className="text-lg font-semibold text-white">API Provider Comparison</h2>
@@ -829,8 +880,102 @@ export default function PayoffCalculator() {
           </div>
         )}
 
-        {/* Proprietary API Alternatives - Provider Stacks */}
-        {calculations.canRun && calculations.proprietaryAlternatives?.length > 0 && (
+        {/* Training Providers - Only shown in training mode */}
+        {calculations.canRun && isTrainingMode && (
+          <div className="mb-8">
+            <div className="flex items-center justify-between mb-2">
+              <h2 className="text-lg font-semibold text-white">Training Providers</h2>
+            </div>
+            <p className="text-sm text-gray-500 mb-4">
+              Cloud GPU platforms for {TRAINING_MODES[trainingMode]?.name} workloads
+            </p>
+
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="text-gray-400 border-b border-gray-800">
+                    <th className="text-left py-3 px-3">Provider</th>
+                    <th className="text-center py-3 px-2">GPU</th>
+                    <th className="text-right py-3 px-2">$/hr</th>
+                    <th className="text-right py-3 px-2 bg-red-900/20">$/day</th>
+                    <th className="text-right py-3 px-2">$/mo</th>
+                    <th className="text-right py-3 px-3 bg-green-900/20">Payoff</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {trainingProviders.providers.map((provider, idx) => {
+                    // Calculate costs based on daily hours and GPU requirements
+                    const gpusNeeded = Math.ceil(
+                      calculations.workloadSummary?.reduce((sum, w) => {
+                        const model = getModel(models, workload.find(e => e.modelId === w.modelId)?.developerId, w.modelId);
+                        return sum + (model?.cloudGPUs || 1) * w.quantity;
+                      }, 0) || 1
+                    );
+                    const dailyCost = provider.ratePerGPUHour * gpusNeeded * dailyHours;
+                    const monthlyCost = dailyCost * 30;
+                    const payoffDays = calculations.localPrice / dailyCost;
+                    const payoffMonths = payoffDays / 30;
+
+                    const payoffColor =
+                      payoffMonths < 3 ? 'text-green-400' :
+                      payoffMonths < 6 ? 'text-emerald-400' :
+                      payoffMonths < 12 ? 'text-yellow-400' :
+                      payoffMonths < 24 ? 'text-orange-400' : 'text-red-400';
+
+                    return (
+                      <tr key={provider.id} className={`border-b border-gray-800/50 ${idx === 0 ? 'bg-orange-900/10' : ''}`}>
+                        <td className="py-3 px-3">
+                          <a
+                            href={provider.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="font-medium text-white hover:text-blue-400 transition-colors"
+                          >
+                            {provider.name}
+                          </a>
+                          <div className="text-xs text-gray-500 mt-1">
+                            {provider.description}
+                          </div>
+                        </td>
+                        <td className="text-center py-3 px-2">
+                          <span className={`font-mono ${gpusNeeded > 1 ? 'text-yellow-400' : 'text-gray-300'}`}>
+                            {gpusNeeded}× {provider.gpuType}
+                          </span>
+                        </td>
+                        <td className="text-right py-3 px-2 font-mono text-gray-400">
+                          ${(provider.ratePerGPUHour * gpusNeeded).toFixed(2)}
+                        </td>
+                        <td className="text-right py-3 px-2 bg-red-900/10 font-mono text-red-400">
+                          ${dailyCost.toFixed(2)}
+                        </td>
+                        <td className="text-right py-3 px-2 font-mono text-red-400">
+                          ${monthlyCost.toFixed(0)}
+                        </td>
+                        <td className={`text-right py-3 px-3 bg-green-900/10 font-bold ${payoffColor}`}>
+                          {formatPayoff(payoffMonths)}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+
+            <div className="mt-4 bg-orange-900/20 border border-orange-800/30 rounded-lg p-4">
+              <div className="font-medium text-orange-300 mb-1">Training vs Inference Providers</div>
+              <div className="text-orange-200/70 text-sm">
+                Training providers like <strong>Prime Intellect</strong> offer specialized RL/fine-tuning infrastructure
+                including distributed training frameworks, environment libraries, and optimized training stacks.
+                {trainingProviders.providers[0] && (
+                  <> Cheapest option: {trainingProviders.providers[0].name} @ ${trainingProviders.providers[0].ratePerGPUHour}/GPU-hr</>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Proprietary API Alternatives - Provider Stacks - Only shown in inference mode */}
+        {calculations.canRun && calculations.proprietaryAlternatives?.length > 0 && !isTrainingMode && (
           <div className="mb-8">
             <div className="flex items-center justify-between mb-2">
               <h2 className="text-lg font-semibold text-white">Proprietary API Alternatives</h2>
@@ -921,35 +1066,98 @@ export default function PayoffCalculator() {
         )}
 
         {/* Summary */}
-        {calculations.canRun && (filteredProviders.length > 0 || filteredApiProviders.length > 0 || calculations.proprietaryAlternatives?.length > 0) && (
-          <div className="mt-6 bg-blue-900/20 border border-blue-800/50 rounded-xl p-5">
-              <h3 className="font-semibold text-blue-300 mb-3">Bottom Line</h3>
-              <div className="space-y-2 text-sm text-blue-200/80">
+        {calculations.canRun && (filteredProviders.length > 0 || filteredApiProviders.length > 0 || calculations.proprietaryAlternatives?.length > 0 || isTrainingMode) && (
+          <div className={`mt-6 rounded-xl p-5 ${isTrainingMode ? 'bg-orange-900/20 border border-orange-800/50' : 'bg-blue-900/20 border border-blue-800/50'}`}>
+              <h3 className={`font-semibold mb-3 ${isTrainingMode ? 'text-orange-300' : 'text-blue-300'}`}>
+                Bottom Line {isTrainingMode && `(${TRAINING_MODES[trainingMode]?.name})`}
+              </h3>
+              <div className={`space-y-2 text-sm ${isTrainingMode ? 'text-orange-200/80' : 'text-blue-200/80'}`}>
                 <p>
-                  Running <strong>{workload.length} model{workload.length > 1 ? 's' : ''}</strong> for <strong>{dailyHours}h/day</strong> on <strong>{calculations.localName}</strong>:
+                  {isTrainingMode ? 'Training' : 'Running'} <strong>{workload.length} model{workload.length > 1 ? 's' : ''}</strong> for <strong>{dailyHours}h/day</strong> on <strong>{calculations.localName}</strong>:
                 </p>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-3">
+                <div className={`grid grid-cols-1 ${isTrainingMode ? 'md:grid-cols-2' : 'md:grid-cols-3'} gap-4 mt-3`}>
                   <div className="bg-black/20 rounded-lg p-3">
                     <div className="text-green-400 font-medium mb-1">Local Hardware</div>
-                    <div>{dailyHours}h/day @ {calculations.localTPS} tok/s</div>
-                    <div>One-time: ${calculations.localPrice.toLocaleString(undefined, {maximumFractionDigits: 0})}</div>
+                    {isTrainingMode ? (
+                      <>
+                        <div>{memoryInfo.totalRAM}GB RAM ({TRAINING_MODES[trainingMode]?.multiplier}× inference)</div>
+                        <div>One-time: ${calculations.localPrice.toLocaleString(undefined, {maximumFractionDigits: 0})}</div>
+                      </>
+                    ) : (
+                      <>
+                        <div>{dailyHours}h/day @ {calculations.localTPS} tok/s</div>
+                        <div>One-time: ${calculations.localPrice.toLocaleString(undefined, {maximumFractionDigits: 0})}</div>
+                      </>
+                    )}
                   </div>
-                  <div className="bg-black/20 rounded-lg p-3">
-                    <div className="text-orange-400 font-medium mb-1">GPU Rental ({cheapest?.provider})</div>
-                    <div>{formatHours(cheapest?.cloudHoursNeeded)}/day @ {cheapest?.cloudTPS} tok/s</div>
-                    <div>${cheapest?.dailyCost.toFixed(2)}/day = ${cheapest?.monthlyCost.toFixed(0)}/mo</div>
-                  </div>
-                  {filteredApiProviders[0] && (
+                  {isTrainingMode ? (
+                    // Training mode: show training provider comparison
                     <div className="bg-black/20 rounded-lg p-3">
-                      <div className="text-purple-400 font-medium mb-1">API ({filteredApiProviders[0].name})</div>
-                      <div>${filteredApiProviders[0].blendedPer1M.toFixed(2)}/1M tokens</div>
-                      <div>${filteredApiProviders[0].dailyCost.toFixed(2)}/day = ${filteredApiProviders[0].monthlyCost.toFixed(0)}/mo</div>
+                      <div className="text-orange-400 font-medium mb-1">
+                        Training Provider ({trainingProviders.providers[0]?.name})
+                      </div>
+                      {(() => {
+                        const gpusNeeded = Math.ceil(
+                          calculations.workloadSummary?.reduce((sum, w) => {
+                            const model = getModel(models, workload.find(e => e.modelId === w.modelId)?.developerId, w.modelId);
+                            return sum + (model?.cloudGPUs || 1) * w.quantity;
+                          }, 0) || 1
+                        );
+                        const provider = trainingProviders.providers[0];
+                        const dailyCost = provider?.ratePerGPUHour * gpusNeeded * dailyHours || 0;
+                        return (
+                          <>
+                            <div>{gpusNeeded}× {provider?.gpuType} @ ${provider?.ratePerGPUHour}/hr</div>
+                            <div>${dailyCost.toFixed(2)}/day = ${(dailyCost * 30).toFixed(0)}/mo</div>
+                          </>
+                        );
+                      })()}
                     </div>
+                  ) : (
+                    // Inference mode: show GPU rental and API
+                    <>
+                      <div className="bg-black/20 rounded-lg p-3">
+                        <div className="text-orange-400 font-medium mb-1">GPU Rental ({cheapest?.provider})</div>
+                        <div>{formatHours(cheapest?.cloudHoursNeeded)}/day @ {cheapest?.cloudTPS} tok/s</div>
+                        <div>${cheapest?.dailyCost.toFixed(2)}/day = ${cheapest?.monthlyCost.toFixed(0)}/mo</div>
+                      </div>
+                      {filteredApiProviders[0] && (
+                        <div className="bg-black/20 rounded-lg p-3">
+                          <div className="text-purple-400 font-medium mb-1">API ({filteredApiProviders[0].name})</div>
+                          <div>${filteredApiProviders[0].blendedPer1M.toFixed(2)}/1M tokens</div>
+                          <div>${filteredApiProviders[0].dailyCost.toFixed(2)}/day = ${filteredApiProviders[0].monthlyCost.toFixed(0)}/mo</div>
+                        </div>
+                      )}
+                    </>
                   )}
                 </div>
 
                 {/* Determine best option */}
                 {(() => {
+                  if (isTrainingMode) {
+                    // Training mode payoff calculation
+                    const gpusNeeded = Math.ceil(
+                      calculations.workloadSummary?.reduce((sum, w) => {
+                        const model = getModel(models, workload.find(e => e.modelId === w.modelId)?.developerId, w.modelId);
+                        return sum + (model?.cloudGPUs || 1) * w.quantity;
+                      }, 0) || 1
+                    );
+                    const provider = trainingProviders.providers[0];
+                    const dailyCost = provider?.ratePerGPUHour * gpusNeeded * dailyHours || Infinity;
+                    const payoffDays = calculations.localPrice / dailyCost;
+                    const payoffMonths = payoffDays / 30;
+
+                    return (
+                      <p className={payoffMonths < 12 ? 'text-green-300 mt-3' : 'text-yellow-300 mt-3'}>
+                        {payoffMonths < 12
+                          ? `✓ Hardware pays off in ${Math.ceil(payoffDays)} days (${formatPayoff(payoffMonths)}) vs cloud training (${provider?.name}). After that, training is essentially free.`
+                          : `⚠ Hardware takes ${formatPayoff(payoffMonths)} to pay off vs cloud training (${provider?.name}) at this utilization level.`
+                        }
+                      </p>
+                    );
+                  }
+
+                  // Inference mode payoff calculation
                   const cheapestApi = filteredApiProviders[0];
                   const gpuCost = cheapest?.dailyCost || Infinity;
                   const apiCost = cheapestApi?.dailyCost || Infinity;

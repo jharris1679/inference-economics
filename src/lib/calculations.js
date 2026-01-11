@@ -372,22 +372,133 @@ export function computeComparison({
 }
 
 /**
- * GRPO Training memory estimation (ANS-514)
+ * Training mode memory estimation (ANS-514)
  *
  * Training requires significantly more memory than inference:
  * - Base model weights (same as inference minRAM)
- * - Gradients (~= model weights)
- * - Optimizer states (~2x model weights for Adam)
+ * - Gradients (~= model weights for full, ~10% for LoRA)
+ * - Optimizer states (~2x gradients for Adam)
  * - Activations (~0.5-1x model weights depending on batch size)
  *
- * Total ≈ 4-5x inference memory for full fine-tuning
- * LoRA/QLoRA variants reduce this to ~1.1-1.5x
+ * Memory multipliers (vs inference baseline):
+ * - Full fine-tuning: 3-4x (weights + gradients + optimizer + activations)
+ * - LoRA: ~1.3x (frozen weights + small adapters)
+ * - QLoRA: ~1.15x (4-bit quantized + adapters)
+ * - DPO: ~2x (needs reference model)
+ * - ORPO: ~1.8x (no reference model needed)
+ * - GRPO/PPO: ~4.5x (policy + reference + reward models)
+ *
+ * Sources:
+ * - https://modal.com/blog/how-much-vram-need-fine-tuning
+ * - https://www.oxen.ai/blog/grpo-vram-requirements-for-the-gpu-poor
+ * - https://docs.unsloth.ai/get-started/reinforcement-learning-rl-guide/memory-efficient-rl
  */
+
+// Training mode categories for UI organization
+export const TRAINING_CATEGORIES = {
+  inference: {
+    name: 'Inference',
+    description: 'Run models for inference only',
+    variants: ['inference'],
+  },
+  sft: {
+    name: 'SFT',
+    description: 'Supervised Fine-Tuning with labeled data',
+    variants: ['sftFull', 'sftLora', 'sftQlora'],
+  },
+  dpo: {
+    name: 'DPO',
+    description: 'Direct Preference Optimization (preference pairs)',
+    variants: ['dpoFull', 'dpoLora'],
+  },
+  orpo: {
+    name: 'ORPO',
+    description: 'Odds Ratio Preference Optimization (no ref model)',
+    variants: ['orpoFull', 'orpoLora'],
+  },
+  grpo: {
+    name: 'GRPO',
+    description: 'Group Relative Policy Optimization (RL)',
+    variants: ['grpoFull', 'grpoLora', 'grpoQlora'],
+  },
+};
+
 export const TRAINING_MODES = {
-  inference: { name: 'Inference', multiplier: 1, description: 'Model weights + KV cache only' },
-  grpoFull: { name: 'GRPO (Full)', multiplier: 4.5, description: 'Full fine-tuning with Adam optimizer' },
-  grpoLora: { name: 'GRPO (LoRA)', multiplier: 1.3, description: 'Low-rank adaptation, ~10% trainable params' },
-  grpoQlora: { name: 'GRPO (QLoRA)', multiplier: 1.15, description: '4-bit quantized with LoRA adapters' },
+  // Inference (baseline)
+  inference: {
+    name: 'Inference',
+    category: 'inference',
+    multiplier: 1,
+    description: 'Model weights + KV cache only',
+  },
+
+  // SFT - Supervised Fine-Tuning
+  sftFull: {
+    name: 'SFT (Full)',
+    category: 'sft',
+    multiplier: 3.5,
+    description: 'Full parameter update with Adam optimizer',
+  },
+  sftLora: {
+    name: 'SFT (LoRA)',
+    category: 'sft',
+    multiplier: 1.3,
+    description: 'Low-rank adaptation, ~1-5% trainable params',
+  },
+  sftQlora: {
+    name: 'SFT (QLoRA)',
+    category: 'sft',
+    multiplier: 1.15,
+    description: '4-bit quantized base + LoRA adapters',
+  },
+
+  // DPO - Direct Preference Optimization
+  dpoFull: {
+    name: 'DPO (Full)',
+    category: 'dpo',
+    multiplier: 2.0,
+    description: 'Policy + reference model, preference pairs',
+  },
+  dpoLora: {
+    name: 'DPO (LoRA)',
+    category: 'dpo',
+    multiplier: 1.4,
+    description: 'LoRA adapters with reference model',
+  },
+
+  // ORPO - Odds Ratio Preference Optimization
+  orpoFull: {
+    name: 'ORPO (Full)',
+    category: 'orpo',
+    multiplier: 1.8,
+    description: 'No reference model, odds-ratio objective',
+  },
+  orpoLora: {
+    name: 'ORPO (LoRA)',
+    category: 'orpo',
+    multiplier: 1.2,
+    description: 'Most memory-efficient preference tuning',
+  },
+
+  // GRPO - Group Relative Policy Optimization (RL)
+  grpoFull: {
+    name: 'GRPO (Full)',
+    category: 'grpo',
+    multiplier: 4.5,
+    description: 'Full RL with policy + reference + reward models',
+  },
+  grpoLora: {
+    name: 'GRPO (LoRA)',
+    category: 'grpo',
+    multiplier: 1.3,
+    description: 'LoRA adapters for RL fine-tuning',
+  },
+  grpoQlora: {
+    name: 'GRPO (QLoRA)',
+    category: 'grpo',
+    multiplier: 1.15,
+    description: '4-bit quantized RL training',
+  },
 };
 
 /**
