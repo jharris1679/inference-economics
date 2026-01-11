@@ -15,6 +15,7 @@
           "cloudTokPerSec": 150,
           "cloudGPUs": 0.2,
           "quantization": "MXFP4",
+          "tier": "small",
           "notes": "MoE architecture, ~12GB loaded, 5 instances per H100"
         },
         "gpt-oss-120b": {
@@ -27,6 +28,7 @@
           "cloudTokPerSec": 100,
           "cloudGPUs": 1,
           "quantization": "MXFP4",
+          "tier": "large",
           "notes": "MoE, single 80GB H100"
         }
       }
@@ -43,6 +45,7 @@
           "cloudTokPerSec": 120,
           "cloudGPUs": 0.1,
           "quantization": "Q4_K_M",
+          "tier": "small",
           "notes": "~5GB loaded, 10 instances per H100"
         },
         "llama-3.1-70b": {
@@ -54,6 +57,7 @@
           "cloudTokPerSec": 35,
           "cloudGPUs": 2,
           "quantization": "Q4_K_M",
+          "tier": "large",
           "notes": "~40GB weights, TP=2"
         },
         "llama-3.1-405b": {
@@ -65,6 +69,7 @@
           "cloudTokPerSec": 15,
           "cloudGPUs": 8,
           "quantization": "FP8",
+          "tier": "frontier",
           "notes": "~200GB weights, 8× H100"
         }
       }
@@ -81,6 +86,7 @@
           "cloudTokPerSec": 42,
           "cloudGPUs": 0.25,
           "quantization": "Q4_K_M",
+          "tier": "medium",
           "notes": "~18GB loaded, 4 instances per H100"
         },
         "deepseek-v3": {
@@ -93,6 +99,7 @@
           "cloudTokPerSec": 25,
           "cloudGPUs": 8,
           "quantization": "Q4_K_M",
+          "tier": "frontier",
           "notes": "MoE, 671B total / 37B active"
         }
       }
@@ -109,6 +116,7 @@
           "cloudTokPerSec": 110,
           "cloudGPUs": 0.1,
           "quantization": "Q4_K_M",
+          "tier": "small",
           "notes": "~4GB loaded, 10 instances per H100"
         },
         "qwen2.5-32b": {
@@ -120,6 +128,7 @@
           "cloudTokPerSec": 45,
           "cloudGPUs": 0.25,
           "quantization": "Q4_K_M",
+          "tier": "medium",
           "notes": "~18GB loaded, 4 instances per H100"
         },
         "qwen2.5-72b": {
@@ -131,6 +140,7 @@
           "cloudTokPerSec": 33,
           "cloudGPUs": 2,
           "quantization": "Q4_K_M",
+          "tier": "large",
           "notes": "~40GB weights, TP=2"
         }
       }
@@ -148,6 +158,7 @@
           "cloudTokPerSec": 50,
           "cloudGPUs": 2,
           "quantization": "FP8",
+          "tier": "frontier",
           "notes": "MoE, 1T total / 32B active, 256k context"
         }
       }
@@ -164,6 +175,7 @@
           "cloudTokPerSec": 115,
           "cloudGPUs": 0.1,
           "quantization": "Q4_K_M",
+          "tier": "small",
           "notes": "~4GB loaded, 10 instances per H100"
         },
         "sqlcoder-34b": {
@@ -175,6 +187,7 @@
           "cloudTokPerSec": 40,
           "cloudGPUs": 0.25,
           "quantization": "Q4_K_M",
+          "tier": "medium",
           "notes": "~18GB loaded, 4 instances per H100"
         },
         "sqlcoder-70b": {
@@ -186,6 +199,7 @@
           "cloudTokPerSec": 32,
           "cloudGPUs": 2,
           "quantization": "Q4_K_M",
+          "tier": "large",
           "notes": "Highest accuracy, text-to-SQL"
         }
       }

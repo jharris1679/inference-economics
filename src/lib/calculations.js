@@ -103,46 +103,133 @@ export function formatHours(hours) {
 }
 
 /**
- * Compute proprietary API alternatives - all models from all tiers.
- * User selects which models to compare via UI filters.
+ * Compute proprietary API alternatives grouped by provider.
+ * Maps workload tiers to each provider's equivalent models.
+ *
+ * @param {Object} params
+ * @param {Array} params.workload - The configured workload entries
+ * @param {Object} params.models - All OSS models data
+ * @param {number} params.dailyHours - Hours per day
+ * @param {number} params.localPrice - Local hardware price
+ * @param {Object} params.apiProviders - API providers data including proprietaryAlternatives
+ * @returns {Array} Provider-grouped results sorted by daily cost
  */
 export function computeProprietaryAlternatives({
-  tokensPerDay,
-  localTPS,
+  workload,
+  models,
+  dailyHours,
   localPrice,
   apiProviders
 }) {
   const allTiers = apiProviders.proprietaryAlternatives || {};
-  const results = [];
 
-  // Iterate over all tiers and compute costs for every model
-  Object.values(allTiers).forEach(tierData => {
+  // Step 1: Calculate tokens per tier from the workload
+  const tierTokens = {}; // { small: { tokens: X, models: [...] }, large: { tokens: Y, models: [...] } }
+
+  for (const entry of workload) {
+    const model = getModel(models, entry.developerId, entry.modelId);
+    if (!model || !model.tier) continue;
+
+    const tier = model.tier;
+    const tokensPerDay = calculateTokensPerDay(model.localTokPerSec, dailyHours) * entry.quantity;
+
+    if (!tierTokens[tier]) {
+      tierTokens[tier] = { tokens: 0, models: [] };
+    }
+    tierTokens[tier].tokens += tokensPerDay;
+    tierTokens[tier].models.push({
+      name: model.name,
+      quantity: entry.quantity,
+      tokensPerDay,
+    });
+  }
+
+  // Step 2: Group proprietary models by provider
+  const providerModels = {}; // { "OpenAI": { small: model, medium: model, ... }, ... }
+
+  Object.entries(allTiers).forEach(([tierName, tierData]) => {
     if (!tierData?.models) return;
 
     tierData.models.forEach(model => {
-      const blendedRatePer1M = calculateBlendedRate(model.inputPer1M, model.outputPer1M);
-      const dailyCost = calculateApiDailyCost(tokensPerDay, blendedRatePer1M);
-      const monthlyCost = dailyCost * 30;
-      const payoffDays = calculatePayoffDays(localPrice, dailyCost);
-      const tokPerSec = model.tokPerSec || 100;
-      const hoursNeeded = calculateCloudHoursNeeded(tokensPerDay, tokPerSec);
-      const speedRatio = localTPS > 0 ? tokPerSec / localTPS : Infinity;
+      const provider = model.provider;
+      if (!providerModels[provider]) {
+        providerModels[provider] = {};
+      }
+      // Use the first model for each tier per provider (could enhance to pick cheapest)
+      if (!providerModels[provider][tierName]) {
+        providerModels[provider][tierName] = model;
+      }
+    });
+  });
 
-      results.push({
-        name: model.name,
-        provider: model.provider,
-        inputPer1M: model.inputPer1M,
-        outputPer1M: model.outputPer1M,
-        blendedPer1M: blendedRatePer1M,
-        tokPerSec,
-        contextWindow: model.contextWindow,
-        hoursNeeded,
-        speedRatio,
-        dailyCost,
-        monthlyCost,
-        payoffDays: Math.ceil(payoffDays),
-        payoffMonths: payoffDays / 30,
+  // Step 3: For each provider, calculate cost for equivalent workload
+  const results = [];
+
+  Object.entries(providerModels).forEach(([providerName, tierModels]) => {
+    let totalDailyCost = 0;
+    let totalTokens = 0;
+    let weightedTokPerSec = 0;
+    const breakdown = [];
+    const missingTiers = [];
+
+    // Calculate cost for each tier in the workload
+    let weightedInputRate = 0;
+    let weightedOutputRate = 0;
+
+    Object.entries(tierTokens).forEach(([tier, tierData]) => {
+      const proprietaryModel = tierModels[tier];
+
+      if (!proprietaryModel) {
+        // Provider doesn't have a model in this tier
+        missingTiers.push(tier);
+        return;
+      }
+
+      const blendedRate = calculateBlendedRate(proprietaryModel.inputPer1M, proprietaryModel.outputPer1M);
+      const tierCost = calculateApiDailyCost(tierData.tokens, blendedRate);
+
+      totalDailyCost += tierCost;
+      totalTokens += tierData.tokens;
+      weightedTokPerSec += (proprietaryModel.tokPerSec || 100) * tierData.tokens;
+      weightedInputRate += proprietaryModel.inputPer1M * tierData.tokens;
+      weightedOutputRate += proprietaryModel.outputPer1M * tierData.tokens;
+
+      breakdown.push({
+        tier,
+        model: proprietaryModel.name,
+        tokensPerDay: tierData.tokens,
+        inputPer1M: proprietaryModel.inputPer1M,
+        outputPer1M: proprietaryModel.outputPer1M,
+        blendedPer1M: blendedRate,
+        dailyCost: tierCost,
+        tokPerSec: proprietaryModel.tokPerSec || 100,
+        ossModels: tierData.models, // What OSS models this replaces
       });
+    });
+
+    // Skip provider if missing required tiers
+    if (missingTiers.length > 0) {
+      return;
+    }
+
+    const avgTokPerSec = totalTokens > 0 ? weightedTokPerSec / totalTokens : 100;
+    const avgInputPer1M = totalTokens > 0 ? weightedInputRate / totalTokens : 0;
+    const avgOutputPer1M = totalTokens > 0 ? weightedOutputRate / totalTokens : 0;
+    const avgBlendedPer1M = calculateBlendedRate(avgInputPer1M, avgOutputPer1M);
+    const monthlyCost = totalDailyCost * 30;
+    const payoffDays = calculatePayoffDays(localPrice, totalDailyCost);
+
+    results.push({
+      provider: providerName,
+      inputPer1M: avgInputPer1M,
+      outputPer1M: avgOutputPer1M,
+      blendedPer1M: avgBlendedPer1M,
+      dailyCost: totalDailyCost,
+      monthlyCost,
+      payoffDays: Math.ceil(payoffDays),
+      payoffMonths: payoffDays / 30,
+      avgTokPerSec: Math.round(avgTokPerSec),
+      breakdown, // Per-tier details
     });
   });
 
@@ -597,10 +684,11 @@ export function computeWorkloadComparison({
     })
     .sort((a, b) => a.dailyCost - b.dailyCost);
 
-  // Proprietary alternatives - all models, user filters via UI
+  // Proprietary alternatives - grouped by provider, mapped to workload tiers
   const proprietaryResults = computeProprietaryAlternatives({
-    tokensPerDay: totalTokensPerDay,
-    localTPS: totalLocalTPS,
+    workload,
+    models,
+    dailyHours,
     localPrice,
     apiProviders,
   });

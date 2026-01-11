@@ -157,17 +157,7 @@ export default function PayoffCalculator() {
   );
   const [ossAPIFilters, setOssAPIFilters] = useState({
     Groq: true, Together: true, Fireworks: true, DeepInfra: true,
-    Cerebras: true, OpenAI: true, Moonshot: true
-  });
-  // Proprietary model filters - dynamically built from all tiers
-  const [proprietaryModelFilters, setProprietaryModelFilters] = useState(() => {
-    const allModels = {};
-    Object.values(apiProviders.proprietaryAlternatives || {}).forEach(tier => {
-      tier.models?.forEach(model => {
-        allModels[model.name] = true;
-      });
-    });
-    return allModels;
+    Cerebras: true, OpenAI: true, Moonshot: true, 'Amazon Bedrock': true
   });
 
   // Memory info for workload (ANS-514: now includes training mode)
@@ -238,11 +228,6 @@ export default function PayoffCalculator() {
   const filteredApiProviders = useMemo(() =>
     calculations.apiProviders.filter(p => ossAPIFilters[p.name] !== false),
     [calculations.apiProviders, ossAPIFilters]
-  );
-
-  const filteredProprietaryAlternatives = useMemo(() =>
-    (calculations.proprietaryAlternatives || []).filter(p => proprietaryModelFilters[p.name] !== false),
-    [calculations.proprietaryAlternatives, proprietaryModelFilters]
   );
 
   const cheapest = filteredProviders[0];
@@ -844,117 +829,99 @@ export default function PayoffCalculator() {
           </div>
         )}
 
-        {/* Proprietary API Alternatives */}
+        {/* Proprietary API Alternatives - Provider Stacks */}
         {calculations.canRun && calculations.proprietaryAlternatives?.length > 0 && (
           <div className="mb-8">
             <div className="flex items-center justify-between mb-2">
               <h2 className="text-lg font-semibold text-white">Proprietary API Alternatives</h2>
-              <MultiSelectDropdown
-                options={calculations.proprietaryAlternatives || []}
-                selected={proprietaryModelFilters}
-                onChange={setProprietaryModelFilters}
-                getKey={(p) => p.name}
-                getLabel={(p) => p.name}
-                getDetail={(p) => p.provider}
-              />
             </div>
             <p className="text-sm text-gray-500 mb-4">
-              Commercial API models — {formatTokens(calculations.tokensPerDay)} tokens/day
+              Equivalent workload using each provider's comparable models — {formatTokens(calculations.tokensPerDay)} tokens/day
             </p>
 
-            {filteredProprietaryAlternatives.length > 0 ? (
-              <>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="text-gray-400 border-b border-gray-800">
-                        <th className="text-left py-3 px-3">Provider</th>
-                        <th className="text-left py-3 px-2">Model</th>
-                        <th className="text-center py-3 px-2">tok/s</th>
-                        <th className="text-center py-3 px-2">vs Local</th>
-                        <th className="text-right py-3 px-2 bg-purple-900/20">$/1M tok</th>
-                        <th className="text-right py-3 px-2 bg-red-900/20">$/day</th>
-                        <th className="text-right py-3 px-2">$/mo</th>
-                        <th className="text-right py-3 px-3 bg-green-900/20">Payoff</th>
-                        <th className="w-8 py-3 px-2"></th>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="text-gray-400 border-b border-gray-800">
+                    <th className="text-left py-3 px-3">Provider</th>
+                    <th className="text-right py-3 px-2">Input $/1M</th>
+                    <th className="text-right py-3 px-2">Output $/1M</th>
+                    <th className="text-right py-3 px-2 bg-purple-900/20">Blended $/1M</th>
+                    <th className="text-right py-3 px-2 bg-red-900/20">$/day</th>
+                    <th className="text-right py-3 px-2">$/mo</th>
+                    <th className="text-right py-3 px-3 bg-green-900/20">Payoff</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {calculations.proprietaryAlternatives.map((stack, idx) => {
+                    const payoffColor =
+                      stack.payoffMonths < 3 ? 'text-green-400' :
+                      stack.payoffMonths < 6 ? 'text-emerald-400' :
+                      stack.payoffMonths < 12 ? 'text-yellow-400' :
+                      stack.payoffMonths < 24 ? 'text-orange-400' : 'text-red-400';
+                    const showBreakdown = stack.breakdown && stack.breakdown.length > 1;
+
+                    return (
+                      <tr key={stack.provider} className={`border-b border-gray-800/50 ${idx === 0 ? 'bg-indigo-900/10' : ''}`}>
+                        <td className="py-3 px-3">
+                          <a
+                            href={apiProviders.sources?.[stack.provider]}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="font-medium text-white hover:text-blue-400 transition-colors"
+                          >
+                            {stack.provider}
+                          </a>
+                          {/* Tier breakdown */}
+                          <div className="text-xs text-gray-500 mt-1">
+                            {stack.breakdown.map((b, i) => (
+                              <span key={b.tier}>
+                                {b.model}: ${b.blendedPer1M.toFixed(2)}/1M
+                                {i < stack.breakdown.length - 1 ? ' • ' : ''}
+                              </span>
+                            ))}
+                          </div>
+                        </td>
+                        <td className="text-right py-3 px-2 font-mono text-gray-400">
+                          ${stack.inputPer1M.toFixed(2)}
+                        </td>
+                        <td className="text-right py-3 px-2 font-mono text-gray-400">
+                          ${stack.outputPer1M.toFixed(2)}
+                        </td>
+                        <td className="text-right py-3 px-2 bg-purple-900/10 font-mono text-purple-400">
+                          ${stack.blendedPer1M.toFixed(2)}
+                          {showBreakdown && <span className="text-xs text-gray-500 block">weighted</span>}
+                        </td>
+                        <td className="text-right py-3 px-2 bg-red-900/10 font-mono text-red-400">
+                          ${stack.dailyCost.toFixed(2)}
+                        </td>
+                        <td className="text-right py-3 px-2 font-mono text-red-400">
+                          ${stack.monthlyCost.toFixed(0)}
+                        </td>
+                        <td className={`text-right py-3 px-3 bg-green-900/10 font-bold ${payoffColor}`}>
+                          {formatPayoff(stack.payoffMonths)}
+                        </td>
                       </tr>
-                    </thead>
-                    <tbody>
-                      {filteredProprietaryAlternatives.map((api, idx) => {
-                        const payoffColor =
-                          api.payoffMonths < 3 ? 'text-green-400' :
-                          api.payoffMonths < 6 ? 'text-emerald-400' :
-                          api.payoffMonths < 12 ? 'text-yellow-400' :
-                          api.payoffMonths < 24 ? 'text-orange-400' : 'text-red-400';
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
 
-                        return (
-                          <tr key={`${api.provider}-${api.name}`} className={`border-b border-gray-800/50 ${idx === 0 ? 'bg-indigo-900/10' : ''}`}>
-                            <td className="py-3 px-3">
-                              <a
-                                href={apiProviders.sources?.[api.provider]}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="font-medium text-white hover:text-blue-400 transition-colors"
-                              >
-                                {api.provider}
-                              </a>
-                            </td>
-                            <td className="py-3 px-2">
-                              <div className="text-gray-200">{api.name}</div>
-                            </td>
-                            <td className="text-center py-3 px-2 text-gray-300">
-                              {api.tokPerSec}
-                            </td>
-                            <td className="text-center py-3 px-2 text-gray-400">
-                              {api.speedRatio.toFixed(1)}×
-                            </td>
-                            <td className="text-right py-3 px-2 bg-purple-900/10 font-mono text-purple-400">
-                              ${api.blendedPer1M.toFixed(2)}
-                            </td>
-                            <td className="text-right py-3 px-2 bg-red-900/10 font-mono text-red-400">
-                              ${api.dailyCost.toFixed(2)}
-                            </td>
-                            <td className="text-right py-3 px-2 font-mono text-red-400">
-                              ${api.monthlyCost.toFixed(0)}
-                            </td>
-                            <td className={`text-right py-3 px-3 bg-green-900/10 font-bold ${payoffColor}`}>
-                              {formatPayoff(api.payoffMonths)}
-                            </td>
-                            <td className="py-3 px-2">
-                              <button
-                                onClick={() => setProprietaryModelFilters(prev => ({ ...prev, [api.name]: false }))}
-                                className="text-gray-500 hover:text-red-400 transition-colors p-1"
-                                title="Remove from comparison"
-                              >
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                </svg>
-                              </button>
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-
-                <div className="mt-4 bg-indigo-900/20 border border-indigo-800/30 rounded-lg p-4">
-                  <div className="font-medium text-indigo-300 mb-1">Why consider proprietary alternatives?</div>
-                  <div className="text-indigo-200/70 text-sm">
-                    Different models with comparable quality. Trade-offs include: API lock-in, no local control, but often faster inference and no hardware investment.
-                  </div>
-                </div>
-              </>
-            ) : (
-              <div className="text-center py-8 text-gray-500 bg-gray-900/50 rounded-lg border border-gray-800">
-                No proprietary models selected. Use the dropdown above to select models to compare.
+            <div className="mt-4 bg-indigo-900/20 border border-indigo-800/30 rounded-lg p-4">
+              <div className="font-medium text-indigo-300 mb-1">How this works</div>
+              <div className="text-indigo-200/70 text-sm">
+                Each row shows what it would cost to run your exact workload using that provider's comparable models.
+                {calculations.proprietaryAlternatives[0]?.breakdown?.length > 1 && (
+                  <> Your workload spans {calculations.proprietaryAlternatives[0].breakdown.length} tiers, so each provider uses multiple models.</>
+                )}
               </div>
-            )}
+            </div>
           </div>
         )}
 
         {/* Summary */}
-        {calculations.canRun && (filteredProviders.length > 0 || filteredApiProviders.length > 0 || filteredProprietaryAlternatives.length > 0) && (
+        {calculations.canRun && (filteredProviders.length > 0 || filteredApiProviders.length > 0 || calculations.proprietaryAlternatives?.length > 0) && (
           <div className="mt-6 bg-blue-900/20 border border-blue-800/50 rounded-xl p-5">
               <h3 className="font-semibold text-blue-300 mb-3">Bottom Line</h3>
               <div className="space-y-2 text-sm text-blue-200/80">
