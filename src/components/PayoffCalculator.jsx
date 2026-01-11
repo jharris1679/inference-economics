@@ -130,18 +130,26 @@ const ramOptions = Object.keys(hardware.mac.configs).map(Number);
 const cadToUsd = hardware.cadToUsd;
 
 export default function PayoffCalculator() {
-  const [dailyHours, setDailyHours] = useState(8);
+  const [dailyHours, setDailyHours] = useState(12);
   const [macRAM, setMacRAM] = useState(512);
   const [selectedHardware, setSelectedHardware] = useState('mac');
   const [trainingMode, setTrainingMode] = useState('inference'); // ANS-514: Training mode selector
 
   // Workload state (ANS-504) - array of models to run
-  const [workload, setWorkload] = useState(() => [{
-    id: crypto.randomUUID(),
-    developerId: 'meta',
-    modelId: 'llama-3.1-70b',
-    quantity: 1,
-  }]);
+  const [workload, setWorkload] = useState(() => [
+    {
+      id: crypto.randomUUID(),
+      developerId: 'openai',
+      modelId: 'gpt-oss-120b',
+      quantity: 4,
+    },
+    {
+      id: crypto.randomUUID(),
+      developerId: 'openai',
+      modelId: 'gpt-oss-20b',
+      quantity: 8,
+    },
+  ]);
 
   // Provider filter state (ANS-511) - multi-select dropdowns in section headers
   const [cloudGPUFilters, setCloudGPUFilters] = useState(() =>
