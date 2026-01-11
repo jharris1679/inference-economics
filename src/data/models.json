@@ -13,9 +13,9 @@
           "localTokPerSec": 80,
           "dgxSparkTokPerSec": 86,
           "cloudTokPerSec": 150,
-          "cloudGPUs": 1,
+          "cloudGPUs": 0.2,
           "quantization": "MXFP4",
-          "notes": "MoE architecture, fits 16GB VRAM"
+          "notes": "MoE architecture, ~12GB loaded, 5 instances per H100"
         },
         "gpt-oss-120b": {
           "name": "gpt-oss-120b",
@@ -41,9 +41,9 @@
           "localTokPerSec": 90,
           "dgxSparkTokPerSec": 45,
           "cloudTokPerSec": 120,
-          "cloudGPUs": 1,
+          "cloudGPUs": 0.1,
           "quantization": "Q4_K_M",
-          "notes": "~5GB weights + KV cache"
+          "notes": "~5GB loaded, 10 instances per H100"
         },
         "llama-3.1-70b": {
           "name": "Llama 3.1 70B",
@@ -79,9 +79,9 @@
           "localTokPerSec": 26,
           "dgxSparkTokPerSec": 14,
           "cloudTokPerSec": 42,
-          "cloudGPUs": 1,
+          "cloudGPUs": 0.25,
           "quantization": "Q4_K_M",
-          "notes": "Code-focused model"
+          "notes": "~18GB loaded, 4 instances per H100"
         },
         "deepseek-v3": {
           "name": "DeepSeek V3",
@@ -107,9 +107,9 @@
           "localTokPerSec": 85,
           "dgxSparkTokPerSec": 42,
           "cloudTokPerSec": 110,
-          "cloudGPUs": 1,
+          "cloudGPUs": 0.1,
           "quantization": "Q4_K_M",
-          "notes": "~4GB weights + KV cache"
+          "notes": "~4GB loaded, 10 instances per H100"
         },
         "qwen2.5-32b": {
           "name": "Qwen2.5 32B",
@@ -118,9 +118,9 @@
           "localTokPerSec": 28,
           "dgxSparkTokPerSec": 15,
           "cloudTokPerSec": 45,
-          "cloudGPUs": 1,
+          "cloudGPUs": 0.25,
           "quantization": "Q4_K_M",
-          "notes": "~18GB weights + KV cache"
+          "notes": "~18GB loaded, 4 instances per H100"
         },
         "qwen2.5-72b": {
           "name": "Qwen2.5 72B",
@@ -162,9 +162,9 @@
           "localTokPerSec": 88,
           "dgxSparkTokPerSec": 45,
           "cloudTokPerSec": 115,
-          "cloudGPUs": 1,
+          "cloudGPUs": 0.1,
           "quantization": "Q4_K_M",
-          "notes": "Mistral-7B based, text-to-SQL"
+          "notes": "~4GB loaded, 10 instances per H100"
         },
         "sqlcoder-34b": {
           "name": "SQLCoder 34B",
@@ -173,9 +173,9 @@
           "localTokPerSec": 26,
           "dgxSparkTokPerSec": 14,
           "cloudTokPerSec": 40,
-          "cloudGPUs": 1,
+          "cloudGPUs": 0.25,
           "quantization": "Q4_K_M",
-          "notes": "Code Llama based, text-to-SQL"
+          "notes": "~18GB loaded, 4 instances per H100"
         },
         "sqlcoder-70b": {
           "name": "SQLCoder 70B",

@@ -504,8 +504,11 @@ export function computeWorkloadComparison({
     }
   }
 
+  // Round up to whole GPUs since you can't rent fractional instances
+  const rentedGPUs = Math.ceil(totalCloudGPUs);
+
   const cloudResults = cloudProviders.providers.map(provider => {
-    const hourlyRate = provider.ratePerGPUHour * totalCloudGPUs;
+    const hourlyRate = provider.ratePerGPUHour * rentedGPUs;
     const cloudHoursNeeded = calculateCloudHoursNeeded(totalTokensPerDay, weightedCloudTPS);
     const dailyCost = calculateDailyCost(cloudHoursNeeded, hourlyRate);
     const monthlyCost = dailyCost * 30;
@@ -513,7 +516,7 @@ export function computeWorkloadComparison({
 
     return {
       provider: provider.name,
-      gpus: totalCloudGPUs,
+      gpus: rentedGPUs,
       cloudTPS: weightedCloudTPS,
       hourlyRatePerGPU: provider.ratePerGPUHour,
       hourlyRateTotal: hourlyRate,
