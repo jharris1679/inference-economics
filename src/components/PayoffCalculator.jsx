@@ -768,7 +768,7 @@ export default function PayoffCalculator() {
                                 <div className="text-xs text-gray-500 mt-1">
                                   {api.details.map((d, i) => (
                                     <span key={d.modelId}>
-                                      {d.quantity > 1 ? `${d.quantity}× ` : ''}{d.modelName}: ${d.dailyCost.toFixed(2)}
+                                      {d.quantity > 1 ? `${d.quantity}× ` : ''}{d.modelName}: ${d.blendedPer1M.toFixed(2)}/1M
                                       {i < api.details.length - 1 ? ' • ' : ''}
                                     </span>
                                   ))}
