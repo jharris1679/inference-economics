@@ -1,5 +1,10 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 
+// Design System Components
+import { ArticleHeader } from './ArticleHeader';
+import { StatCard } from './StatCard';
+import { CalloutBox } from './CalloutBox';
+
 // Data
 import models from '../data/models.json';
 
@@ -241,25 +246,58 @@ export default function PayoffCalculator() {
   const cheapest = filteredProviders[0];
 
   return (
-    <div className="min-h-screen bg-background text-foreground p-6">
-      <div className="max-w-6xl mx-auto">
-        {/* ANS-517: Header with data freshness indicator */}
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
-          <div>
-            <h1 className="text-2xl font-bold mb-2 text-foreground font-headline">Hardware vs. Cloud Payoff Calculator</h1>
-            <p className="text-muted-foreground">
-              Using real benchmark data — cloud hours adjusted to match your local token output
-            </p>
-          </div>
-          <div className="mt-3 md:mt-0 flex items-center gap-2 bg-secondary px-3 py-2 border border-border">
-            <svg className="w-4 h-4 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <span className="text-sm text-muted-foreground">
-              Data updated: <span className="text-foreground font-medium">{apiProviders.updatedAt}</span>
-            </span>
+    <div className="min-h-screen bg-background text-foreground">
+      {/* Hero Section */}
+      <div className="border-b border-border">
+        <div className="max-w-6xl mx-auto px-6 py-12">
+          <ArticleHeader
+            kicker="Interactive Analysis"
+            headline="Hardware vs. Cloud Payoff Calculator"
+            subheadline="Compare local hardware costs against cloud GPU rental and API pricing using real benchmark data. Cloud hours are adjusted to match your local token output."
+            date={`Data updated: ${apiProviders.updatedAt}`}
+            variant="default"
+          />
+        </div>
+      </div>
+
+      {/* Stats Overview */}
+      {calculations.canRun && (
+        <div className="bg-secondary">
+          <div className="max-w-6xl mx-auto px-6 py-8">
+            <h5 className="mb-6 uppercase tracking-wider text-foreground" style={{ fontSize: '0.6875rem', fontWeight: 700, letterSpacing: '0.08em' }}>
+              Key Metrics at a Glance
+            </h5>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <StatCard
+                label="Local Hardware"
+                value={`$${calculations.localPrice.toLocaleString(undefined, {maximumFractionDigits: 0})}`}
+                description={calculations.localName}
+              />
+              <StatCard
+                label="Throughput"
+                value={calculations.localTPS}
+                unit="tok/s"
+                description={`${formatTokens(calculations.tokensPerDay)} tokens/day`}
+              />
+              <StatCard
+                label="Cheapest Cloud"
+                value={cheapest ? `$${cheapest.dailyCost.toFixed(0)}` : 'N/A'}
+                unit="/day"
+                description={cheapest ? `${cheapest.provider} (${cheapest.gpus}× H100)` : 'No providers selected'}
+              />
+              <StatCard
+                label="Payoff Time"
+                value={cheapest ? formatPayoff(cheapest.payoffMonths) : 'N/A'}
+                change={cheapest?.payoffMonths < 12 ? { value: 'Good investment', trend: 'up' } : cheapest?.payoffMonths < 24 ? { value: 'Moderate', trend: 'neutral' } : { value: 'Long payoff', trend: 'down' }}
+                description="Break-even vs cheapest cloud"
+              />
+            </div>
           </div>
         </div>
+      )}
+
+      {/* Main Content */}
+      <div className="max-w-6xl mx-auto px-6 py-8">
 
         {/* Controls */}
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-8">
@@ -897,9 +935,9 @@ export default function PayoffCalculator() {
                     <th className="text-left py-3 px-3">Provider</th>
                     <th className="text-center py-3 px-2">GPU</th>
                     <th className="text-right py-3 px-2">$/hr</th>
-                    <th className="text-right py-3 px-2 bg-red-900/20">$/day</th>
+                    <th className="text-right py-3 px-2 bg-destructive/20">$/day</th>
                     <th className="text-right py-3 px-2">$/mo</th>
-                    <th className="text-right py-3 px-3 bg-green-900/20">Payoff</th>
+                    <th className="text-right py-3 px-3 bg-success/20">Payoff</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -923,7 +961,7 @@ export default function PayoffCalculator() {
                       payoffMonths < 24 ? 'text-warning' : 'text-destructive';
 
                     return (
-                      <tr key={provider.id} className={`border-b border-border/50 ${idx === 0 ? 'bg-orange-900/10' : ''}`}>
+                      <tr key={provider.id} className={`border-b border-border/50 ${idx === 0 ? 'bg-warning/10' : ''}`}>
                         <td className="py-3 px-3">
                           <a
                             href={provider.url}
@@ -945,13 +983,13 @@ export default function PayoffCalculator() {
                         <td className="text-right py-3 px-2 font-mono text-muted-foreground">
                           ${(provider.ratePerGPUHour * gpusNeeded).toFixed(2)}
                         </td>
-                        <td className="text-right py-3 px-2 bg-red-900/10 font-mono text-destructive">
+                        <td className="text-right py-3 px-2 bg-destructive/10 font-mono text-destructive">
                           ${dailyCost.toFixed(2)}
                         </td>
                         <td className="text-right py-3 px-2 font-mono text-destructive">
                           ${monthlyCost.toFixed(0)}
                         </td>
-                        <td className={`text-right py-3 px-3 bg-green-900/10 font-bold ${payoffColor}`}>
+                        <td className={`text-right py-3 px-3 bg-success/10 font-bold ${payoffColor}`}>
                           {formatPayoff(payoffMonths)}
                         </td>
                       </tr>
@@ -991,10 +1029,10 @@ export default function PayoffCalculator() {
                     <th className="text-left py-3 px-3">Provider</th>
                     <th className="text-right py-3 px-2">Input $/1M</th>
                     <th className="text-right py-3 px-2">Output $/1M</th>
-                    <th className="text-right py-3 px-2 bg-purple-900/20">Blended $/1M</th>
-                    <th className="text-right py-3 px-2 bg-red-900/20">$/day</th>
+                    <th className="text-right py-3 px-2 bg-accent/20">Blended $/1M</th>
+                    <th className="text-right py-3 px-2 bg-destructive/20">$/day</th>
                     <th className="text-right py-3 px-2">$/mo</th>
-                    <th className="text-right py-3 px-3 bg-green-900/20">Payoff</th>
+                    <th className="text-right py-3 px-3 bg-success/20">Payoff</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -1033,17 +1071,17 @@ export default function PayoffCalculator() {
                         <td className="text-right py-3 px-2 font-mono text-muted-foreground">
                           ${stack.outputPer1M.toFixed(2)}
                         </td>
-                        <td className="text-right py-3 px-2 bg-purple-900/10 font-mono text-accent">
+                        <td className="text-right py-3 px-2 bg-accent/10 font-mono text-accent">
                           ${stack.blendedPer1M.toFixed(2)}
                           {showBreakdown && <span className="text-xs text-muted-foreground block">weighted</span>}
                         </td>
-                        <td className="text-right py-3 px-2 bg-red-900/10 font-mono text-destructive">
+                        <td className="text-right py-3 px-2 bg-destructive/10 font-mono text-destructive">
                           ${stack.dailyCost.toFixed(2)}
                         </td>
                         <td className="text-right py-3 px-2 font-mono text-destructive">
                           ${stack.monthlyCost.toFixed(0)}
                         </td>
-                        <td className={`text-right py-3 px-3 bg-green-900/10 font-bold ${payoffColor}`}>
+                        <td className={`text-right py-3 px-3 bg-success/10 font-bold ${payoffColor}`}>
                           {formatPayoff(stack.payoffMonths)}
                         </td>
                       </tr>
@@ -1183,9 +1221,9 @@ export default function PayoffCalculator() {
         )}
 
         {!calculations.canRun && (
-          <div className="bg-red-900/20 border border-red-800/50  p-5">
+          <div className="bg-destructive/10 border border-destructive/30 p-5">
             <h3 className="font-semibold text-destructive mb-2">Cannot Run Workload</h3>
-            <p className="text-sm text-red-200/70">
+            <p className="text-sm text-foreground/80">
               {calculations.memoryInfo?.deficit > 0
                 ? `This workload requires ${calculations.memoryInfo?.totalRAM}GB RAM but only ${calculations.memoryInfo?.availableRAM}GB available. Reduce workload or increase RAM.`
                 : calculations.memoryInfo?.incompatibleModels?.length > 0
@@ -1196,28 +1234,22 @@ export default function PayoffCalculator() {
           </div>
         )}
 
-        {/* ANS-517: Footer with Data Sources & Methodology */}
-        <div className="mt-4 bg-secondary/50  p-5 border border-border">
-          <h3 className="text-sm font-semibold text-foreground mb-3">Data Sources & Methodology</h3>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs text-muted-foreground">
-            {/* Calculation Methodology */}
+        {/* ANS-517 & ANS-509: Methodology CalloutBox */}
+        <CalloutBox title="How We Calculate" variant="methodology">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <h4 className="text-muted-foreground font-medium mb-2">How We Calculate</h4>
-              <ul className="space-y-1.5">
-                <li><strong className="text-muted-foreground">Payoff:</strong> Hardware cost ÷ daily cloud savings = days to break even</li>
-                <li><strong className="text-muted-foreground">Cloud hours:</strong> Adjusted to match local token output using throughput ratios</li>
-                <li><strong className="text-muted-foreground">API costs:</strong> 50% input + 50% output tokens (blended rate)</li>
-                <li><strong className="text-muted-foreground">Memory:</strong> Model weights + KV cache overhead; training modes add optimizer states</li>
+              <ul className="space-y-2">
+                <li><strong>Payoff:</strong> Hardware cost ÷ daily cloud savings = days to break even</li>
+                <li><strong>Cloud hours:</strong> Adjusted to match local token output using throughput ratios</li>
+                <li><strong>API costs:</strong> 50% input + 50% output tokens (blended rate)</li>
+                <li><strong>Memory:</strong> Model weights + KV cache overhead; training modes add optimizer states</li>
               </ul>
             </div>
-
-            {/* Data Sources */}
             <div>
-              <h4 className="text-muted-foreground font-medium mb-2">Data Sources</h4>
-              <ul className="space-y-1.5">
+              <p className="font-medium mb-2">Data Sources</p>
+              <ul className="space-y-2">
                 <li>
-                  <strong className="text-muted-foreground">Benchmarks:</strong>{' '}
+                  <strong>Benchmarks:</strong>{' '}
                   {models.sources.slice(0, 3).map((s, i) => (
                     <span key={s.id}>
                       <a href={s.url} className="text-accent hover:underline" target="_blank" rel="noopener noreferrer">
@@ -1229,7 +1261,7 @@ export default function PayoffCalculator() {
                   {models.sources.length > 3 && ` +${models.sources.length - 3} more`}
                 </li>
                 <li>
-                  <strong className="text-muted-foreground">GPU rental:</strong>{' '}
+                  <strong>GPU rental:</strong>{' '}
                   {cloudProviders.providers.slice(0, 3).map((p, i) => (
                     <span key={p.id}>
                       <a href={cloudProviders.sources?.[p.name]} className="text-accent hover:underline" target="_blank" rel="noopener noreferrer">
@@ -1241,7 +1273,7 @@ export default function PayoffCalculator() {
                   {cloudProviders.providers.length > 3 && ` +${cloudProviders.providers.length - 3} more`}
                 </li>
                 <li>
-                  <strong className="text-muted-foreground">API pricing:</strong>{' '}
+                  <strong>API pricing:</strong>{' '}
                   {Object.keys(apiProviders.sources || {}).slice(0, 4).map((name, i, arr) => (
                     <span key={name}>
                       <a href={apiProviders.sources[name]} className="text-accent hover:underline" target="_blank" rel="noopener noreferrer">
@@ -1255,13 +1287,12 @@ export default function PayoffCalculator() {
               </ul>
             </div>
           </div>
-
-          <div className="mt-3 pt-3 border-t border-border text-xs text-muted-foreground">
-            <strong className="text-muted-foreground">Last updated:</strong> {apiProviders.updatedAt} •{' '}
-            <strong className="text-muted-foreground">Mac prices:</strong> CAD converted at {cadToUsd} USD •{' '}
-            <strong className="text-muted-foreground">GPU type:</strong> {cloudProviders.gpuType}
-          </div>
-        </div>
+          <p className="mt-4 pt-3 border-t border-accent/20 text-xs">
+            <strong>Last updated:</strong> {apiProviders.updatedAt} •{' '}
+            <strong>Mac prices:</strong> CAD converted at {cadToUsd} USD •{' '}
+            <strong>GPU type:</strong> {cloudProviders.gpuType}
+          </p>
+        </CalloutBox>
       </div>
     </div>
   );
