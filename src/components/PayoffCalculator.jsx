@@ -279,18 +279,38 @@ export default function PayoffCalculator() {
                 unit="tok/s"
                 description={`${formatTokens(calculations.tokensPerDay)} tokens/day`}
               />
-              <StatCard
-                label="Cheapest Cloud"
-                value={cheapest ? `$${cheapest.dailyCost.toFixed(0)}` : 'N/A'}
-                unit="/day"
-                description={cheapest ? `${cheapest.provider} (${cheapest.gpus}× H100)` : 'No providers selected'}
-              />
-              <StatCard
-                label="Payoff Time"
-                value={cheapest ? formatPayoff(cheapest.payoffMonths) : 'N/A'}
-                change={cheapest?.payoffMonths < 12 ? { value: 'Good investment', trend: 'up' } : cheapest?.payoffMonths < 24 ? { value: 'Moderate', trend: 'neutral' } : { value: 'Long payoff', trend: 'down' }}
-                description="Break-even vs cheapest cloud"
-              />
+              {/* Show cheapest API for inference, cheapest cloud GPU for training */}
+              {isTrainingMode ? (
+                <StatCard
+                  label="Cheapest Cloud"
+                  value={cheapest ? `$${cheapest.dailyCost.toFixed(0)}` : 'N/A'}
+                  unit="/day"
+                  description={cheapest ? `${cheapest.provider} (${cheapest.gpus}× H100)` : 'No providers selected'}
+                />
+              ) : (
+                <StatCard
+                  label="Cheapest API"
+                  value={filteredApiProviders[0] ? `$${filteredApiProviders[0].dailyCost.toFixed(0)}` : 'N/A'}
+                  unit="/day"
+                  description={filteredApiProviders[0] ? `${filteredApiProviders[0].name} @ $${filteredApiProviders[0].blendedPer1M.toFixed(2)}/1M` : 'No providers selected'}
+                />
+              )}
+              {/* Payoff comparison: vs API for inference, vs cloud for training */}
+              {isTrainingMode ? (
+                <StatCard
+                  label="Payoff Time"
+                  value={cheapest ? formatPayoff(cheapest.payoffMonths) : 'N/A'}
+                  change={cheapest?.payoffMonths < 12 ? { value: 'Good investment', trend: 'up' } : cheapest?.payoffMonths < 24 ? { value: 'Moderate', trend: 'neutral' } : { value: 'Long payoff', trend: 'down' }}
+                  description="Break-even vs cheapest cloud"
+                />
+              ) : (
+                <StatCard
+                  label="Payoff Time"
+                  value={filteredApiProviders[0] ? formatPayoff(filteredApiProviders[0].payoffMonths) : 'N/A'}
+                  change={filteredApiProviders[0]?.payoffMonths < 12 ? { value: 'Good investment', trend: 'up' } : filteredApiProviders[0]?.payoffMonths < 24 ? { value: 'Moderate', trend: 'neutral' } : { value: 'Long payoff', trend: 'down' }}
+                  description="Break-even vs cheapest API"
+                />
+              )}
             </div>
           </div>
         </div>
