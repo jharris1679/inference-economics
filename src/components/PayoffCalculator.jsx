@@ -295,19 +295,19 @@ export default function PayoffCalculator() {
             <div className="border-l-2 border-accent/30 pl-4">
               <p className="text-sm text-muted-foreground font-serif">
                 <strong className="text-foreground block mb-1">Demand outpacing supply</strong>
-                TSMC's CEO predicts chip shortages through 2026. HBM memory faces 6-12 month lead times.
+                <a href="https://www.reuters.com/technology/tsmc-says-demand-ai-chips-exceeds-supply-2024-07-18/" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">TSMC's CEO</a> predicts chip shortages through 2026. HBM memory faces 6-12 month lead times.
               </p>
             </div>
             <div className="border-l-2 border-accent/30 pl-4">
               <p className="text-sm text-muted-foreground font-serif">
                 <strong className="text-foreground block mb-1">Geopolitical concentration</strong>
-                Over 90% of advanced chips are manufactured in Taiwan. A single point of failure.
+                Over <a href="https://www.semiconductors.org/wp-content/uploads/2021/05/BCG-x-SIA-Strengthening-the-Global-Semiconductor-Value-Chain-April-2021_1.pdf" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">90% of advanced chips</a> are manufactured in Taiwan. A single point of failure.
               </p>
             </div>
             <div className="border-l-2 border-accent/30 pl-4">
               <p className="text-sm text-muted-foreground font-serif">
                 <strong className="text-foreground block mb-1">Years to expand</strong>
-                New fabs announced in 2025 won't come online until 2027 or later.
+                New fabs take <a href="https://www.mckinsey.com/industries/semiconductors/our-insights/semiconductor-fabs-construction-challenges" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">3-5 years to build</a>; announced 2025 capacity won't arrive until 2027+.
               </p>
             </div>
           </div>
@@ -874,38 +874,6 @@ export default function PayoffCalculator() {
           </div>
         )}
 
-        {/* Prose: Security & Why Local Matters - Shown between GPU and API sections */}
-        {calculations.canRun && !isTrainingMode && (
-          <div className="max-w-3xl mx-auto my-12 px-6">
-            <div className="border-l-4 border-accent pl-6 mb-6">
-              <h2 className="font-headline text-xl font-bold text-foreground mb-2">Why I'm Considering Local</h2>
-              <p className="text-muted-foreground font-serif italic">Beyond the economics: security, sovereignty, and control</p>
-            </div>
-            <p className="text-base leading-relaxed text-muted-foreground font-serif mb-4" style={{ lineHeight: 1.8 }}>
-              For my use case, the payoff calculation is only part of the story. Data sovereignty is becoming the dominant paradigm—governments worldwide are mandating local storage and restricting cross-border transfers. Europe has issued over €5.65 billion in GDPR fines since 2018, with the EU AI Act adding new obligations in 2026.
-            </p>
-            <p className="text-base leading-relaxed text-muted-foreground font-serif mb-4" style={{ lineHeight: 1.8 }}>
-              Local inference keeps my data entirely on-premises. No API logs, no third-party training pipelines, no policy changes from providers. For regulated industries—healthcare, finance, legal—this isn't optimization. It's compliance.
-            </p>
-          </div>
-        )}
-
-        {/* Prose: Open Source Context - Before API providers */}
-        {calculations.canRun && !isTrainingMode && (
-          <div className="max-w-3xl mx-auto my-12 px-6">
-            <div className="border-l-4 border-accent pl-6 mb-6">
-              <h2 className="font-headline text-xl font-bold text-foreground mb-2">The Open Source Option</h2>
-              <p className="text-muted-foreground font-serif italic">When open-weight models match proprietary performance</p>
-            </div>
-            <p className="text-base leading-relaxed text-muted-foreground font-serif mb-4" style={{ lineHeight: 1.8 }}>
-              The API providers below offer access to both proprietary and open-source models. What's changed is that open models now compete on quality. Meta's Llama 3.3 70B delivers performance comparable to models 5× larger. Mistral achieves 92% of GPT-5's benchmark scores at 15% of the cost.
-            </p>
-            <p className="text-base leading-relaxed text-muted-foreground font-serif" style={{ lineHeight: 1.8 }}>
-              For many applications—summarization, extraction, code generation—the gap has effectively closed. My choice isn't about quality anymore. It's about cost, latency, and control.
-            </p>
-          </div>
-        )}
-
         {/* API Provider Comparison - Only shown in inference mode */}
         {calculations.canRun && calculations.apiProviders.length > 0 && !isTrainingMode && (
           <div className="mb-8">
@@ -1356,34 +1324,77 @@ export default function PayoffCalculator() {
           </div>
         )}
 
+        {/* Prose: Why I'm Considering Local - After results */}
+        {calculations.canRun && !isTrainingMode && (
+          <div className="my-12">
+            <div className="border-l-4 border-accent pl-6 mb-6">
+              <h2 className="font-headline text-xl font-bold text-foreground mb-2">Why I'm Considering Local</h2>
+              <p className="text-muted-foreground font-serif italic">Beyond the economics: security, sovereignty, and control</p>
+            </div>
+            <p className="text-base leading-relaxed text-muted-foreground font-serif mb-4" style={{ lineHeight: 1.8 }}>
+              For my use case, the payoff calculation is only part of the story. Data sovereignty is becoming the dominant paradigm—governments worldwide are mandating local storage and restricting cross-border transfers. Europe has issued over{' '}
+              <a href="https://www.enforcementtracker.com/" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">€5.65 billion in GDPR fines</a> since 2018, with the{' '}
+              <a href="https://artificialintelligenceact.eu/" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">EU AI Act</a> adding new obligations in 2026.
+            </p>
+            <p className="text-base leading-relaxed text-muted-foreground font-serif" style={{ lineHeight: 1.8 }}>
+              Local inference keeps my data entirely on-premises. No API logs, no third-party training pipelines, no policy changes from providers. For regulated industries—healthcare, finance, legal—this isn't optimization. It's compliance.
+            </p>
+          </div>
+        )}
+
+        {/* Prose: The Open Source Option - After Why Local */}
+        {calculations.canRun && !isTrainingMode && (
+          <div className="my-12">
+            <div className="border-l-4 border-accent pl-6 mb-6">
+              <h2 className="font-headline text-xl font-bold text-foreground mb-2">The Open Source Option</h2>
+              <p className="text-muted-foreground font-serif italic">When open-weight models match proprietary performance</p>
+            </div>
+            <p className="text-base leading-relaxed text-muted-foreground font-serif mb-4" style={{ lineHeight: 1.8 }}>
+              The API providers above offer access to both proprietary and open-source models. What's changed is that open models now compete on quality. Meta's{' '}
+              <a href="https://ai.meta.com/blog/llama-3-3/" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">Llama 3.3 70B</a> delivers performance comparable to models 5× larger.{' '}
+              <a href="https://mistral.ai/news" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">Mistral</a> achieves competitive benchmark scores at a fraction of the cost.
+            </p>
+            <p className="text-base leading-relaxed text-muted-foreground font-serif" style={{ lineHeight: 1.8 }}>
+              For many applications—summarization, extraction, code generation—the gap has effectively closed. My choice isn't about quality anymore. It's about cost, latency, and control.
+            </p>
+          </div>
+        )}
+
         {/* Prose: Right-Sizing - After results */}
         {calculations.canRun && (
-          <div className="max-w-3xl mx-auto my-12 px-6">
+          <div className="my-12">
             <div className="border-l-4 border-accent pl-6 mb-6">
               <h2 className="font-headline text-xl font-bold text-foreground mb-2">Right-Sizing My Models</h2>
               <p className="text-muted-foreground font-serif italic">When smaller models outperform giants</p>
             </div>
             <p className="text-base leading-relaxed text-muted-foreground font-serif mb-4" style={{ lineHeight: 1.8 }}>
-              One insight that changed my thinking: bigger isn't always better. A 350M parameter model fine-tuned for tool calling achieved 77.55% on ToolBench—outperforming ChatGPT (26%) by nearly 3×. NVIDIA showed a fine-tuned Llama 3 8B beat models 40× larger on code review.
+              One insight that changed my thinking: bigger isn't always better. A{' '}
+              <a href="https://arxiv.org/abs/2307.16789" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">350M parameter model fine-tuned for tool calling</a>{' '}
+              achieved 77.55% on ToolBench—outperforming ChatGPT (26%) by nearly 3×. NVIDIA showed a{' '}
+              <a href="https://developer.nvidia.com/blog/how-to-get-better-outputs-from-your-large-language-model/" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">fine-tuned Llama 3 8B beat models 40× larger</a>{' '}
+              on code review.
             </p>
             <p className="text-base leading-relaxed text-muted-foreground font-serif mb-4" style={{ lineHeight: 1.8 }}>
-              With techniques like LoRA, I can fine-tune a model for my specific domain with modest compute. Studies show fine-tuned models outperform GPT-4 on 85% of specialized tasks—while running on hardware that fits under my desk.
+              With techniques like{' '}
+              <a href="https://huggingface.co/docs/peft/conceptual_guides/lora" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">LoRA</a>, I can fine-tune a model for my specific domain with modest compute. Research shows fine-tuned models can outperform larger general-purpose models on specialized tasks—while running on hardware that fits under my desk.
             </p>
             <div className="bg-secondary border border-border p-4 mt-6">
               <p className="text-sm text-muted-foreground">
-                <strong className="text-foreground">The market signal:</strong> Small language models grew from $6.5B in 2024 to a projected $20.7B by 2030. Organizations report 300-400% ROI from fine-tuning their own models.
+                <strong className="text-foreground">The market signal:</strong>{' '}
+                <a href="https://www.marketsandmarkets.com/Market-Reports/small-language-model-market-100002254.html" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">Small language models</a>{' '}
+                grew from $6.5B in 2024 to a projected $20.7B by 2030.
               </p>
             </div>
           </div>
         )}
 
         {/* Section: Key Assumptions */}
-        <div className="max-w-3xl mx-auto my-12 px-6">
+        <div className="my-12">
           <div className="border-l-4 border-border pl-6 mb-6">
             <h2 className="font-headline text-xl font-bold text-foreground mb-2">My Assumptions</h2>
           </div>
           <p className="text-base leading-relaxed text-muted-foreground font-serif mb-4" style={{ lineHeight: 1.8 }}>
-            This calculator makes several simplifying assumptions. I assume consistent daily usage—my actual workloads are often bursty. I use a 50/50 input/output token ratio for API costs, though my application may differ. Hardware depreciation and electricity costs are excluded, which favors local hardware. Cloud providers may impose minimum commitments not reflected here.
+            This calculator makes several simplifying assumptions. I assume consistent daily usage—my actual workloads are often bursty. I use a 4:1 input-to-output token ratio for API costs, reflecting that most LLM applications send more context than they receive—though your application may differ. Hardware depreciation and electricity costs are excluded, which favors local hardware. Cloud providers may impose minimum commitments not reflected here.
           </p>
         </div>
 
@@ -1394,7 +1405,7 @@ export default function PayoffCalculator() {
               <ul className="space-y-2">
                 <li><strong>Payoff:</strong> Hardware cost ÷ daily cloud savings = days to break even</li>
                 <li><strong>Cloud hours:</strong> Adjusted to match local token output using throughput ratios</li>
-                <li><strong>API costs:</strong> 50% input + 50% output tokens (blended rate)</li>
+                <li><strong>API costs:</strong> 4:1 input/output ratio (80% input + 20% output tokens)</li>
                 <li><strong>Memory:</strong> Model weights + KV cache overhead; training modes add optimizer states</li>
               </ul>
             </div>

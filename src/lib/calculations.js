@@ -66,7 +66,9 @@ export function calculatePayoffDays(hardwarePrice, dailyCost) {
 }
 
 export function calculateBlendedRate(inputPer1M, outputPer1M) {
-  return (inputPer1M + outputPer1M) / 2;
+  // 4:1 input to output ratio (typical for most LLM applications)
+  // Input: 80%, Output: 20%
+  return (inputPer1M * 0.8) + (outputPer1M * 0.2);
 }
 
 export function calculateApiDailyCost(tokensPerDay, blendedRatePer1M) {
