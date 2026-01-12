@@ -86,9 +86,16 @@ export function canModelRun(memoryGB, minRAM) {
 
 export function formatPayoff(months) {
   if (!isFinite(months) || isNaN(months)) return 'N/A';
-  if (months >= 12) return `${(months / 12).toFixed(1)}y`;
-  if (months >= 1) return `${months.toFixed(1)}mo`;
-  return `${Math.ceil(months * 30)}d`;
+  if (months >= 12) {
+    const years = (months / 12).toFixed(1);
+    return `${years} year${years === '1.0' ? '' : 's'}`;
+  }
+  if (months >= 1) {
+    const mo = months.toFixed(1);
+    return `${mo} month${mo === '1.0' ? '' : 's'}`;
+  }
+  const days = Math.ceil(months * 30);
+  return `${days} day${days === 1 ? '' : 's'}`;
 }
 
 export function formatTokens(num) {

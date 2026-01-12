@@ -74,6 +74,47 @@
         }
       }
     },
+    "google": {
+      "name": "Google",
+      "models": {
+        "gemma-3-2b": {
+          "name": "Gemma 3 2B",
+          "params": "2B",
+          "minRAM": 4,
+          "localTokPerSec": 120,
+          "dgxSparkTokPerSec": 60,
+          "cloudTokPerSec": 160,
+          "cloudGPUs": 0.05,
+          "quantization": "Q4_K_M",
+          "tier": "small",
+          "notes": "~2GB loaded, 20 instances per H100"
+        },
+        "gemma-3-9b": {
+          "name": "Gemma 3 9B",
+          "params": "9B",
+          "minRAM": 8,
+          "localTokPerSec": 75,
+          "dgxSparkTokPerSec": 38,
+          "cloudTokPerSec": 100,
+          "cloudGPUs": 0.1,
+          "quantization": "Q4_K_M",
+          "tier": "small",
+          "notes": "~6GB loaded, 10 instances per H100"
+        },
+        "gemma-3-27b": {
+          "name": "Gemma 3 27B",
+          "params": "27B",
+          "minRAM": 20,
+          "localTokPerSec": 32,
+          "dgxSparkTokPerSec": 18,
+          "cloudTokPerSec": 50,
+          "cloudGPUs": 0.25,
+          "quantization": "Q4_K_M",
+          "tier": "medium",
+          "notes": "~15GB loaded, 4 instances per H100"
+        }
+      }
+    },
     "deepseek": {
       "name": "DeepSeek",
       "models": {

@@ -697,14 +697,12 @@ export default function PayoffCalculator() {
                   <StatCard
                     label="Payoff Time"
                     value={cheapest ? formatPayoff(cheapest.payoffMonths) : 'N/A'}
-                    unit="months"
                     description="Break-even vs cheapest cloud"
                   />
                 ) : (
                   <StatCard
                     label="Payoff Time"
                     value={filteredApiProviders[0] ? formatPayoff(filteredApiProviders[0].payoffMonths) : 'N/A'}
-                    unit="months"
                     description="Break-even vs cheapest API"
                   />
                 )}
