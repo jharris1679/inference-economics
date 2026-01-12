@@ -259,8 +259,21 @@ export default function PayoffCalculator() {
           <p className="text-xl text-muted-foreground font-serif max-w-2xl mx-auto mb-8" style={{ lineHeight: 1.6 }}>
             As GPU prices fall and open-source models mature, the buy-vs-rent calculus for AI infrastructure is shifting. But supply chain risks and geopolitical tensions add new uncertainty to my equation.
           </p>
-          <div className="text-sm text-muted-foreground">
-            Data updated {apiProviders.updatedAt} • Interactive analysis
+          {/* Byline */}
+          <div className="flex items-center justify-center gap-3 mt-8 pt-6 border-t border-border">
+            <img
+              src="https://media.licdn.com/dms/image/v2/C5603AQHqNsJKPJqHVg/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1516331090768?e=2147483647&v=beta&t=dKHj-Cd5tSsYlMv5hZHLjK4CxqmqMPjmkk_LWiDdaWo"
+              alt="Josh Harris"
+              className="w-10 h-10 rounded-full object-cover"
+            />
+            <div className="text-left">
+              <div className="text-sm font-medium text-foreground">By Josh Harris</div>
+              <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                <span>Data updated {apiProviders.updatedAt}</span>
+                <a href="https://www.linkedin.com/in/josh-harris-86188983/" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">LinkedIn</a>
+                <a href="https://x.com/dynemetis" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">𝕏</a>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -295,7 +308,7 @@ export default function PayoffCalculator() {
             <div className="border-l-2 border-accent/30 pl-4">
               <p className="text-sm text-muted-foreground font-serif">
                 <strong className="text-foreground block mb-1">Demand outpacing supply</strong>
-                <a href="https://www.reuters.com/technology/tsmc-says-demand-ai-chips-exceeds-supply-2024-07-18/" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">TSMC's CEO</a> predicts chip shortages through 2026. HBM memory faces 6-12 month lead times.
+                <a href="https://www.theregister.com/2024/07/18/tsmc_ceo_predicts_ai_chip/" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">TSMC's CEO</a> predicts chip shortages through 2026. HBM memory faces 6-12 month lead times.
               </p>
             </div>
             <div className="border-l-2 border-accent/30 pl-4">
@@ -307,7 +320,7 @@ export default function PayoffCalculator() {
             <div className="border-l-2 border-accent/30 pl-4">
               <p className="text-sm text-muted-foreground font-serif">
                 <strong className="text-foreground block mb-1">Years to expand</strong>
-                New fabs take <a href="https://www.mckinsey.com/industries/semiconductors/our-insights/semiconductor-fabs-construction-challenges" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">3-5 years to build</a>; announced 2025 capacity won't arrive until 2027+.
+                New fabs take <a href="https://www.construction-physics.com/p/how-to-build-a-20-billion-semiconductor" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">2-4 years to build</a>; announced 2025 capacity won't arrive until 2027+.
               </p>
             </div>
           </div>
