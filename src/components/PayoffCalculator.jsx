@@ -338,9 +338,14 @@ export default function PayoffCalculator() {
             </div>
           </div>
 
-          <p className="text-sm text-muted-foreground bg-background p-4 border border-border">
-            <strong className="text-foreground">The key question:</strong> At what utilization level does owning hardware make sense? The calculator below shows the break-even point at today's prices. If cloud/API costs rise, that threshold drops; if they fall, it rises. Your view on these supply chain dynamics shapes how you interpret the numbers.
-          </p>
+          <div className="bg-background p-6 border border-border">
+            <p className="text-lg font-serif text-foreground mb-2">
+              <strong>The key question:</strong> At what utilization level does owning hardware make sense?
+            </p>
+            <p className="text-sm text-muted-foreground">
+              The calculator below shows the break-even point at today's prices. If cloud/API costs rise, that threshold drops; if they fall, it rises. Your view on these supply chain dynamics shapes how you interpret the numbers.
+            </p>
+          </div>
         </div>
       </div>
 
