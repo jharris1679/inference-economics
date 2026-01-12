@@ -272,7 +272,7 @@ export default function PayoffCalculator() {
               className="w-10 h-10 rounded-full object-cover"
             />
             <div className="text-left">
-              <div className="text-sm font-medium text-foreground">By Josh Harris</div>
+              <div className="text-sm font-medium text-foreground">By Josh Harris, <span className="font-normal text-muted-foreground">CEO of <a href="https://getanswerlayer.com" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">AnswerLayer</a></span></div>
               <div className="flex items-center gap-3 text-xs text-muted-foreground">
                 <a href="https://www.linkedin.com/in/josh-harris-86188983/" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">LinkedIn</a>
                 <a href="https://x.com/dynemetis" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">𝕏</a>
@@ -289,8 +289,8 @@ export default function PayoffCalculator() {
       {/* Opening Argument */}
       <div className="max-w-6xl mx-auto px-6 py-12">
         <p className="text-lg leading-relaxed text-foreground font-serif mb-6" style={{ lineHeight: 1.8 }}>
-          <span className="float-left text-5xl font-headline font-bold mr-3 mt-1 text-accent" style={{ lineHeight: 0.85 }}>E</span>
-          very team makes a decision about how to purchase compute that defines their AI strategy. Until recently, the answer was straightforward: rent from the cloud. But the economics have shifted dramatically since 2023. Today, consumer hardware like Apple's M-series chips and NVIDIA's DGX Spark offer a compelling alternative: pay once, run forever.
+          <span className="float-left text-5xl font-headline font-bold mr-3 mt-1 text-accent" style={{ lineHeight: 0.85 }}>C</span>
+          ompute is the new capex decision. How you source it defines your AI economics. Until recently, the answer was straightforward: rent from the cloud. But the economics have shifted dramatically in recent years. Today, consumer hardware like Apple's M-series chips and NVIDIA's DGX Spark offer a compelling alternative: pay once, run forever.
         </p>
         <p className="text-lg leading-relaxed text-foreground font-serif mb-6" style={{ lineHeight: 1.8 }}>
           At <a href="https://getanswerlayer.com" className="text-accent hover:underline" target="_blank" rel="noopener noreferrer">AnswerLayer</a>, we deploy on customer infrastructure—which means we think constantly about how to maximize value from whatever compute power our customers own or plan to buy. The calculus isn't simple. Cloud providers offer raw speed—an H100 cluster can process tokens 2-4× faster than consumer hardware. API providers abstract infrastructure entirely. The question isn't which is "best," but which makes sense for a company's specific workload and time horizon.
@@ -507,11 +507,26 @@ export default function PayoffCalculator() {
                     <div className="flex items-center gap-1">
                       <span className="text-xs text-muted-foreground">×</span>
                       <input
-                        type="number"
-                        min="1"
-                        max="10"
-                        value={entry.quantity}
-                        onChange={(e) => updateWorkloadEntry(entry.id, { quantity: Math.max(1, parseInt(e.target.value) || 1) })}
+                        type="text"
+                        inputMode="numeric"
+                        pattern="[0-9]*"
+                        value={entry.quantity === 0 ? '' : entry.quantity}
+                        onChange={(e) => {
+                          const raw = e.target.value;
+                          if (raw === '') {
+                            updateWorkloadEntry(entry.id, { quantity: 0 });
+                          } else {
+                            const val = parseInt(raw);
+                            if (!isNaN(val)) {
+                              updateWorkloadEntry(entry.id, { quantity: Math.max(1, val) });
+                            }
+                          }
+                        }}
+                        onBlur={(e) => {
+                          if (entry.quantity < 1) {
+                            updateWorkloadEntry(entry.id, { quantity: 1 });
+                          }
+                        }}
                         className="w-12 bg-card border border-border px-2 py-1 text-foreground text-xs text-center focus:outline-none focus:ring-1 focus:ring-accent"
                       />
                     </div>
@@ -877,6 +892,11 @@ export default function PayoffCalculator() {
             </div>
             <p className="text-sm text-muted-foreground mb-4">
               Pay-per-token pricing for workload — {formatTokens(calculations.tokensPerDay)} tokens/day
+              {Object.values(ossAPIFilters).filter(Boolean).length > filteredApiProviders.length && (
+                <span className="block mt-1 text-xs italic">
+                  Note: Only providers offering all {workload.length} model{workload.length > 1 ? 's' : ''} in your workload are shown.
+                </span>
+              )}
             </p>
 
             {filteredApiProviders.length > 0 ? (
@@ -1351,11 +1371,12 @@ export default function PayoffCalculator() {
               <p className="text-muted-foreground font-serif italic">When open-weight models match proprietary performance</p>
             </div>
             <p className="text-base leading-relaxed text-muted-foreground font-serif mb-4" style={{ lineHeight: 1.8 }}>
-              The API providers above offer access to both proprietary and open-source models. What's changed is that open models now compete on quality.{' '}
-              <a href="https://ai.meta.com/blog/llama-4-multimodal-intelligence/" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">Meta's Llama 4</a>{' '}
-              delivers frontier-class performance with models ranging from Scout (17B active) to Behemoth (288B active).{' '}
-              <a href="https://blog.google/technology/developers/gemma-3/" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">Google's Gemma 3</a>{' '}
-              offers strong performance at smaller sizes (1B to 27B). For many applications—summarization, extraction, code generation—the gap with proprietary models has effectively closed.
+              The API providers above offer access to both proprietary and open-source models. What's changed is that open models now compete on quality. According to the{' '}
+              <a href="https://artificialanalysis.ai/leaderboards/models" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">Artificial Analysis leaderboard</a>,{' '}
+              open models like DeepSeek R1,{' '}
+              <a href="https://qwenlm.github.io/blog/qwen2.5/" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">Qwen 2.5</a>, and{' '}
+              <a href="https://ai.meta.com/blog/llama-4-multimodal-intelligence/" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">Llama 4</a>{' '}
+              now rival closed models on key benchmarks. Qwen has overtaken Llama as the most-downloaded base model for fine-tuning. For many applications—summarization, extraction, code generation—the gap with proprietary models has effectively closed.
             </p>
             <p className="text-base leading-relaxed text-muted-foreground font-serif mb-4" style={{ lineHeight: 1.8 }}>
               There's another factor to consider: today's API prices are{' '}
