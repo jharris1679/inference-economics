@@ -349,61 +349,6 @@ export default function PayoffCalculator() {
         </div>
       </div>
 
-      {/* Stats Overview - Now with editorial context */}
-      {calculations.canRun && (
-        <div className="bg-secondary border-y border-border">
-          <div className="max-w-6xl mx-auto px-6 py-10">
-            <div className="max-w-3xl mx-auto text-center mb-8">
-              <h2 className="font-headline text-2xl font-bold text-foreground mb-3">Your Configuration at a Glance</h2>
-              <p className="text-muted-foreground font-serif">Based on your selected hardware and workload, here's how the numbers break down.</p>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <StatCard
-                label="Local Hardware"
-                value={`$${calculations.localPrice.toLocaleString(undefined, {maximumFractionDigits: 0})}`}
-                description={calculations.localName}
-              />
-              <StatCard
-                label="Throughput"
-                value={calculations.localTPS}
-                unit="tok/s"
-                description={`${formatTokens(calculations.tokensPerDay)} tokens/day`}
-              />
-              {/* Show cheapest API for inference, cheapest cloud GPU for training */}
-              {isTrainingMode ? (
-                <StatCard
-                  label="Cheapest Cloud"
-                  value={cheapest ? `$${cheapest.dailyCost.toFixed(0)}` : 'N/A'}
-                  unit="/day"
-                  description={cheapest ? `${cheapest.provider} (${cheapest.gpus}× H100)` : 'No providers selected'}
-                />
-              ) : (
-                <StatCard
-                  label="Cheapest API"
-                  value={filteredApiProviders[0] ? `$${filteredApiProviders[0].dailyCost.toFixed(0)}` : 'N/A'}
-                  unit="/day"
-                  description={filteredApiProviders[0] ? `${filteredApiProviders[0].name} @ $${filteredApiProviders[0].blendedPer1M.toFixed(2)}/1M` : 'No providers selected'}
-                />
-              )}
-              {/* Payoff comparison: vs API for inference, vs cloud for training */}
-              {isTrainingMode ? (
-                <StatCard
-                  label="Payoff Time"
-                  value={cheapest ? formatPayoff(cheapest.payoffMonths) : 'N/A'}
-                  description="Break-even vs cheapest cloud"
-                />
-              ) : (
-                <StatCard
-                  label="Payoff Time"
-                  value={filteredApiProviders[0] ? formatPayoff(filteredApiProviders[0].payoffMonths) : 'N/A'}
-                  description="Break-even vs cheapest API"
-                />
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Transition to Calculator */}
       <div className="max-w-6xl mx-auto px-6 py-12 text-center">
         <h2 className="font-headline text-2xl font-bold text-foreground mb-4">Configure Your Scenario</h2>
@@ -710,6 +655,61 @@ export default function PayoffCalculator() {
             </div>
           </div>
         </div>
+
+        {/* Stats Overview - Your Configuration at a Glance */}
+        {calculations.canRun && (
+          <div className="bg-secondary border border-border mb-6">
+            <div className="px-6 py-8">
+              <div className="text-center mb-6">
+                <h3 className="font-headline text-xl font-bold text-foreground mb-2">Your Configuration at a Glance</h3>
+                <p className="text-sm text-muted-foreground font-serif">Based on your selected hardware and workload</p>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <StatCard
+                  label="Local Hardware"
+                  value={`$${calculations.localPrice.toLocaleString(undefined, {maximumFractionDigits: 0})}`}
+                  description={calculations.localName}
+                />
+                <StatCard
+                  label="Throughput"
+                  value={calculations.localTPS}
+                  unit="tok/s"
+                  description={`${formatTokens(calculations.tokensPerDay)} tokens/day`}
+                />
+                {/* Show cheapest API for inference, cheapest cloud GPU for training */}
+                {isTrainingMode ? (
+                  <StatCard
+                    label="Cheapest Cloud"
+                    value={cheapest ? `$${cheapest.dailyCost.toFixed(0)}` : 'N/A'}
+                    unit="/day"
+                    description={cheapest ? `${cheapest.provider} (${cheapest.gpus}× H100)` : 'No providers selected'}
+                  />
+                ) : (
+                  <StatCard
+                    label="Cheapest API"
+                    value={filteredApiProviders[0] ? `$${filteredApiProviders[0].dailyCost.toFixed(0)}` : 'N/A'}
+                    unit="/day"
+                    description={filteredApiProviders[0] ? `${filteredApiProviders[0].name} @ $${filteredApiProviders[0].blendedPer1M.toFixed(2)}/1M` : 'No providers selected'}
+                  />
+                )}
+                {/* Payoff comparison: vs API for inference, vs cloud for training */}
+                {isTrainingMode ? (
+                  <StatCard
+                    label="Payoff Time"
+                    value={cheapest ? formatPayoff(cheapest.payoffMonths) : 'N/A'}
+                    description="Break-even vs cheapest cloud"
+                  />
+                ) : (
+                  <StatCard
+                    label="Payoff Time"
+                    value={filteredApiProviders[0] ? formatPayoff(filteredApiProviders[0].payoffMonths) : 'N/A'}
+                    description="Break-even vs cheapest API"
+                  />
+                )}
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Workload Summary */}
         {calculations.canRun && (
@@ -1391,6 +1391,27 @@ export default function PayoffCalculator() {
           </div>
         )}
 
+        {/* Prose: When Cloud Wins - Balance the narrative */}
+        {calculations.canRun && !isTrainingMode && (
+          <div className="my-12">
+            <div className="mb-6">
+              <h2 className="font-headline text-xl font-bold text-foreground mb-2">When Cloud Wins</h2>
+              <p className="text-muted-foreground font-serif italic">Convenience, guarantees, and the value of not managing infrastructure</p>
+            </div>
+            <p className="text-base leading-relaxed text-muted-foreground font-serif mb-4" style={{ lineHeight: 1.8 }}>
+              Local hardware isn't always the answer. Cloud and API providers offer real advantages: no hardware procurement, no maintenance, no capacity planning. For teams without dedicated infrastructure expertise, managed services eliminate entire categories of operational burden.
+            </p>
+            <p className="text-base leading-relaxed text-muted-foreground font-serif mb-4" style={{ lineHeight: 1.8 }}>
+              SLAs matter too. Cloud providers guarantee uptime, offer redundancy across regions, and handle failover automatically. Local hardware is a single point of failure unless you invest in redundancy—which multiplies the cost.
+            </p>
+            <div className="bg-secondary border border-border p-4 mt-6">
+              <p className="text-sm text-muted-foreground">
+                <strong className="text-foreground">A note on pricing:</strong> The cloud GPU rates above are spot/on-demand prices. Reserved instances and usage commitments can reduce costs 30-60%, which would extend the payoff period. The calculator shows the baseline case—your actual economics may differ.
+              </p>
+            </div>
+          </div>
+        )}
+
         {/* Prose: The Open Source Option - After Why Local */}
         {calculations.canRun && !isTrainingMode && (
           <div className="my-12">
@@ -1400,8 +1421,8 @@ export default function PayoffCalculator() {
             </div>
             <p className="text-base leading-relaxed text-muted-foreground font-serif mb-4" style={{ lineHeight: 1.8 }}>
               The API providers above offer access to both proprietary and open-source models. What's changed is that open models now compete on quality.{' '}
-              <a href="https://techcrunch.com/2024/12/06/meta-unveils-a-new-more-efficient-llama-model/" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">Meta's Llama 3.3 70B</a>{' '}
-              delivers performance comparable to the 405B model at a fraction of the cost. For many applications—summarization, extraction, code generation—the gap with proprietary models has effectively closed.
+              <a href="https://ai.meta.com/blog/llama-4-multimodal-intelligence/" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">Meta's Llama 4</a>{' '}
+              delivers frontier-class performance with models ranging from Scout (17B active parameters) to Behemoth (288B active). For many applications—summarization, extraction, code generation—the gap with proprietary models has effectively closed.
             </p>
             <p className="text-base leading-relaxed text-muted-foreground font-serif mb-4" style={{ lineHeight: 1.8 }}>
               There's another factor to consider: today's API prices are{' '}
