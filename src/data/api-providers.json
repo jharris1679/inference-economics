@@ -57,6 +57,23 @@
       { "name": "DeepInfra", "inputPer1M": 0.90, "outputPer1M": 0.90 },
       { "name": "Fireworks", "inputPer1M": 0.90, "outputPer1M": 0.90 }
     ],
+    "gemma-3-2b": [
+      { "name": "Groq", "inputPer1M": 0.04, "outputPer1M": 0.04 },
+      { "name": "Together", "inputPer1M": 0.10, "outputPer1M": 0.10 },
+      { "name": "DeepInfra", "inputPer1M": 0.03, "outputPer1M": 0.03 }
+    ],
+    "gemma-3-9b": [
+      { "name": "Groq", "inputPer1M": 0.10, "outputPer1M": 0.10 },
+      { "name": "Together", "inputPer1M": 0.20, "outputPer1M": 0.20 },
+      { "name": "DeepInfra", "inputPer1M": 0.07, "outputPer1M": 0.07 },
+      { "name": "Fireworks", "inputPer1M": 0.20, "outputPer1M": 0.20 }
+    ],
+    "gemma-3-27b": [
+      { "name": "Groq", "inputPer1M": 0.20, "outputPer1M": 0.20 },
+      { "name": "Together", "inputPer1M": 0.30, "outputPer1M": 0.30 },
+      { "name": "DeepInfra", "inputPer1M": 0.12, "outputPer1M": 0.12 },
+      { "name": "Fireworks", "inputPer1M": 0.30, "outputPer1M": 0.30 }
+    ],
     "gpt-oss-20b": [
       { "name": "OpenAI", "inputPer1M": 1.10, "outputPer1M": 4.40 },
       { "name": "Together", "inputPer1M": 0.60, "outputPer1M": 0.60 }
