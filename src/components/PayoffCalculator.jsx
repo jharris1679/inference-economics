@@ -260,6 +260,16 @@ export default function PayoffCalculator() {
         </div>
       </div>
 
+      {/* Introduction Prose */}
+      <div className="max-w-3xl mx-auto px-6 py-8">
+        <p className="text-lg leading-relaxed text-muted-foreground font-serif mb-4">
+          The economics of running large language models have shifted dramatically. In 2023, cloud GPU rental was often the only viable option for serious inference workloads. Today, consumer hardware like Apple's M-series chips and NVIDIA's DGX Spark offer a compelling alternative: pay once, run forever.
+        </p>
+        <p className="text-lg leading-relaxed text-muted-foreground font-serif">
+          But the calculus isn't simple. Cloud providers offer raw speed—an H100 cluster can process tokens 2-4× faster than local hardware. API providers eliminate infrastructure entirely. The question isn't which is "best," but which makes sense for <em>your</em> specific workload and time horizon.
+        </p>
+      </div>
+
       {/* Stats Overview */}
       {calculations.canRun && (
         <div className="bg-secondary">
@@ -531,7 +541,7 @@ export default function PayoffCalculator() {
             <label className="block text-sm font-medium text-muted-foreground mb-3">
               Mode: <span className="text-foreground font-bold">{memoryInfo.trainingMode}</span>
               {isTrainingMode && (
-                <span className="ml-2 text-warning text-xs">({TRAINING_MODES[trainingMode]?.multiplier}× RAM)</span>
+                <span className="ml-2 text-muted-foreground text-xs">({TRAINING_MODES[trainingMode]?.multiplier}× RAM)</span>
               )}
             </label>
 
@@ -545,12 +555,10 @@ export default function PayoffCalculator() {
                     // Auto-select first variant when changing category
                     setTrainingMode(cat.variants[0]);
                   }}
-                  className={`px-3 py-1.5 text-sm font-medium transition-all ${
+                  className={`px-3 py-1.5 text-sm font-medium transition-all border ${
                     trainingCategory === catKey
-                      ? catKey === 'inference'
-                        ? 'bg-accent text-accent-foreground'
-                        : 'bg-warning text-warning-foreground'
-                      : 'bg-muted text-foreground hover:bg-border'
+                      ? 'bg-accent text-white border-accent'
+                      : 'bg-muted text-muted-foreground border-border hover:bg-border hover:text-foreground'
                   }`}
                 >
                   {cat.name}
@@ -567,14 +575,16 @@ export default function PayoffCalculator() {
                     <button
                       key={variantKey}
                       onClick={() => setTrainingMode(variantKey)}
-                      className={`px-3 py-1.5 text-xs transition-all ${
+                      className={`px-3 py-1.5 text-xs transition-all border ${
                         trainingMode === variantKey
-                          ? 'bg-foreground text-background ring-2 ring-warning'
-                          : 'bg-muted text-muted-foreground hover:bg-border'
+                          ? 'bg-accent text-white border-accent'
+                          : 'bg-muted text-muted-foreground border-border hover:bg-border hover:text-foreground'
                       }`}
                     >
                       {variant.name.replace(`${TRAINING_CATEGORIES[trainingCategory].name} `, '')}
-                      <span className="text-muted-foreground ml-1">({variant.multiplier}×)</span>
+                      <span className={trainingMode === variantKey ? 'text-white/70' : 'text-muted-foreground'}>
+                        {' '}({variant.multiplier}×)
+                      </span>
                     </button>
                   );
                 })}
@@ -582,23 +592,13 @@ export default function PayoffCalculator() {
             )}
 
             {/* Description */}
-            <div className={`text-xs p-2 ${
-              isTrainingMode
-                ? 'text-warning bg-warning/10'
-                : 'text-muted-foreground bg-muted/50'
-            }`}>
-              {isTrainingMode ? (
-                <>
-                  <strong>Training mode:</strong> {TRAINING_MODES[trainingMode]?.description}
-                  <br />
-                  <span className="text-warning">
-                    Memory includes: weights + gradients + optimizer states + activations
-                  </span>
-                </>
-              ) : (
-                <>
-                  <strong>Inference mode:</strong> {TRAINING_MODES[trainingMode]?.description}
-                </>
+            <div className="text-xs p-2 text-muted-foreground bg-muted/50">
+              <strong className="text-foreground">{isTrainingMode ? 'Training' : 'Inference'}:</strong>{' '}
+              {TRAINING_MODES[trainingMode]?.description}
+              {isTrainingMode && (
+                <span className="block mt-1 text-muted-foreground">
+                  Memory includes: weights + gradients + optimizer states + activations
+                </span>
               )}
             </div>
           </div>
@@ -779,23 +779,23 @@ export default function PayoffCalculator() {
 
             {/* Explanation Cards */}
             <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-              <div className="bg-warning/10 border border-warning/30 p-4">
-                <div className="font-medium text-warning mb-1">Hrs needed</div>
-                <div className="text-foreground/70">
+              <div className="bg-secondary border border-border p-4">
+                <div className="font-medium text-foreground mb-1">Hours needed</div>
+                <div className="text-muted-foreground">
                   Cloud is {cheapest?.speedRatio.toFixed(1)}× faster, so you only need {formatHours(cheapest?.cloudHoursNeeded)}
                   to match {dailyHours}h of local output.
                 </div>
               </div>
-              <div className="bg-destructive/10 border border-destructive/30 p-4">
-                <div className="font-medium text-destructive mb-1">$/day</div>
-                <div className="text-foreground/70">
+              <div className="bg-secondary border border-border p-4">
+                <div className="font-medium text-foreground mb-1">Daily cost</div>
+                <div className="text-muted-foreground">
                   {formatHours(cheapest?.cloudHoursNeeded)} × ${cheapest?.hourlyRateTotal.toFixed(2)}/hr
                   = ${cheapest?.dailyCost.toFixed(2)}/day for equivalent work.
                 </div>
               </div>
-              <div className="bg-success/10 border border-success/30 p-4">
-                <div className="font-medium text-success mb-1">Payoff</div>
-                <div className="text-foreground/70">
+              <div className="bg-secondary border border-border p-4">
+                <div className="font-medium text-foreground mb-1">Payoff period</div>
+                <div className="text-muted-foreground">
                   ${calculations.localPrice.toLocaleString(undefined, {maximumFractionDigits: 0})} ÷
                   ${cheapest?.dailyCost.toFixed(2)}/day = {cheapest?.payoffDays} days to break even.
                 </div>
@@ -914,9 +914,9 @@ export default function PayoffCalculator() {
                   </table>
                 </div>
 
-                <div className="mt-4 bg-accent/10 border border-accent/30 p-4">
-                  <div className="font-medium text-accent mb-1">API vs GPU Rental vs Local</div>
-                  <div className="text-foreground/70 text-sm">
+                <div className="mt-4 bg-secondary border border-border p-4">
+                  <div className="font-medium text-foreground mb-1">API vs GPU Rental vs Local</div>
+                  <div className="text-muted-foreground text-sm">
                     {filteredApiProviders[0] && cheapest && (
                       <>
                         <strong>Cheapest API:</strong> {filteredApiProviders[0].name} @ ${filteredApiProviders[0].dailyCost.toFixed(2)}/day
@@ -1019,9 +1019,9 @@ export default function PayoffCalculator() {
               </table>
             </div>
 
-            <div className="mt-4 bg-warning/10 border border-warning/30  p-4">
-              <div className="font-medium text-warning mb-1">Training vs Inference Providers</div>
-              <div className="text-warning/80/70 text-sm">
+            <div className="mt-4 bg-secondary border border-border p-4">
+              <div className="font-medium text-foreground mb-1">Training vs Inference Providers</div>
+              <div className="text-muted-foreground text-sm">
                 Training providers like <strong>Prime Intellect</strong> offer specialized RL/fine-tuning infrastructure
                 including distributed training frameworks, environment libraries, and optimized training stacks.
                 {trainingProviders.providers[0] && (
@@ -1111,9 +1111,9 @@ export default function PayoffCalculator() {
               </table>
             </div>
 
-            <div className="mt-4 bg-accent/10 border border-accent/30  p-4">
-              <div className="font-medium text-accent mb-1">How this works</div>
-              <div className="text-accent/80/70 text-sm">
+            <div className="mt-4 bg-secondary border border-border p-4">
+              <div className="font-medium text-foreground mb-1">How this works</div>
+              <div className="text-muted-foreground text-sm">
                 Each row shows what it would cost to run your exact workload using that provider's comparable models.
                 {calculations.proprietaryAlternatives[0]?.breakdown?.length > 1 && (
                   <> Your workload spans {calculations.proprietaryAlternatives[0].breakdown.length} tiers, so each provider uses multiple models.</>
@@ -1125,17 +1125,17 @@ export default function PayoffCalculator() {
 
         {/* Summary */}
         {calculations.canRun && (filteredProviders.length > 0 || filteredApiProviders.length > 0 || calculations.proprietaryAlternatives?.length > 0 || isTrainingMode) && (
-          <div className={`mt-6  p-5 ${isTrainingMode ? 'bg-warning/10 border border-warning/50' : 'bg-accent/10 border border-accent/50'}`}>
-              <h3 className={`font-semibold mb-3 ${isTrainingMode ? 'text-warning' : 'text-accent'}`}>
+          <div className="mt-6 p-5 bg-secondary border border-border">
+              <h3 className="font-semibold mb-3 text-foreground">
                 Bottom Line {isTrainingMode && `(${TRAINING_MODES[trainingMode]?.name})`}
               </h3>
-              <div className={`space-y-2 text-sm ${isTrainingMode ? 'text-warning/80/80' : 'text-accent/80/80'}`}>
+              <div className="space-y-2 text-sm text-muted-foreground">
                 <p>
-                  {isTrainingMode ? 'Training' : 'Running'} <strong>{workload.length} model{workload.length > 1 ? 's' : ''}</strong> for <strong>{dailyHours}h/day</strong> on <strong>{calculations.localName}</strong>:
+                  {isTrainingMode ? 'Training' : 'Running'} <strong className="text-foreground">{workload.length} model{workload.length > 1 ? 's' : ''}</strong> for <strong className="text-foreground">{dailyHours}h/day</strong> on <strong className="text-foreground">{calculations.localName}</strong>:
                 </p>
                 <div className={`grid grid-cols-1 ${isTrainingMode ? 'md:grid-cols-2' : 'md:grid-cols-3'} gap-4 mt-3`}>
-                  <div className="bg-black/20  p-3">
-                    <div className="text-success font-medium mb-1">Local Hardware</div>
+                  <div className="bg-muted p-3">
+                    <div className="text-foreground font-medium mb-1">Local Hardware</div>
                     {isTrainingMode ? (
                       <>
                         <div>{memoryInfo.totalRAM}GB RAM ({TRAINING_MODES[trainingMode]?.multiplier}× inference)</div>
@@ -1150,8 +1150,8 @@ export default function PayoffCalculator() {
                   </div>
                   {isTrainingMode ? (
                     // Training mode: show training provider comparison
-                    <div className="bg-black/20  p-3">
-                      <div className="text-warning font-medium mb-1">
+                    <div className="bg-muted p-3">
+                      <div className="text-foreground font-medium mb-1">
                         Training Provider ({trainingProviders.providers[0]?.name})
                       </div>
                       {(() => {
@@ -1174,14 +1174,14 @@ export default function PayoffCalculator() {
                   ) : (
                     // Inference mode: show GPU rental and API
                     <>
-                      <div className="bg-black/20  p-3">
-                        <div className="text-warning font-medium mb-1">GPU Rental ({cheapest?.provider})</div>
+                      <div className="bg-muted p-3">
+                        <div className="text-foreground font-medium mb-1">GPU Rental ({cheapest?.provider})</div>
                         <div>{formatHours(cheapest?.cloudHoursNeeded)}/day @ {cheapest?.cloudTPS} tok/s</div>
                         <div>${cheapest?.dailyCost.toFixed(2)}/day = ${cheapest?.monthlyCost.toFixed(0)}/mo</div>
                       </div>
                       {filteredApiProviders[0] && (
-                        <div className="bg-black/20  p-3">
-                          <div className="text-accent font-medium mb-1">API ({filteredApiProviders[0].name})</div>
+                        <div className="bg-muted p-3">
+                          <div className="text-foreground font-medium mb-1">API ({filteredApiProviders[0].name})</div>
                           <div>${filteredApiProviders[0].blendedPer1M.toFixed(2)}/1M tokens</div>
                           <div>${filteredApiProviders[0].dailyCost.toFixed(2)}/day = ${filteredApiProviders[0].monthlyCost.toFixed(0)}/mo</div>
                         </div>
@@ -1206,10 +1206,10 @@ export default function PayoffCalculator() {
                     const payoffMonths = payoffDays / 30;
 
                     return (
-                      <p className={payoffMonths < 12 ? 'text-success mt-3' : 'text-warning mt-3'}>
+                      <p className={`mt-3 font-medium ${payoffMonths < 12 ? 'text-success' : 'text-foreground'}`}>
                         {payoffMonths < 12
                           ? `✓ Hardware pays off in ${Math.ceil(payoffDays)} days (${formatPayoff(payoffMonths)}) vs cloud training (${provider?.name}). After that, training is essentially free.`
-                          : `⚠ Hardware takes ${formatPayoff(payoffMonths)} to pay off vs cloud training (${provider?.name}) at this utilization level.`
+                          : `Hardware takes ${formatPayoff(payoffMonths)} to pay off vs cloud training (${provider?.name}) at this utilization level.`
                         }
                       </p>
                     );
@@ -1228,10 +1228,10 @@ export default function PayoffCalculator() {
                     : { name: cheapest?.provider, type: 'GPU', cost: gpuCost };
 
                   return (
-                    <p className={payoffMonths < 12 ? 'text-success mt-3' : 'text-warning mt-3'}>
+                    <p className={`mt-3 font-medium ${payoffMonths < 12 ? 'text-success' : 'text-foreground'}`}>
                       {payoffMonths < 12
                         ? `✓ Hardware pays off in ${Math.ceil(payoffDays)} days (${formatPayoff(payoffMonths)}) vs ${bestCloud.type} (${bestCloud.name}). After that, inference is essentially free.`
-                        : `⚠ Hardware takes ${formatPayoff(payoffMonths)} to pay off vs ${bestCloud.type} (${bestCloud.name}) at this utilization level.`
+                        : `Hardware takes ${formatPayoff(payoffMonths)} to pay off vs ${bestCloud.type} (${bestCloud.name}) at this utilization level.`
                       }
                     </p>
                   );
@@ -1253,6 +1253,39 @@ export default function PayoffCalculator() {
             </p>
           </div>
         )}
+
+        {/* Market Context Prose */}
+        <div className="max-w-3xl mx-auto my-12">
+          <h2 className="font-headline text-2xl font-bold text-foreground mb-6">The Shifting Economics of Compute</h2>
+
+          <p className="text-base leading-relaxed text-muted-foreground font-serif mb-4">
+            GPU compute costs have followed a dramatic trajectory. In early 2023, H100 rentals commanded $4-5 per GPU-hour when available at all. Today, competition among cloud providers like Lambda, RunPod, and Denvr has driven prices below $2.50/GPU-hour—a 40% reduction in under two years.
+          </p>
+
+          <p className="text-base leading-relaxed text-muted-foreground font-serif mb-4">
+            Meanwhile, API pricing has collapsed even faster. OpenAI's GPT-4 launched at $30 per million output tokens; today, open-source alternatives from Together and Fireworks serve comparable models at $0.20-1.00/million—a 30-150× cost reduction. This price pressure shows no signs of abating.
+          </p>
+
+          <h3 className="font-headline text-xl font-bold text-foreground mt-8 mb-4">Key Assumptions</h3>
+
+          <p className="text-base leading-relaxed text-muted-foreground font-serif mb-4">
+            This calculator makes several simplifying assumptions worth noting. We assume consistent daily usage over time—actual workloads are often bursty. We use a 50/50 input/output token ratio for API costs, though your application may differ significantly. Hardware depreciation and electricity costs are excluded, which favors the local hardware case. Cloud providers may impose minimum commitments or availability constraints not reflected here.
+          </p>
+
+          <h3 className="font-headline text-xl font-bold text-foreground mt-8 mb-4">Future Scenarios</h3>
+
+          <p className="text-base leading-relaxed text-muted-foreground font-serif mb-4">
+            <strong>If compute prices continue falling:</strong> The payoff period extends. Today's 6-month payoff could become 12 months if API prices halve again. For light-to-moderate usage, cloud options may remain perpetually cheaper than hardware ownership.
+          </p>
+
+          <p className="text-base leading-relaxed text-muted-foreground font-serif mb-4">
+            <strong>If you need cutting-edge models:</strong> Local hardware can't run the largest frontier models. A 405B parameter model requires 800GB+ of memory—well beyond any consumer device. For these workloads, cloud or API access remains mandatory.
+          </p>
+
+          <p className="text-base leading-relaxed text-muted-foreground font-serif mb-6">
+            <strong>If privacy matters:</strong> Local inference keeps data entirely on-premises. For healthcare, legal, or proprietary applications, this may justify a longer payoff period. No data leaves your machine.
+          </p>
+        </div>
 
         {/* ANS-517 & ANS-509: Methodology CalloutBox */}
         <CalloutBox title="How We Calculate" variant="methodology">
