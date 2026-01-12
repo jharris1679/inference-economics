@@ -713,45 +713,6 @@ export default function PayoffCalculator() {
           </div>
         )}
 
-        {/* Local Hardware Card */}
-        <div className={`p-5 border mb-6 ${
-          calculations.canRun
-            ? 'bg-success/10 border-success/30'
-            : 'bg-destructive/10 border-destructive/30'
-        }`}>
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div>
-              <h2 className="text-lg font-semibold text-foreground">{calculations.localName}</h2>
-              <div className="text-sm text-muted-foreground">
-                {calculations.memory}GB • {calculations.bandwidth} GB/s bandwidth
-              </div>
-            </div>
-            <div className="flex gap-6 items-center">
-              {calculations.canRun ? (
-                <>
-                  <div className="text-center">
-                    <div className="text-xl font-bold text-accent">{calculations.localTPS} tok/s</div>
-                    <div className="text-xs text-muted-foreground">throughput</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-xl font-bold text-success">
-                      ${calculations.localPrice.toLocaleString(undefined, {maximumFractionDigits: 0})}
-                    </div>
-                    <div className="text-xs text-muted-foreground">USD</div>
-                  </div>
-                </>
-              ) : (
-                <div className="text-destructive">
-                  Cannot run workload — needs {calculations.memoryInfo?.totalRAM || 0}GB RAM
-                  {calculations.memoryInfo?.incompatibleModels?.length > 0 && (
-                    <> (incompatible: {calculations.memoryInfo.incompatibleModels.join(', ')})</>
-                  )}
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-
         {/* Cloud GPU Comparison */}
         {calculations.canRun && (
           <div className="mb-8">
