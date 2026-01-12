@@ -295,7 +295,7 @@ export default function PayoffCalculator() {
           At <a href="https://getanswerlayer.com" className="text-accent hover:underline" target="_blank" rel="noopener noreferrer">AnswerLayer</a>, we deploy on customer infrastructure—which means we think constantly about how to maximize value from whatever compute power our customers own or plan to buy. The calculus isn't simple. Cloud providers offer raw speed—an H100 cluster can process tokens 2-4× faster than consumer hardware. API providers abstract infrastructure entirely. The question isn't which is "best," but which makes sense for a company's specific workload and time horizon.
         </p>
         <p className="text-lg leading-relaxed text-foreground font-serif" style={{ lineHeight: 1.8 }}>
-          I built this calculator to model that decision with real pricing data—for our customers and anyone else evaluating the hardware investment. But first, it's worth understanding the forces reshaping this market—and why the conventional wisdom about ever-cheaper compute may be incomplete.
+          I built this calculator to answer a simplified question: <em>how many tokens does it take to make buying hardware worthwhile?</em> The answer depends on your workload, your time horizon, and your assumptions about future pricing—which is where supply chain dynamics come in.
         </p>
       </div>
 
@@ -304,11 +304,11 @@ export default function PayoffCalculator() {
         <div className="max-w-6xl mx-auto px-6 py-12">
           <div className="mb-6">
             <h2 className="font-headline text-2xl font-bold text-foreground mb-2">The GPU Supply Chain</h2>
-            <p className="text-muted-foreground font-serif italic">Why the assumption of ever-cheaper compute may not hold</p>
+            <p className="text-muted-foreground font-serif italic">Risk factors that could affect future compute pricing</p>
           </div>
 
           <p className="text-base leading-relaxed text-foreground font-serif mb-6" style={{ lineHeight: 1.8 }}>
-            The conventional wisdom holds that GPU costs will continue their downward trajectory indefinitely. But a closer look at semiconductor supply chains reveals a more complex picture—one where demand is accelerating faster than supply can expand.
+            The calculator below assumes today's pricing holds steady. But there are structural factors in semiconductor supply chains that could push prices in either direction. Understanding these risks helps frame the buy-vs-rent decision.
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 my-8">
@@ -339,7 +339,7 @@ export default function PayoffCalculator() {
           </div>
 
           <p className="text-sm text-muted-foreground bg-background p-4 border border-border">
-            <strong className="text-foreground">The strategic implication:</strong> Locking in hardware at today's prices provides a hedge against supply disruption. If shortages materialize, both cloud rental rates and API costs could rise—retroactively shortening the payoff period for those who bought early.
+            <strong className="text-foreground">The key question:</strong> At what utilization level does owning hardware make sense? The calculator below shows the break-even point at today's prices. If cloud/API costs rise, that threshold drops; if they fall, it rises. Your view on these supply chain dynamics shapes how you interpret the numbers.
           </p>
         </div>
       </div>
