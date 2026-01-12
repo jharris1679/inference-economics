@@ -141,6 +141,7 @@ export default function PayoffCalculator() {
   const [dailyHours, setDailyHours] = useState(12);
   const [macRAM, setMacRAM] = useState(512);
   const [selectedHardware, setSelectedHardware] = useState('mac');
+  const [hardwareQuantity, setHardwareQuantity] = useState(1);
   // ANS-514: Training mode with category/variant selection
   const [trainingCategory, setTrainingCategory] = useState('inference');
   const [trainingMode, setTrainingMode] = useState('inference');
@@ -175,13 +176,15 @@ export default function PayoffCalculator() {
 
   // Memory info for workload (ANS-514: now includes training mode)
   const memoryInfo = useMemo(() => {
-    const availableMemory = selectedHardware === 'mac' ? macRAM : hardware.dgxSpark.memory;
+    const singleBoxMemory = selectedHardware === 'mac' ? macRAM : hardware.dgxSpark.memory;
+    const availableMemory = singleBoxMemory * hardwareQuantity;
     const memCalc = calculateWorkloadMemory(workload, models, trainingMode);
     const { totalRAM, breakdown, trainingMode: modeName, trainingDescription, isTraining } = memCalc;
     const percentage = (totalRAM / availableMemory) * 100;
     return {
       totalRAM,
       availableMemory,
+      singleBoxMemory,
       breakdown,
       percentage,
       canFit: totalRAM <= availableMemory,
@@ -189,7 +192,7 @@ export default function PayoffCalculator() {
       trainingDescription,
       isTraining,
     };
-  }, [workload, macRAM, selectedHardware, trainingMode]);
+  }, [workload, macRAM, selectedHardware, trainingMode, hardwareQuantity]);
 
   // Workload management functions
   const addModelToWorkload = () => {
@@ -217,12 +220,13 @@ export default function PayoffCalculator() {
     dailyHours,
     macRAM,
     selectedHardware,
+    hardwareQuantity,
     models,
     hardware,
     cloudProviders,
     apiProviders,
     trainingMode,
-  }), [workload, dailyHours, macRAM, selectedHardware, trainingMode]);
+  }), [workload, dailyHours, macRAM, selectedHardware, hardwareQuantity, trainingMode]);
 
   // Filter results by provider selection (ANS-511)
   // Map provider names to IDs for filtering
@@ -251,7 +255,7 @@ export default function PayoffCalculator() {
       <div className="bg-secondary border-b border-border">
         <div className="max-w-4xl mx-auto px-6 py-16 text-center">
           <div className="uppercase tracking-wider text-accent mb-4" style={{ fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.15em' }}>
-            The Economics of AI Infrastructure
+            Interactive Analysis: The Economics of AI Infrastructure
           </div>
           <h1 className="font-headline text-foreground mb-6" style={{ fontSize: '3rem', fontWeight: 700, lineHeight: 1.1, letterSpacing: '-0.02em' }}>
             Should I Buy the Hardware?
@@ -276,7 +280,7 @@ export default function PayoffCalculator() {
           </div>
           {/* Data timestamp */}
           <div className="text-sm text-muted-foreground mt-6 pt-4 border-t border-border">
-            Data updated {apiProviders.updatedAt} • Interactive analysis
+            Data updated {apiProviders.updatedAt}
           </div>
         </div>
       </div>
@@ -284,43 +288,49 @@ export default function PayoffCalculator() {
       {/* Opening Argument */}
       <div className="max-w-6xl mx-auto px-6 py-12">
         <p className="text-lg leading-relaxed text-foreground font-serif mb-6" style={{ lineHeight: 1.8 }}>
-          <span className="float-left text-5xl font-headline font-bold mr-3 mt-1 text-accent" style={{ lineHeight: 0.85 }}>M</span>
-          any teams are wrestling with a decision that defines their AI strategy: buy dedicated hardware, or rent from the cloud? The economics have shifted dramatically since 2023, when cloud GPU rental was often the only viable option. Today, consumer hardware like Apple's M-series chips and NVIDIA's DGX Spark offer a compelling alternative: pay once, run forever.
+          <span className="float-left text-5xl font-headline font-bold mr-3 mt-1 text-accent" style={{ lineHeight: 0.85 }}>E</span>
+          very team makes a decision about how to purchase compute that defines their AI strategy. Until recently, the answer was straightforward: rent from the cloud. But the economics have shifted dramatically since 2023. Today, consumer hardware like Apple's M-series chips and NVIDIA's DGX Spark offer a compelling alternative: pay once, run forever.
         </p>
-        <p className="text-lg leading-relaxed text-muted-foreground font-serif mb-6" style={{ lineHeight: 1.8 }}>
-          At <a href="https://answerlayer.com" className="text-accent hover:underline" target="_blank" rel="noopener noreferrer">AnswerLayer</a>, we deploy on customer infrastructure—which means we think constantly about how to maximize value from whatever hardware our customers own or plan to buy. The calculus isn't simple. Cloud providers offer raw speed—an H100 cluster can process tokens 2-4× faster than consumer hardware. API providers eliminate infrastructure entirely. The question isn't which is "best," but which makes sense for a company's specific workload and time horizon.
+        <p className="text-lg leading-relaxed text-foreground font-serif mb-6" style={{ lineHeight: 1.8 }}>
+          At <a href="https://getanswerlayer.com" className="text-accent hover:underline" target="_blank" rel="noopener noreferrer">AnswerLayer</a>, we deploy on customer infrastructure—which means we think constantly about how to maximize value from whatever hardware our customers own or plan to buy. The calculus isn't simple. Cloud providers offer raw speed—an H100 cluster can process tokens 2-4× faster than consumer hardware. API providers eliminate infrastructure entirely. The question isn't which is "best," but which makes sense for a company's specific workload and time horizon.
         </p>
-        <p className="text-lg leading-relaxed text-muted-foreground font-serif" style={{ lineHeight: 1.8 }}>
+        <p className="text-lg leading-relaxed text-foreground font-serif" style={{ lineHeight: 1.8 }}>
           I built this calculator to model that decision with real pricing data—for our customers and anyone else evaluating the hardware investment. But first, it's worth understanding the forces reshaping this market—and why the conventional wisdom about ever-cheaper compute may be incomplete.
         </p>
       </div>
 
-      {/* Section: The Supply Chain Reality - Placed early to set context */}
+      {/* Section: The GPU Supply Chain - Placed early to set context */}
       <div className="bg-secondary border-y border-border">
         <div className="max-w-6xl mx-auto px-6 py-12">
-          <div className="border-l-4 border-accent pl-6 mb-8">
-            <h2 className="font-headline text-2xl font-bold text-foreground mb-2">The Supply Chain Reality</h2>
+          <div className="mb-6">
+            <h2 className="font-headline text-2xl font-bold text-foreground mb-2">The GPU Supply Chain</h2>
             <p className="text-muted-foreground font-serif italic">Why the assumption of ever-cheaper compute may not hold</p>
           </div>
 
-          <p className="text-base leading-relaxed text-muted-foreground font-serif mb-6" style={{ lineHeight: 1.8 }}>
+          <p className="text-base leading-relaxed text-foreground font-serif mb-6" style={{ lineHeight: 1.8 }}>
             The conventional wisdom holds that GPU costs will continue their downward trajectory indefinitely. But a closer look at semiconductor supply chains reveals a more complex picture—one where demand is accelerating faster than supply can expand.
           </p>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 my-8">
-            <div className="border-l-2 border-accent/30 pl-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 my-8">
+            <div className="bg-background p-4 border border-border">
               <p className="text-sm text-muted-foreground font-serif">
-                <strong className="text-foreground block mb-1">Demand outpacing supply</strong>
+                <strong className="text-foreground block mb-1">Demand still accelerating</strong>
+                The <a href="https://www.iea.org/reports/electricity-2024" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">IEA projects</a> data center electricity consumption will double by 2026, driven primarily by AI workloads. Enterprise AI adoption is still in early innings.
+              </p>
+            </div>
+            <div className="bg-background p-4 border border-border">
+              <p className="text-sm text-muted-foreground font-serif">
+                <strong className="text-foreground block mb-1">Supply can't keep up</strong>
                 <a href="https://www.tomshardware.com/tech-industry/semiconductors/tsmc-csays-advanced-node-capacity-falls-short-of-ai-demand" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">TSMC's CEO</a> says capacity is "three times short" of demand. HBM memory faces 6-12 month lead times.
               </p>
             </div>
-            <div className="border-l-2 border-accent/30 pl-4">
+            <div className="bg-background p-4 border border-border">
               <p className="text-sm text-muted-foreground font-serif">
                 <strong className="text-foreground block mb-1">Geopolitical concentration</strong>
-                Over <a href="https://www.semiconductors.org/wp-content/uploads/2021/05/BCG-x-SIA-Strengthening-the-Global-Semiconductor-Value-Chain-April-2021_1.pdf" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">90% of advanced chips</a> are manufactured in Taiwan. A single point of failure.
+                Over <a href="https://www.semiconductors.org/wp-content/uploads/2021/05/BCG-x-SIA-Strengthening-the-Global-Semiconductor-Value-Chain-April-2021_1.pdf" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">90% of advanced chips</a> are manufactured in Taiwan. A single point of failure for global AI infrastructure.
               </p>
             </div>
-            <div className="border-l-2 border-accent/30 pl-4">
+            <div className="bg-background p-4 border border-border">
               <p className="text-sm text-muted-foreground font-serif">
                 <strong className="text-foreground block mb-1">Years to expand</strong>
                 New fabs take <a href="https://www.construction-physics.com/p/how-to-build-a-20-billion-semiconductor" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">2-4 years to build</a>; announced 2025 capacity won't arrive until 2027+.
@@ -375,14 +385,12 @@ export default function PayoffCalculator() {
                 <StatCard
                   label="Payoff Time"
                   value={cheapest ? formatPayoff(cheapest.payoffMonths) : 'N/A'}
-                  change={cheapest?.payoffMonths < 12 ? { value: 'Good investment', trend: 'up' } : cheapest?.payoffMonths < 24 ? { value: 'Moderate', trend: 'neutral' } : { value: 'Long payoff', trend: 'down' }}
                   description="Break-even vs cheapest cloud"
                 />
               ) : (
                 <StatCard
                   label="Payoff Time"
                   value={filteredApiProviders[0] ? formatPayoff(filteredApiProviders[0].payoffMonths) : 'N/A'}
-                  change={filteredApiProviders[0]?.payoffMonths < 12 ? { value: 'Good investment', trend: 'up' } : filteredApiProviders[0]?.payoffMonths < 24 ? { value: 'Moderate', trend: 'neutral' } : { value: 'Long payoff', trend: 'down' }}
                   description="Break-even vs cheapest API"
                 />
               )}
@@ -407,7 +415,27 @@ export default function PayoffCalculator() {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-8">
           {/* Hardware Selection */}
           <div className="bg-secondary p-4 border border-border">
-            <label className="block text-sm font-medium text-muted-foreground mb-3">Hardware</label>
+            <div className="flex items-center justify-between mb-3">
+              <label className="text-sm font-medium text-muted-foreground">Hardware</label>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-muted-foreground">Qty:</span>
+                <button
+                  onClick={() => setHardwareQuantity(q => Math.max(1, q - 1))}
+                  className="w-6 h-6 flex items-center justify-center bg-muted border border-border text-foreground hover:bg-border transition-colors"
+                  disabled={hardwareQuantity <= 1}
+                >
+                  −
+                </button>
+                <span className="w-6 text-center text-sm font-bold text-foreground">{hardwareQuantity}</span>
+                <button
+                  onClick={() => setHardwareQuantity(q => Math.min(10, q + 1))}
+                  className="w-6 h-6 flex items-center justify-center bg-muted border border-border text-foreground hover:bg-border transition-colors"
+                  disabled={hardwareQuantity >= 10}
+                >
+                  +
+                </button>
+              </div>
+            </div>
             <div className="space-y-2">
               <button
                 onClick={() => setSelectedHardware('mac')}
@@ -752,7 +780,7 @@ export default function PayoffCalculator() {
         {/* Cloud GPU Comparison */}
         {calculations.canRun && (
           <div className="mb-8">
-            <div className="border-l-4 border-accent pl-4 mb-6">
+            <div className="mb-2 mb-6">
               <h2 className="font-headline text-xl font-bold text-foreground mb-2">Cloud GPU Rental</h2>
               <p className="text-sm text-muted-foreground">
                 Rent raw compute by the hour. Faster than local hardware, but you pay for every minute of runtime.
@@ -893,7 +921,7 @@ export default function PayoffCalculator() {
         {/* API Provider Comparison - Only shown in inference mode */}
         {calculations.canRun && calculations.apiProviders.length > 0 && !isTrainingMode && (
           <div className="mb-8">
-            <div className="border-l-4 border-accent pl-4 mb-6">
+            <div className="mb-2 mb-6">
               <h2 className="font-headline text-xl font-bold text-foreground mb-2">API Providers</h2>
               <p className="text-sm text-muted-foreground">
                 Pay per token with zero infrastructure. The simplest path to production—but costs scale directly with usage.
@@ -1343,12 +1371,12 @@ export default function PayoffCalculator() {
         {/* Prose: Why Local Matters - After results */}
         {calculations.canRun && !isTrainingMode && (
           <div className="my-12">
-            <div className="border-l-4 border-accent pl-6 mb-6">
+            <div className="mb-2 mb-6">
               <h2 className="font-headline text-xl font-bold text-foreground mb-2">Why Local Matters</h2>
               <p className="text-muted-foreground font-serif italic">Beyond the economics: security, sovereignty, and control</p>
             </div>
             <p className="text-base leading-relaxed text-muted-foreground font-serif mb-4" style={{ lineHeight: 1.8 }}>
-              At <a href="https://answerlayer.com" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">AnswerLayer</a>, our customers in healthcare, finance, and legal can't send their data to third-party APIs. Data sovereignty is becoming the dominant paradigm—governments worldwide are mandating local storage and restricting cross-border transfers. Europe has issued over{' '}
+              At <a href="https://getanswerlayer.com" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">AnswerLayer</a>, our customers in healthcare, finance, and legal can't send their data to third-party APIs. Data sovereignty is becoming the dominant paradigm—governments worldwide are mandating local storage and restricting cross-border transfers. Europe has issued over{' '}
               <a href="https://www.enforcementtracker.com/" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">€5.65 billion in GDPR fines</a> since 2018, with the{' '}
               <a href="https://artificialintelligenceact.eu/" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">EU AI Act</a> adding new obligations in 2026.
             </p>
@@ -1361,7 +1389,7 @@ export default function PayoffCalculator() {
         {/* Prose: The Open Source Option - After Why Local */}
         {calculations.canRun && !isTrainingMode && (
           <div className="my-12">
-            <div className="border-l-4 border-accent pl-6 mb-6">
+            <div className="mb-2 mb-6">
               <h2 className="font-headline text-xl font-bold text-foreground mb-2">The Open Source Option</h2>
               <p className="text-muted-foreground font-serif italic">When open-weight models match proprietary performance</p>
             </div>
@@ -1384,7 +1412,7 @@ export default function PayoffCalculator() {
         {/* Prose: Right-Sizing - After results */}
         {calculations.canRun && (
           <div className="my-12">
-            <div className="border-l-4 border-accent pl-6 mb-6">
+            <div className="mb-2 mb-6">
               <h2 className="font-headline text-xl font-bold text-foreground mb-2">Right-Sizing Models</h2>
               <p className="text-muted-foreground font-serif italic">When smaller models outperform giants</p>
             </div>
@@ -1411,7 +1439,7 @@ export default function PayoffCalculator() {
 
         {/* Section: Key Assumptions */}
         <div className="my-12">
-          <div className="border-l-4 border-border pl-6 mb-6">
+          <div className="mb-2 mb-6">
             <h2 className="font-headline text-xl font-bold text-foreground mb-2">Key Assumptions</h2>
           </div>
           <p className="text-base leading-relaxed text-muted-foreground font-serif mb-4" style={{ lineHeight: 1.8 }}>

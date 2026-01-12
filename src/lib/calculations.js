@@ -626,6 +626,7 @@ export function computeWorkloadComparison({
   dailyHours,
   macRAM,
   selectedHardware,
+  hardwareQuantity = 1,
   models,
   hardware,
   cloudProviders,
@@ -633,19 +634,24 @@ export function computeWorkloadComparison({
   trainingMode = 'inference',
 }) {
   const isMac = selectedHardware === 'mac';
-  const localMemory = isMac ? macRAM : hardware.dgxSpark.memory;
+  const singleBoxMemory = isMac ? macRAM : hardware.dgxSpark.memory;
+  const localMemory = singleBoxMemory * hardwareQuantity;
   const cadToUsd = hardware.cadToUsd;
 
-  // Check if workload fits in memory
+  // Check if workload fits in memory (across all boxes)
   const memoryInfo = canRunWorkload(localMemory, workload, models, selectedHardware, trainingMode);
 
-  const localPrice = isMac
+  const singleBoxPrice = isMac
     ? hardware.mac.configs[macRAM].priceCAD * cadToUsd
     : hardware.dgxSpark.priceUSD;
+  const localPrice = singleBoxPrice * hardwareQuantity;
 
-  const localName = isMac
+  const baseName = isMac
     ? `${hardware.mac.name} (${macRAM}GB)`
     : hardware.dgxSpark.name;
+  const localName = hardwareQuantity > 1
+    ? `${hardwareQuantity}× ${baseName}`
+    : baseName;
 
   const localBandwidth = isMac
     ? hardware.mac.bandwidth
@@ -689,6 +695,8 @@ export function computeWorkloadComparison({
     }
   }
 
+  // Multiple boxes = parallel processing = higher throughput
+  totalLocalTPS = totalLocalTPS * hardwareQuantity;
   const totalTokensPerDay = calculateTokensPerDay(totalLocalTPS, dailyHours);
 
   // Cloud provider calculations - aggregate across workload
