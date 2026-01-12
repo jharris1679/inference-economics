@@ -1381,7 +1381,7 @@ export default function PayoffCalculator() {
               <p className="text-muted-foreground font-serif italic">Beyond the economics: security, sovereignty, and control</p>
             </div>
             <p className="text-base leading-relaxed text-muted-foreground font-serif mb-4" style={{ lineHeight: 1.8 }}>
-              At <a href="https://getanswerlayer.com" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">AnswerLayer</a>, our customers in healthcare, finance, and legal can't send their data to third-party APIs. Data sovereignty is becoming the dominant paradigm—governments worldwide are mandating local storage and restricting cross-border transfers. Europe has issued over{' '}
+              For a product like <a href="https://getanswerlayer.com" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">AnswerLayer</a>, customers in healthcare, finance, legal, and public sector can't send their data to third-party APIs. Data sovereignty is becoming the dominant paradigm—governments worldwide are mandating local storage and restricting cross-border transfers. Europe has issued over{' '}
               <a href="https://www.enforcementtracker.com/" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">€5.65 billion in GDPR fines</a> since 2018, with the{' '}
               <a href="https://artificialintelligenceact.eu/" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">EU AI Act</a> adding new obligations in 2026.
             </p>
@@ -1514,7 +1514,7 @@ export default function PayoffCalculator() {
           <p className="text-sm text-muted-foreground">
             This calculator is{' '}
             <a
-              href="https://github.com/answerlayer/inference-economics"
+              href="https://github.com/jharris1679/inference-economics"
               target="_blank"
               rel="noopener noreferrer"
               className="text-accent hover:underline"
