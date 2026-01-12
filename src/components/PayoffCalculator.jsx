@@ -262,7 +262,7 @@ export default function PayoffCalculator() {
           {/* Author Byline */}
           <div className="flex items-center justify-center gap-3 mt-8">
             <img
-              src="https://media.licdn.com/dms/image/v2/C5603AQHqNsJKPJqHVg/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1516331090768?e=2147483647&v=beta&t=dKHj-Cd5tSsYlMv5hZHLjK4CxqmqMPjmkk_LWiDdaWo"
+              src="/inference-economics/images/josh-harris.jpg"
               alt="Josh Harris"
               className="w-10 h-10 rounded-full object-cover"
             />
