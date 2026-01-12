@@ -266,7 +266,7 @@ export default function PayoffCalculator() {
       </div>
 
       {/* Opening Argument */}
-      <div className="max-w-3xl mx-auto px-6 py-12">
+      <div className="max-w-6xl mx-auto px-6 py-12">
         <p className="text-lg leading-relaxed text-foreground font-serif mb-6" style={{ lineHeight: 1.8 }}>
           <span className="float-left text-5xl font-headline font-bold mr-3 mt-1 text-accent" style={{ lineHeight: 0.85 }}>I</span>
           've been wrestling with a decision that many teams face today: should I invest in local AI hardware, or continue renting from the cloud? The economics have shifted dramatically since 2023, when cloud GPU rental was often the only viable option. Today, consumer hardware like Apple's M-series chips and NVIDIA's DGX Spark offer a compelling alternative: pay once, run forever.
@@ -281,7 +281,7 @@ export default function PayoffCalculator() {
 
       {/* Section: The Supply Chain Reality - Placed early to set context */}
       <div className="bg-secondary border-y border-border">
-        <div className="max-w-3xl mx-auto px-6 py-12">
+        <div className="max-w-6xl mx-auto px-6 py-12">
           <div className="border-l-4 border-accent pl-6 mb-8">
             <h2 className="font-headline text-2xl font-bold text-foreground mb-2">The Supply Chain Reality</h2>
             <p className="text-muted-foreground font-serif italic">Why my assumption of ever-cheaper compute may be wrong</p>
@@ -376,7 +376,7 @@ export default function PayoffCalculator() {
       )}
 
       {/* Transition to Calculator */}
-      <div className="max-w-3xl mx-auto px-6 py-12 text-center">
+      <div className="max-w-6xl mx-auto px-6 py-12 text-center">
         <h2 className="font-headline text-2xl font-bold text-foreground mb-4">Configure Your Scenario</h2>
         <p className="text-muted-foreground font-serif" style={{ lineHeight: 1.7 }}>
           Select your hardware configuration, define your workload, and see how the costs compare across providers.
