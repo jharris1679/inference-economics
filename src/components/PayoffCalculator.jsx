@@ -261,7 +261,7 @@ export default function PayoffCalculator() {
             Should I Buy the Hardware?
           </h1>
           <p className="text-xl text-muted-foreground font-serif max-w-2xl mx-auto mb-8" style={{ lineHeight: 1.6 }}>
-            As GPU prices fall and open-source models mature, the buy-vs-rent calculus for AI infrastructure is shifting. For companies running AI on their own infrastructure, the question is becoming urgent.
+            As GPU prices fall and open-source models mature, the buy-vs-rent calculus for AI infrastructure is shifting. For more and more organizations, the question is becoming relevant.
           </p>
           {/* Author Byline */}
           <div className="flex items-center justify-center gap-3 mt-8">
@@ -292,7 +292,7 @@ export default function PayoffCalculator() {
           very team makes a decision about how to purchase compute that defines their AI strategy. Until recently, the answer was straightforward: rent from the cloud. But the economics have shifted dramatically since 2023. Today, consumer hardware like Apple's M-series chips and NVIDIA's DGX Spark offer a compelling alternative: pay once, run forever.
         </p>
         <p className="text-lg leading-relaxed text-foreground font-serif mb-6" style={{ lineHeight: 1.8 }}>
-          At <a href="https://getanswerlayer.com" className="text-accent hover:underline" target="_blank" rel="noopener noreferrer">AnswerLayer</a>, we deploy on customer infrastructure—which means we think constantly about how to maximize value from whatever hardware our customers own or plan to buy. The calculus isn't simple. Cloud providers offer raw speed—an H100 cluster can process tokens 2-4× faster than consumer hardware. API providers eliminate infrastructure entirely. The question isn't which is "best," but which makes sense for a company's specific workload and time horizon.
+          At <a href="https://getanswerlayer.com" className="text-accent hover:underline" target="_blank" rel="noopener noreferrer">AnswerLayer</a>, we deploy on customer infrastructure—which means we think constantly about how to maximize value from whatever compute power our customers own or plan to buy. The calculus isn't simple. Cloud providers offer raw speed—an H100 cluster can process tokens 2-4× faster than consumer hardware. API providers abstract infrastructure entirely. The question isn't which is "best," but which makes sense for a company's specific workload and time horizon.
         </p>
         <p className="text-lg leading-relaxed text-foreground font-serif" style={{ lineHeight: 1.8 }}>
           I built this calculator to model that decision with real pricing data—for our customers and anyone else evaluating the hardware investment. But first, it's worth understanding the forces reshaping this market—and why the conventional wisdom about ever-cheaper compute may be incomplete.
@@ -1503,6 +1503,22 @@ export default function PayoffCalculator() {
             <strong>GPU type:</strong> {cloudProviders.gpuType}
           </p>
         </CalloutBox>
+
+        {/* Open Source Section */}
+        <div className="my-12 text-center">
+          <p className="text-sm text-muted-foreground">
+            This calculator is{' '}
+            <a
+              href="https://github.com/answerlayer/inference-economics"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-accent hover:underline"
+            >
+              open source
+            </a>
+            . Found an error in the data? Have a suggestion? Contributions welcome.
+          </p>
+        </div>
       </div>
     </div>
   );
