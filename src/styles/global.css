@@ -1,11 +1,108 @@
+@import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=Noto+Sans:wght@400;500;600;700&family=Noto+Serif:wght@400;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  /* Typography - NYT Style */
+  --font-sans: 'Noto Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+  --font-serif: 'Noto Serif', Georgia, 'Times New Roman', serif;
+  --font-headline: 'Libre Baskerville', Georgia, serif;
+  --font-size: 16px;
+
+  /* Core Colors */
+  --background: #ffffff;
+  --foreground: #121212;
+  --card: #ffffff;
+  --card-foreground: #121212;
+
+  /* Secondary */
+  --secondary: #f7f7f7;
+  --secondary-foreground: #121212;
+
+  /* Muted */
+  --muted: #ebebeb;
+  --muted-foreground: #666666;
+
+  /* Accent - NYT Blue */
+  --accent: #567b95;
+  --accent-foreground: #ffffff;
+
+  /* Destructive */
+  --destructive: #e45756;
+  --destructive-foreground: #ffffff;
+
+  /* Success */
+  --success: #54a24b;
+  --success-foreground: #ffffff;
+
+  /* Warning */
+  --warning: #f58518;
+  --warning-foreground: #ffffff;
+
+  /* Borders */
+  --border: #e2e2e2;
+  --input: #e2e2e2;
+  --ring: #567b95;
+
+  /* NYT Data Visualization Colors */
+  --chart-1: #5c8db8; /* NYT Blue */
+  --chart-2: #e45756; /* Salmon/Coral */
+  --chart-3: #54a24b; /* Green */
+  --chart-4: #f58518; /* Orange */
+  --chart-5: #b279a2; /* Purple */
+  --chart-6: #ff9da6; /* Pink */
+  --chart-7: #9d755d; /* Brown */
+  --chart-8: #eeca3b; /* Yellow */
+
+  /* Font Weights */
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* Sharp corners for NYT style */
+  --radius: 0rem;
+}
+
 html {
-  font-family: system-ui, sans-serif;
+  font-family: var(--font-sans);
+  font-size: var(--font-size);
 }
 
 body {
   margin: 0;
+  background-color: var(--background);
+  color: var(--foreground);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Utility classes for design system colors */
+@layer utilities {
+  .bg-background { background-color: var(--background); }
+  .bg-foreground { background-color: var(--foreground); }
+  .bg-card { background-color: var(--card); }
+  .bg-secondary { background-color: var(--secondary); }
+  .bg-muted { background-color: var(--muted); }
+  .bg-accent { background-color: var(--accent); }
+  .bg-destructive { background-color: var(--destructive); }
+  .bg-success { background-color: var(--success); }
+  .bg-warning { background-color: var(--warning); }
+
+  .text-foreground { color: var(--foreground); }
+  .text-muted-foreground { color: var(--muted-foreground); }
+  .text-accent { color: var(--accent); }
+  .text-accent-foreground { color: var(--accent-foreground); }
+  .text-destructive { color: var(--destructive); }
+  .text-success { color: var(--success); }
+  .text-warning { color: var(--warning); }
+
+  .border-border { border-color: var(--border); }
+  .border-input { border-color: var(--input); }
+
+  .font-sans { font-family: var(--font-sans); }
+  .font-serif { font-family: var(--font-serif); }
+  .font-headline { font-family: var(--font-headline); }
 }

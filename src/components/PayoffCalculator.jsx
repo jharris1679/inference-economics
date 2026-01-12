@@ -43,7 +43,7 @@ function MultiSelectDropdown({ options, selected, onChange, getKey = (o) => o.id
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-3 py-1.5 bg-gray-800 border border-gray-700 rounded-lg text-sm text-gray-300 hover:bg-gray-700 hover:border-gray-600 transition-colors"
+        className="flex items-center gap-2 px-3 py-1.5 bg-muted border border-border  text-sm text-foreground hover:bg-muted hover:border-border transition-colors"
       >
         <span>
           {selectedCount === totalCount
@@ -63,18 +63,18 @@ function MultiSelectDropdown({ options, selected, onChange, getKey = (o) => o.id
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 z-20 mt-1 w-56 bg-gray-800 rounded-lg shadow-xl border border-gray-700 overflow-hidden">
+        <div className="absolute right-0 z-20 mt-1 w-56 bg-muted  shadow-xl border border-border overflow-hidden">
           {/* All/Clear buttons */}
-          <div className="flex gap-2 p-2 border-b border-gray-700 bg-gray-850">
+          <div className="flex gap-2 p-2 border-b border-border bg-secondary">
             <button
               onClick={selectAll}
-              className="flex-1 px-2 py-1 text-xs font-medium text-blue-400 bg-blue-900/30 rounded hover:bg-blue-900/50 transition-colors"
+              className="flex-1 px-2 py-1 text-xs font-medium text-accent bg-accent/10 rounded hover:bg-accent/20 transition-colors"
             >
               All
             </button>
             <button
               onClick={clearAll}
-              className="flex-1 px-2 py-1 text-xs font-medium text-gray-400 bg-gray-700 rounded hover:bg-gray-600 transition-colors"
+              className="flex-1 px-2 py-1 text-xs font-medium text-muted-foreground bg-muted rounded hover:bg-border transition-colors"
             >
               Clear
             </button>
@@ -88,16 +88,16 @@ function MultiSelectDropdown({ options, selected, onChange, getKey = (o) => o.id
               return (
                 <label
                   key={key}
-                  className="flex items-center gap-2 px-3 py-2 hover:bg-gray-700 cursor-pointer transition-colors"
+                  className="flex items-center gap-2 px-3 py-2 hover:bg-muted cursor-pointer transition-colors"
                 >
                   <input
                     type="checkbox"
                     checked={selected[key] !== false}
                     onChange={() => toggleOption(key)}
-                    className="rounded border-gray-600 bg-gray-900 text-blue-500 focus:ring-blue-500 focus:ring-offset-0"
+                    className="rounded border-border bg-secondary text-accent focus:ring-accent focus:ring-offset-0"
                   />
-                  <span className="text-sm text-gray-200">{getLabel(opt)}</span>
-                  {detail && <span className="text-xs text-gray-500 ml-auto">{detail}</span>}
+                  <span className="text-sm text-foreground">{getLabel(opt)}</span>
+                  {detail && <span className="text-xs text-muted-foreground ml-auto">{detail}</span>}
                 </label>
               );
             })}
@@ -241,22 +241,22 @@ export default function PayoffCalculator() {
   const cheapest = filteredProviders[0];
 
   return (
-    <div className="min-h-screen bg-gray-950 text-gray-100 p-6">
+    <div className="min-h-screen bg-background text-foreground p-6">
       <div className="max-w-6xl mx-auto">
         {/* ANS-517: Header with data freshness indicator */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
           <div>
-            <h1 className="text-2xl font-bold mb-2 text-white">Hardware vs. Cloud Payoff Calculator</h1>
-            <p className="text-gray-400">
+            <h1 className="text-2xl font-bold mb-2 text-foreground font-headline">Hardware vs. Cloud Payoff Calculator</h1>
+            <p className="text-muted-foreground">
               Using real benchmark data — cloud hours adjusted to match your local token output
             </p>
           </div>
-          <div className="mt-3 md:mt-0 flex items-center gap-2 bg-gray-800 rounded-lg px-3 py-2 border border-gray-700">
-            <svg className="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="mt-3 md:mt-0 flex items-center gap-2 bg-secondary px-3 py-2 border border-border">
+            <svg className="w-4 h-4 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <span className="text-sm text-gray-300">
-              Data updated: <span className="text-white font-medium">{apiProviders.updatedAt}</span>
+            <span className="text-sm text-muted-foreground">
+              Data updated: <span className="text-foreground font-medium">{apiProviders.updatedAt}</span>
             </span>
           </div>
         </div>
@@ -264,15 +264,15 @@ export default function PayoffCalculator() {
         {/* Controls */}
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-8">
           {/* Hardware Selection */}
-          <div className="bg-gray-900 rounded-xl p-4 border border-gray-800">
-            <label className="block text-sm font-medium text-gray-400 mb-3">Hardware</label>
+          <div className="bg-secondary p-4 border border-border">
+            <label className="block text-sm font-medium text-muted-foreground mb-3">Hardware</label>
             <div className="space-y-2">
               <button
                 onClick={() => setSelectedHardware('mac')}
-                className={`w-full text-left p-3 rounded-lg transition-all ${
+                className={`w-full text-left p-3 transition-all border ${
                   selectedHardware === 'mac'
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+                    ? 'bg-accent text-accent-foreground border-accent'
+                    : 'bg-muted text-foreground hover:bg-border border-border'
                 }`}
               >
                 <div className="font-medium">{hardware.mac.name}</div>
@@ -280,10 +280,10 @@ export default function PayoffCalculator() {
               </button>
               <button
                 onClick={() => setSelectedHardware('spark')}
-                className={`w-full text-left p-3 rounded-lg transition-all ${
+                className={`w-full text-left p-3 transition-all border ${
                   selectedHardware === 'spark'
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+                    ? 'bg-accent text-accent-foreground border-accent'
+                    : 'bg-muted text-foreground hover:bg-border border-border'
                 }`}
               >
                 <div className="font-medium">{hardware.dgxSpark.name}</div>
@@ -293,12 +293,12 @@ export default function PayoffCalculator() {
           </div>
 
           {/* Mac RAM Slider */}
-          <div className="bg-gray-900 rounded-xl p-4 border border-gray-800">
-            <label className="block text-sm font-medium text-gray-400 mb-3">
+          <div className="bg-secondary p-4 border border-border">
+            <label className="block text-sm font-medium text-muted-foreground mb-3">
               {selectedHardware === 'mac' ? (
-                <>Mac RAM: <span className="text-white font-bold">{macRAM}GB</span></>
+                <>Mac RAM: <span className="text-foreground font-bold">{macRAM}GB</span></>
               ) : (
-                <>DGX Spark: <span className="text-white font-bold">{hardware.dgxSpark.memory}GB</span> (fixed)</>
+                <>DGX Spark: <span className="text-foreground font-bold">{hardware.dgxSpark.memory}GB</span> (fixed)</>
               )}
             </label>
             {selectedHardware === 'mac' ? (
@@ -309,17 +309,17 @@ export default function PayoffCalculator() {
                   max={ramOptions.length - 1}
                   value={ramOptions.indexOf(macRAM)}
                   onChange={(e) => setMacRAM(ramOptions[Number(e.target.value)])}
-                  className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                  className="w-full h-2 bg-muted  appearance-none cursor-pointer accent-accent"
                 />
-                <div className="flex justify-between text-xs text-gray-500 mt-2">
+                <div className="flex justify-between text-xs text-muted-foreground mt-2">
                   {ramOptions.map(r => <span key={r}>{r}</span>)}
                 </div>
-                <div className="mt-2 text-sm text-green-400">
+                <div className="mt-2 text-sm text-success">
                   ${(hardware.mac.configs[macRAM].priceCAD * cadToUsd).toLocaleString(undefined, {maximumFractionDigits: 0})} USD
                 </div>
               </>
             ) : (
-              <div className="text-sm text-gray-500 mt-4">
+              <div className="text-sm text-muted-foreground mt-4">
                 Fixed {hardware.dgxSpark.memory}GB unified memory<br/>
                 {hardware.dgxSpark.bandwidth} GB/s bandwidth
               </div>
@@ -327,12 +327,12 @@ export default function PayoffCalculator() {
           </div>
 
           {/* Workload Builder (ANS-504) - spans 2 columns */}
-          <div className="bg-gray-900 rounded-xl p-4 border border-gray-800 lg:col-span-2">
+          <div className="bg-secondary p-4 border border-border lg:col-span-2">
             <div className="flex items-center justify-between mb-3">
-              <label className="text-sm font-medium text-gray-400">Workload</label>
+              <label className="text-sm font-medium text-muted-foreground">Workload</label>
               <button
                 onClick={addModelToWorkload}
-                className="flex items-center gap-1 px-2 py-1 text-xs font-medium text-blue-400 bg-blue-900/30 rounded hover:bg-blue-900/50 transition-colors"
+                className="flex items-center gap-1 px-2 py-1 text-xs font-medium text-accent bg-accent/10 hover:bg-accent/20 transition-colors"
               >
                 <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -347,7 +347,7 @@ export default function PayoffCalculator() {
                 const developerModels = getModelsByDeveloper(models, entry.developerId);
                 const currentModel = getModel(models, entry.developerId, entry.modelId);
                 return (
-                  <div key={entry.id} className="flex items-center gap-2 p-2 bg-gray-800/50 rounded-lg">
+                  <div key={entry.id} className="flex items-center gap-2 p-2 bg-muted/50 border border-border">
                     {/* Developer dropdown */}
                     <select
                       value={entry.developerId}
@@ -359,7 +359,7 @@ export default function PayoffCalculator() {
                           modelId: devModels[0]?.id || '',
                         });
                       }}
-                      className="bg-gray-700 border border-gray-600 rounded px-2 py-1 text-white text-xs focus:outline-none focus:ring-1 focus:ring-blue-500"
+                      className="bg-card border border-border px-2 py-1 text-foreground text-xs focus:outline-none focus:ring-1 focus:ring-accent"
                     >
                       {developerList.map(dev => (
                         <option key={dev.id} value={dev.id}>{dev.name.split(' ')[0]}</option>
@@ -370,7 +370,7 @@ export default function PayoffCalculator() {
                     <select
                       value={entry.modelId}
                       onChange={(e) => updateWorkloadEntry(entry.id, { modelId: e.target.value })}
-                      className="flex-1 bg-gray-700 border border-gray-600 rounded px-2 py-1 text-white text-xs focus:outline-none focus:ring-1 focus:ring-blue-500"
+                      className="flex-1 bg-card border border-border px-2 py-1 text-foreground text-xs focus:outline-none focus:ring-1 focus:ring-accent"
                     >
                       {developerModels.map(model => {
                         const tps = selectedHardware === 'mac' ? model.localTokPerSec : model.dgxSparkTokPerSec;
@@ -384,19 +384,19 @@ export default function PayoffCalculator() {
 
                     {/* Quantity */}
                     <div className="flex items-center gap-1">
-                      <span className="text-xs text-gray-500">×</span>
+                      <span className="text-xs text-muted-foreground">×</span>
                       <input
                         type="number"
                         min="1"
                         max="10"
                         value={entry.quantity}
                         onChange={(e) => updateWorkloadEntry(entry.id, { quantity: Math.max(1, parseInt(e.target.value) || 1) })}
-                        className="w-12 bg-gray-700 border border-gray-600 rounded px-2 py-1 text-white text-xs text-center focus:outline-none focus:ring-1 focus:ring-blue-500"
+                        className="w-12 bg-card border border-border px-2 py-1 text-foreground text-xs text-center focus:outline-none focus:ring-1 focus:ring-accent"
                       />
                     </div>
 
                     {/* RAM indicator */}
-                    <span className="text-xs text-gray-500 w-16 text-right">
+                    <span className="text-xs text-muted-foreground w-16 text-right">
                       {currentModel ? currentModel.minRAM * entry.quantity : 0}GB
                     </span>
 
@@ -404,10 +404,10 @@ export default function PayoffCalculator() {
                     <button
                       onClick={() => removeFromWorkload(entry.id)}
                       disabled={workload.length <= 1}
-                      className={`p-1 rounded transition-colors ${
+                      className={`p-1 transition-colors ${
                         workload.length <= 1
-                          ? 'text-gray-600 cursor-not-allowed'
-                          : 'text-gray-400 hover:text-red-400 hover:bg-red-900/20'
+                          ? 'text-border cursor-not-allowed'
+                          : 'text-muted-foreground hover:text-destructive hover:bg-destructive/10'
                       }`}
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -422,25 +422,25 @@ export default function PayoffCalculator() {
             {/* Memory Summary Bar */}
             <div className="mt-3">
               <div className="flex items-center justify-between text-xs mb-1">
-                <span className="text-gray-400">Memory Usage</span>
-                <span className={memoryInfo.canFit ? 'text-green-400' : 'text-red-400'}>
+                <span className="text-muted-foreground">Memory Usage</span>
+                <span className={memoryInfo.canFit ? 'text-success' : 'text-destructive'}>
                   {memoryInfo.totalRAM}GB / {memoryInfo.availableMemory}GB
                   {memoryInfo.canFit ? ' ✓' : ` (${memoryInfo.totalRAM - memoryInfo.availableMemory}GB over)`}
                 </span>
               </div>
-              <div className="h-2 bg-gray-700 rounded-full overflow-hidden">
+              <div className="h-2 bg-muted overflow-hidden">
                 <div
                   className={`h-full transition-all ${
-                    memoryInfo.percentage > 100 ? 'bg-red-500' :
-                    memoryInfo.percentage > 80 ? 'bg-yellow-500' : 'bg-green-500'
+                    memoryInfo.percentage > 100 ? 'bg-destructive' :
+                    memoryInfo.percentage > 80 ? 'bg-warning' : 'bg-success'
                   }`}
                   style={{ width: `${Math.min(memoryInfo.percentage, 100)}%` }}
                 />
               </div>
               {/* Memory breakdown tooltip */}
-              <div className="flex flex-wrap gap-2 mt-2 text-xs text-gray-500">
+              <div className="flex flex-wrap gap-2 mt-2 text-xs text-muted-foreground">
                 {memoryInfo.breakdown.map((b, i) => (
-                  <span key={i} className="bg-gray-800 px-1.5 py-0.5 rounded">
+                  <span key={i} className="bg-muted px-1.5 py-0.5">
                     {b.name}: {b.subtotal}GB{b.quantity > 1 ? ` (×${b.quantity})` : ''}
                   </span>
                 ))}
@@ -449,9 +449,9 @@ export default function PayoffCalculator() {
           </div>
 
           {/* Daily Hours */}
-          <div className="bg-gray-900 rounded-xl p-4 border border-gray-800">
-            <label className="block text-sm font-medium text-gray-400 mb-3">
-              Usage: <span className="text-white font-bold">{dailyHours}h/day</span>
+          <div className="bg-secondary p-4 border border-border">
+            <label className="block text-sm font-medium text-muted-foreground mb-3">
+              Usage: <span className="text-foreground font-bold">{dailyHours}h/day</span>
             </label>
             <input
               type="range"
@@ -459,9 +459,9 @@ export default function PayoffCalculator() {
               max="24"
               value={dailyHours}
               onChange={(e) => setDailyHours(Number(e.target.value))}
-              className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
+              className="w-full h-2 bg-muted  appearance-none cursor-pointer accent-accent"
             />
-            <div className="flex justify-between text-xs text-gray-500 mt-2">
+            <div className="flex justify-between text-xs text-muted-foreground mt-2">
               <span>1h</span>
               <span>12h</span>
               <span>24h</span>
@@ -469,11 +469,11 @@ export default function PayoffCalculator() {
           </div>
 
           {/* ANS-514: Training Mode Selector with Category/Variant */}
-          <div className="bg-gray-900 rounded-xl p-4 border border-gray-800 lg:col-span-2">
-            <label className="block text-sm font-medium text-gray-400 mb-3">
-              Mode: <span className="text-white font-bold">{memoryInfo.trainingMode}</span>
+          <div className="bg-secondary p-4 border border-border lg:col-span-2">
+            <label className="block text-sm font-medium text-muted-foreground mb-3">
+              Mode: <span className="text-foreground font-bold">{memoryInfo.trainingMode}</span>
               {isTrainingMode && (
-                <span className="ml-2 text-orange-400 text-xs">({TRAINING_MODES[trainingMode]?.multiplier}× RAM)</span>
+                <span className="ml-2 text-warning text-xs">({TRAINING_MODES[trainingMode]?.multiplier}× RAM)</span>
               )}
             </label>
 
@@ -487,12 +487,12 @@ export default function PayoffCalculator() {
                     // Auto-select first variant when changing category
                     setTrainingMode(cat.variants[0]);
                   }}
-                  className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                  className={`px-3 py-1.5 text-sm font-medium transition-all ${
                     trainingCategory === catKey
                       ? catKey === 'inference'
-                        ? 'bg-blue-600 text-white'
-                        : 'bg-orange-600 text-white'
-                      : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+                        ? 'bg-accent text-accent-foreground'
+                        : 'bg-warning text-warning-foreground'
+                      : 'bg-muted text-foreground hover:bg-border'
                   }`}
                 >
                   {cat.name}
@@ -509,14 +509,14 @@ export default function PayoffCalculator() {
                     <button
                       key={variantKey}
                       onClick={() => setTrainingMode(variantKey)}
-                      className={`px-3 py-1.5 rounded-lg text-xs transition-all ${
+                      className={`px-3 py-1.5 text-xs transition-all ${
                         trainingMode === variantKey
-                          ? 'bg-gray-600 text-white ring-2 ring-orange-500'
-                          : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                          ? 'bg-foreground text-background ring-2 ring-warning'
+                          : 'bg-muted text-muted-foreground hover:bg-border'
                       }`}
                     >
                       {variant.name.replace(`${TRAINING_CATEGORIES[trainingCategory].name} `, '')}
-                      <span className="text-gray-500 ml-1">({variant.multiplier}×)</span>
+                      <span className="text-muted-foreground ml-1">({variant.multiplier}×)</span>
                     </button>
                   );
                 })}
@@ -524,16 +524,16 @@ export default function PayoffCalculator() {
             )}
 
             {/* Description */}
-            <div className={`text-xs rounded-lg p-2 ${
+            <div className={`text-xs p-2 ${
               isTrainingMode
-                ? 'text-orange-400 bg-orange-900/20'
-                : 'text-gray-500 bg-gray-800/50'
+                ? 'text-warning bg-warning/10'
+                : 'text-muted-foreground bg-muted/50'
             }`}>
               {isTrainingMode ? (
                 <>
                   <strong>Training mode:</strong> {TRAINING_MODES[trainingMode]?.description}
                   <br />
-                  <span className="text-orange-300">
+                  <span className="text-warning">
                     Memory includes: weights + gradients + optimizer states + activations
                   </span>
                 </>
@@ -548,16 +548,16 @@ export default function PayoffCalculator() {
 
         {/* Workload Summary */}
         {calculations.canRun && (
-          <div className="bg-gray-800/50 rounded-xl p-4 mb-6 border border-gray-700">
-            <div className="text-sm text-gray-400 mb-2">
+          <div className="bg-secondary p-4 mb-6 border border-border">
+            <div className="text-sm text-muted-foreground mb-2">
               Daily workload:{' '}
-              <span className="text-white font-medium">
+              <span className="text-foreground font-medium">
                 {calculations.workloadSummary?.length > 1
                   ? `${calculations.workloadSummary.length} models`
                   : calculations.workloadSummary?.[0]?.name || 'Unknown'}
               </span>
               {calculations.workloadSummary?.length > 1 && (
-                <span className="text-gray-500">
+                <span className="text-muted-foreground">
                   {' '}({calculations.workloadSummary.map(w =>
                     `${w.quantity > 1 ? w.quantity + '× ' : ''}${w.name}`
                   ).join(', ')})
@@ -566,28 +566,28 @@ export default function PayoffCalculator() {
             </div>
             <div className="flex flex-wrap items-center gap-4">
               <div className="text-center">
-                <div className="text-xl font-bold text-white">{dailyHours}h × {calculations.localTPS} tok/s</div>
-                <div className="text-xs text-gray-500">runtime × combined throughput</div>
+                <div className="text-xl font-bold text-foreground">{dailyHours}h × {calculations.localTPS} tok/s</div>
+                <div className="text-xs text-muted-foreground">runtime × combined throughput</div>
               </div>
-              <div className="text-xl text-gray-600">=</div>
+              <div className="text-xl text-muted-foreground">=</div>
               <div className="text-center">
-                <div className="text-xl font-bold text-blue-400">{formatTokens(calculations.tokensPerDay)}</div>
-                <div className="text-xs text-gray-500">tokens/day</div>
+                <div className="text-xl font-bold text-accent">{formatTokens(calculations.tokensPerDay)}</div>
+                <div className="text-xs text-muted-foreground">tokens/day</div>
               </div>
             </div>
           </div>
         )}
 
         {/* Local Hardware Card */}
-        <div className={`rounded-xl p-5 border mb-6 ${
+        <div className={`p-5 border mb-6 ${
           calculations.canRun
-            ? 'bg-gradient-to-r from-green-900/30 to-emerald-900/30 border-green-800/50'
-            : 'bg-red-900/20 border-red-800/50'
+            ? 'bg-success/10 border-success/30'
+            : 'bg-destructive/10 border-destructive/30'
         }`}>
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
-              <h2 className="text-lg font-semibold text-white">{calculations.localName}</h2>
-              <div className="text-sm text-gray-400">
+              <h2 className="text-lg font-semibold text-foreground">{calculations.localName}</h2>
+              <div className="text-sm text-muted-foreground">
                 {calculations.memory}GB • {calculations.bandwidth} GB/s bandwidth
               </div>
             </div>
@@ -595,18 +595,18 @@ export default function PayoffCalculator() {
               {calculations.canRun ? (
                 <>
                   <div className="text-center">
-                    <div className="text-xl font-bold text-blue-400">{calculations.localTPS} tok/s</div>
-                    <div className="text-xs text-gray-500">throughput</div>
+                    <div className="text-xl font-bold text-accent">{calculations.localTPS} tok/s</div>
+                    <div className="text-xs text-muted-foreground">throughput</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-xl font-bold text-green-400">
+                    <div className="text-xl font-bold text-success">
                       ${calculations.localPrice.toLocaleString(undefined, {maximumFractionDigits: 0})}
                     </div>
-                    <div className="text-xs text-gray-500">USD</div>
+                    <div className="text-xs text-muted-foreground">USD</div>
                   </div>
                 </>
               ) : (
-                <div className="text-red-400">
+                <div className="text-destructive">
                   Cannot run workload — needs {calculations.memoryInfo?.totalRAM || 0}GB RAM
                   {calculations.memoryInfo?.incompatibleModels?.length > 0 && (
                     <> (incompatible: {calculations.memoryInfo.incompatibleModels.join(', ')})</>
@@ -621,7 +621,7 @@ export default function PayoffCalculator() {
         {calculations.canRun && (
           <div className="mb-8">
             <div className="flex items-center justify-between mb-2">
-              <h2 className="text-lg font-semibold text-white">Cloud Alternatives</h2>
+              <h2 className="text-lg font-semibold text-foreground">Cloud Alternatives</h2>
               <MultiSelectDropdown
                 options={cloudProviders.providers}
                 selected={cloudGPUFilters}
@@ -631,7 +631,7 @@ export default function PayoffCalculator() {
                 getDetail={(p) => `$${p.ratePerGPUHour}/hr`}
               />
             </div>
-            <p className="text-sm text-gray-500 mb-4">
+            <p className="text-sm text-muted-foreground mb-4">
               Hours adjusted to produce {formatTokens(calculations.tokensPerDay)} tokens/day — same as local
             </p>
 
@@ -640,71 +640,71 @@ export default function PayoffCalculator() {
                 <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="text-gray-400 border-b border-gray-800">
+                  <tr className="text-muted-foreground border-b-2 border-foreground">
                     <th className="text-left py-3 px-3">Provider</th>
                     <th className="text-center py-3 px-2">GPUs</th>
                     <th className="text-center py-3 px-2">Cloud tok/s</th>
                     <th className="text-center py-3 px-2">Speedup</th>
-                    <th className="text-center py-3 px-2 bg-yellow-900/20">Hrs needed</th>
+                    <th className="text-center py-3 px-2 bg-warning/10">Hrs needed</th>
                     <th className="text-right py-3 px-2">$/hr</th>
-                    <th className="text-right py-3 px-2 bg-red-900/20">$/day</th>
+                    <th className="text-right py-3 px-2 bg-destructive/10">$/day</th>
                     <th className="text-right py-3 px-2">$/mo</th>
-                    <th className="text-right py-3 px-3 bg-green-900/20">Payoff</th>
+                    <th className="text-right py-3 px-3 bg-success/10">Payoff</th>
                     <th className="w-8 py-3 px-2"></th>
                   </tr>
                 </thead>
                 <tbody>
                   {filteredProviders.map((p, idx) => {
                     const payoffColor =
-                      p.payoffMonths < 3 ? 'text-green-400' :
-                      p.payoffMonths < 6 ? 'text-emerald-400' :
-                      p.payoffMonths < 12 ? 'text-yellow-400' :
-                      p.payoffMonths < 24 ? 'text-orange-400' : 'text-red-400';
+                      p.payoffMonths < 3 ? 'text-success' :
+                      p.payoffMonths < 6 ? 'text-success' :
+                      p.payoffMonths < 12 ? 'text-warning' :
+                      p.payoffMonths < 24 ? 'text-warning' : 'text-destructive';
 
                     return (
-                      <tr key={`${p.provider}-${p.gpus}`} className={`border-b border-gray-800/50 ${idx === 0 ? 'bg-blue-900/10' : ''}`}>
+                      <tr key={`${p.provider}-${p.gpus}`} className={`border-b border-border ${idx === 0 ? 'bg-accent/5' : ''} ${idx % 2 === 0 ? 'bg-secondary/30' : ''}`}>
                         <td className="py-3 px-3">
                           {/* ANS-517: Link to provider pricing page */}
                           <a
                             href={cloudProviders.sources?.[p.provider]}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="font-medium text-white hover:text-blue-400 transition-colors"
+                            className="font-medium text-foreground hover:text-accent transition-colors"
                           >
                             {p.provider}
                           </a>
-                          <div className="text-xs text-gray-500">${p.hourlyRatePerGPU}/GPU/hr</div>
+                          <div className="text-xs text-muted-foreground">${p.hourlyRatePerGPU}/GPU/hr</div>
                         </td>
                         <td className="text-center py-3 px-2">
-                          <span className={`font-mono ${p.gpus > 1 ? 'text-yellow-400' : 'text-gray-300'}`}>
+                          <span className={`font-mono ${p.gpus > 1 ? 'text-warning' : 'text-foreground'}`}>
                             {p.gpus}× H100
                           </span>
                         </td>
-                        <td className="text-center py-3 px-2 text-gray-300">
+                        <td className="text-center py-3 px-2 text-foreground">
                           {p.cloudTPS}
                         </td>
-                        <td className="text-center py-3 px-2 text-gray-400">
+                        <td className="text-center py-3 px-2 text-muted-foreground">
                           {p.speedRatio.toFixed(1)}×
                         </td>
-                        <td className="text-center py-3 px-2 bg-yellow-900/10 font-mono text-yellow-400">
+                        <td className="text-center py-3 px-2 bg-warning/10 font-mono text-warning">
                           {formatHours(p.cloudHoursNeeded)}
                         </td>
-                        <td className="text-right py-3 px-2 font-mono text-gray-400">
+                        <td className="text-right py-3 px-2 font-mono text-muted-foreground">
                           ${p.hourlyRateTotal.toFixed(2)}
                         </td>
-                        <td className="text-right py-3 px-2 bg-red-900/10 font-mono text-red-400">
+                        <td className="text-right py-3 px-2 bg-destructive/10 font-mono text-destructive">
                           ${p.dailyCost.toFixed(2)}
                         </td>
-                        <td className="text-right py-3 px-2 font-mono text-red-400">
+                        <td className="text-right py-3 px-2 font-mono text-destructive">
                           ${p.monthlyCost.toFixed(0)}
                         </td>
-                        <td className={`text-right py-3 px-3 bg-green-900/10 font-bold ${payoffColor}`}>
+                        <td className={`text-right py-3 px-3 bg-success/10 font-bold ${payoffColor}`}>
                           {formatPayoff(p.payoffMonths)}
                         </td>
                         <td className="py-3 px-2">
                           <button
                             onClick={() => setCloudGPUFilters(prev => ({ ...prev, [p.provider]: false }))}
-                            className="text-gray-500 hover:text-red-400 transition-colors p-1"
+                            className="text-muted-foreground hover:text-destructive transition-colors p-1"
                             title="Remove from comparison"
                           >
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -721,23 +721,23 @@ export default function PayoffCalculator() {
 
             {/* Explanation Cards */}
             <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-              <div className="bg-yellow-900/20 border border-yellow-800/30 rounded-lg p-4">
-                <div className="font-medium text-yellow-300 mb-1">Hrs needed</div>
-                <div className="text-yellow-200/70">
+              <div className="bg-warning/10 border border-warning/30 p-4">
+                <div className="font-medium text-warning mb-1">Hrs needed</div>
+                <div className="text-foreground/70">
                   Cloud is {cheapest?.speedRatio.toFixed(1)}× faster, so you only need {formatHours(cheapest?.cloudHoursNeeded)}
                   to match {dailyHours}h of local output.
                 </div>
               </div>
-              <div className="bg-red-900/20 border border-red-800/30 rounded-lg p-4">
-                <div className="font-medium text-red-300 mb-1">$/day</div>
-                <div className="text-red-200/70">
+              <div className="bg-destructive/10 border border-destructive/30 p-4">
+                <div className="font-medium text-destructive mb-1">$/day</div>
+                <div className="text-foreground/70">
                   {formatHours(cheapest?.cloudHoursNeeded)} × ${cheapest?.hourlyRateTotal.toFixed(2)}/hr
                   = ${cheapest?.dailyCost.toFixed(2)}/day for equivalent work.
                 </div>
               </div>
-              <div className="bg-green-900/20 border border-green-800/30 rounded-lg p-4">
-                <div className="font-medium text-green-300 mb-1">Payoff</div>
-                <div className="text-green-200/70">
+              <div className="bg-success/10 border border-success/30 p-4">
+                <div className="font-medium text-success mb-1">Payoff</div>
+                <div className="text-foreground/70">
                   ${calculations.localPrice.toLocaleString(undefined, {maximumFractionDigits: 0})} ÷
                   ${cheapest?.dailyCost.toFixed(2)}/day = {cheapest?.payoffDays} days to break even.
                 </div>
@@ -745,7 +745,7 @@ export default function PayoffCalculator() {
             </div>
               </>
             ) : (
-              <div className="text-center py-8 text-gray-500 bg-gray-900/50 rounded-lg border border-gray-800">
+              <div className="text-center py-8 text-muted-foreground bg-secondary/50 border border-border">
                 No cloud providers selected. Use the dropdown above to select providers to compare.
               </div>
             )}
@@ -756,7 +756,7 @@ export default function PayoffCalculator() {
         {calculations.canRun && calculations.apiProviders.length > 0 && !isTrainingMode && (
           <div className="mb-8">
             <div className="flex items-center justify-between mb-2">
-              <h2 className="text-lg font-semibold text-white">API Provider Comparison</h2>
+              <h2 className="text-lg font-semibold text-foreground">API Provider Comparison</h2>
               <MultiSelectDropdown
                 options={Object.keys(ossAPIFilters).map(name => ({ id: name, name }))}
                 selected={ossAPIFilters}
@@ -765,7 +765,7 @@ export default function PayoffCalculator() {
                 getLabel={(p) => p.name}
               />
             </div>
-            <p className="text-sm text-gray-500 mb-4">
+            <p className="text-sm text-muted-foreground mb-4">
               Pay-per-token pricing for workload — {formatTokens(calculations.tokensPerDay)} tokens/day
             </p>
 
@@ -774,42 +774,42 @@ export default function PayoffCalculator() {
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead>
-                      <tr className="text-gray-400 border-b border-gray-800">
+                      <tr className="text-muted-foreground border-b-2 border-foreground">
                         <th className="text-left py-3 px-3">Provider</th>
                         <th className="text-right py-3 px-2">Input $/1M</th>
                         <th className="text-right py-3 px-2">Output $/1M</th>
-                        <th className="text-right py-3 px-2 bg-purple-900/20">Blended $/1M</th>
-                        <th className="text-right py-3 px-2 bg-red-900/20">$/day</th>
+                        <th className="text-right py-3 px-2 bg-accent/10">Blended $/1M</th>
+                        <th className="text-right py-3 px-2 bg-destructive/10">$/day</th>
                         <th className="text-right py-3 px-2">$/mo</th>
-                        <th className="text-right py-3 px-3 bg-green-900/20">Payoff</th>
+                        <th className="text-right py-3 px-3 bg-success/10">Payoff</th>
                         <th className="w-8 py-3 px-2"></th>
                       </tr>
                     </thead>
                     <tbody>
                       {filteredApiProviders.map((api, idx) => {
                         const payoffColor =
-                          api.payoffMonths < 3 ? 'text-green-400' :
-                          api.payoffMonths < 6 ? 'text-emerald-400' :
-                          api.payoffMonths < 12 ? 'text-yellow-400' :
-                          api.payoffMonths < 24 ? 'text-orange-400' : 'text-red-400';
+                          api.payoffMonths < 3 ? 'text-success' :
+                          api.payoffMonths < 6 ? 'text-success' :
+                          api.payoffMonths < 12 ? 'text-warning' :
+                          api.payoffMonths < 24 ? 'text-warning' : 'text-destructive';
                         // ANS-515: Show per-model breakdown for multi-model workloads
                         const showBreakdown = api.details && api.details.length > 1;
 
                         return (
-                          <tr key={api.name} className={`border-b border-gray-800/50 ${idx === 0 ? 'bg-purple-900/10' : ''}`}>
+                          <tr key={api.name} className={`border-b border-border ${idx === 0 ? 'bg-accent/5' : ''} ${idx % 2 === 0 ? 'bg-secondary/30' : ''}`}>
                             <td className="py-3 px-3">
                               {/* ANS-517: Link to provider pricing page */}
                               <a
                                 href={apiProviders.sources?.[api.name]}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="font-medium text-white hover:text-blue-400 transition-colors"
+                                className="font-medium text-foreground hover:text-accent transition-colors"
                               >
                                 {api.name}
                               </a>
                               {/* ANS-515: Show model breakdown inline for multi-model workloads */}
                               {showBreakdown && (
-                                <div className="text-xs text-gray-500 mt-1">
+                                <div className="text-xs text-muted-foreground mt-1">
                                   {api.details.map((d, i) => (
                                     <span key={d.modelId}>
                                       {d.quantity > 1 ? `${d.quantity}× ` : ''}{d.modelName}: ${d.blendedPer1M.toFixed(2)}/1M
@@ -819,29 +819,29 @@ export default function PayoffCalculator() {
                                 </div>
                               )}
                             </td>
-                            <td className="text-right py-3 px-2 font-mono text-gray-400">
+                            <td className="text-right py-3 px-2 font-mono text-muted-foreground">
                               ${api.inputPer1M.toFixed(2)}
                             </td>
-                            <td className="text-right py-3 px-2 font-mono text-gray-400">
+                            <td className="text-right py-3 px-2 font-mono text-muted-foreground">
                               ${api.outputPer1M.toFixed(2)}
                             </td>
-                            <td className="text-right py-3 px-2 bg-purple-900/10 font-mono text-purple-400">
+                            <td className="text-right py-3 px-2 bg-accent/10 font-mono text-accent">
                               ${api.blendedPer1M.toFixed(2)}
-                              {showBreakdown && <span className="text-xs text-gray-500 block">weighted</span>}
+                              {showBreakdown && <span className="text-xs text-muted-foreground block">weighted</span>}
                             </td>
-                            <td className="text-right py-3 px-2 bg-red-900/10 font-mono text-red-400">
+                            <td className="text-right py-3 px-2 bg-destructive/10 font-mono text-destructive">
                               ${api.dailyCost.toFixed(2)}
                             </td>
-                            <td className="text-right py-3 px-2 font-mono text-red-400">
+                            <td className="text-right py-3 px-2 font-mono text-destructive">
                               ${api.monthlyCost.toFixed(0)}
                             </td>
-                            <td className={`text-right py-3 px-3 bg-green-900/10 font-bold ${payoffColor}`}>
+                            <td className={`text-right py-3 px-3 bg-success/10 font-bold ${payoffColor}`}>
                               {formatPayoff(api.payoffMonths)}
                             </td>
                             <td className="py-3 px-2">
                               <button
                                 onClick={() => setOssAPIFilters(prev => ({ ...prev, [api.name]: false }))}
-                                className="text-gray-500 hover:text-red-400 transition-colors p-1"
+                                className="text-muted-foreground hover:text-destructive transition-colors p-1"
                                 title="Remove from comparison"
                               >
                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -856,9 +856,9 @@ export default function PayoffCalculator() {
                   </table>
                 </div>
 
-                <div className="mt-4 bg-purple-900/20 border border-purple-800/30 rounded-lg p-4">
-                  <div className="font-medium text-purple-300 mb-1">API vs GPU Rental vs Local</div>
-                  <div className="text-purple-200/70 text-sm">
+                <div className="mt-4 bg-accent/10 border border-accent/30 p-4">
+                  <div className="font-medium text-accent mb-1">API vs GPU Rental vs Local</div>
+                  <div className="text-foreground/70 text-sm">
                     {filteredApiProviders[0] && cheapest && (
                       <>
                         <strong>Cheapest API:</strong> {filteredApiProviders[0].name} @ ${filteredApiProviders[0].dailyCost.toFixed(2)}/day
@@ -873,7 +873,7 @@ export default function PayoffCalculator() {
                 </div>
               </>
             ) : (
-              <div className="text-center py-8 text-gray-500 bg-gray-900/50 rounded-lg border border-gray-800">
+              <div className="text-center py-8 text-muted-foreground bg-secondary/50 border border-border">
                 No API providers selected. Use the dropdown above to select providers to compare.
               </div>
             )}
@@ -884,16 +884,16 @@ export default function PayoffCalculator() {
         {calculations.canRun && isTrainingMode && (
           <div className="mb-8">
             <div className="flex items-center justify-between mb-2">
-              <h2 className="text-lg font-semibold text-white">Training Providers</h2>
+              <h2 className="text-lg font-semibold text-foreground">Training Providers</h2>
             </div>
-            <p className="text-sm text-gray-500 mb-4">
+            <p className="text-sm text-muted-foreground mb-4">
               Cloud GPU platforms for {TRAINING_MODES[trainingMode]?.name} workloads
             </p>
 
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="text-gray-400 border-b border-gray-800">
+                  <tr className="text-muted-foreground border-b border-border">
                     <th className="text-left py-3 px-3">Provider</th>
                     <th className="text-center py-3 px-2">GPU</th>
                     <th className="text-right py-3 px-2">$/hr</th>
@@ -917,38 +917,38 @@ export default function PayoffCalculator() {
                     const payoffMonths = payoffDays / 30;
 
                     const payoffColor =
-                      payoffMonths < 3 ? 'text-green-400' :
-                      payoffMonths < 6 ? 'text-emerald-400' :
-                      payoffMonths < 12 ? 'text-yellow-400' :
-                      payoffMonths < 24 ? 'text-orange-400' : 'text-red-400';
+                      payoffMonths < 3 ? 'text-success' :
+                      payoffMonths < 6 ? 'text-success' :
+                      payoffMonths < 12 ? 'text-warning' :
+                      payoffMonths < 24 ? 'text-warning' : 'text-destructive';
 
                     return (
-                      <tr key={provider.id} className={`border-b border-gray-800/50 ${idx === 0 ? 'bg-orange-900/10' : ''}`}>
+                      <tr key={provider.id} className={`border-b border-border/50 ${idx === 0 ? 'bg-orange-900/10' : ''}`}>
                         <td className="py-3 px-3">
                           <a
                             href={provider.url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="font-medium text-white hover:text-blue-400 transition-colors"
+                            className="font-medium text-foreground hover:text-accent transition-colors"
                           >
                             {provider.name}
                           </a>
-                          <div className="text-xs text-gray-500 mt-1">
+                          <div className="text-xs text-muted-foreground mt-1">
                             {provider.description}
                           </div>
                         </td>
                         <td className="text-center py-3 px-2">
-                          <span className={`font-mono ${gpusNeeded > 1 ? 'text-yellow-400' : 'text-gray-300'}`}>
+                          <span className={`font-mono ${gpusNeeded > 1 ? 'text-warning' : 'text-foreground'}`}>
                             {gpusNeeded}× {provider.gpuType}
                           </span>
                         </td>
-                        <td className="text-right py-3 px-2 font-mono text-gray-400">
+                        <td className="text-right py-3 px-2 font-mono text-muted-foreground">
                           ${(provider.ratePerGPUHour * gpusNeeded).toFixed(2)}
                         </td>
-                        <td className="text-right py-3 px-2 bg-red-900/10 font-mono text-red-400">
+                        <td className="text-right py-3 px-2 bg-red-900/10 font-mono text-destructive">
                           ${dailyCost.toFixed(2)}
                         </td>
-                        <td className="text-right py-3 px-2 font-mono text-red-400">
+                        <td className="text-right py-3 px-2 font-mono text-destructive">
                           ${monthlyCost.toFixed(0)}
                         </td>
                         <td className={`text-right py-3 px-3 bg-green-900/10 font-bold ${payoffColor}`}>
@@ -961,9 +961,9 @@ export default function PayoffCalculator() {
               </table>
             </div>
 
-            <div className="mt-4 bg-orange-900/20 border border-orange-800/30 rounded-lg p-4">
-              <div className="font-medium text-orange-300 mb-1">Training vs Inference Providers</div>
-              <div className="text-orange-200/70 text-sm">
+            <div className="mt-4 bg-warning/10 border border-warning/30  p-4">
+              <div className="font-medium text-warning mb-1">Training vs Inference Providers</div>
+              <div className="text-warning/80/70 text-sm">
                 Training providers like <strong>Prime Intellect</strong> offer specialized RL/fine-tuning infrastructure
                 including distributed training frameworks, environment libraries, and optimized training stacks.
                 {trainingProviders.providers[0] && (
@@ -978,16 +978,16 @@ export default function PayoffCalculator() {
         {calculations.canRun && calculations.proprietaryAlternatives?.length > 0 && !isTrainingMode && (
           <div className="mb-8">
             <div className="flex items-center justify-between mb-2">
-              <h2 className="text-lg font-semibold text-white">Proprietary API Alternatives</h2>
+              <h2 className="text-lg font-semibold text-foreground">Proprietary API Alternatives</h2>
             </div>
-            <p className="text-sm text-gray-500 mb-4">
+            <p className="text-sm text-muted-foreground mb-4">
               Equivalent workload using each provider's comparable models — {formatTokens(calculations.tokensPerDay)} tokens/day
             </p>
 
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="text-gray-400 border-b border-gray-800">
+                  <tr className="text-muted-foreground border-b border-border">
                     <th className="text-left py-3 px-3">Provider</th>
                     <th className="text-right py-3 px-2">Input $/1M</th>
                     <th className="text-right py-3 px-2">Output $/1M</th>
@@ -1000,25 +1000,25 @@ export default function PayoffCalculator() {
                 <tbody>
                   {calculations.proprietaryAlternatives.map((stack, idx) => {
                     const payoffColor =
-                      stack.payoffMonths < 3 ? 'text-green-400' :
-                      stack.payoffMonths < 6 ? 'text-emerald-400' :
-                      stack.payoffMonths < 12 ? 'text-yellow-400' :
-                      stack.payoffMonths < 24 ? 'text-orange-400' : 'text-red-400';
+                      stack.payoffMonths < 3 ? 'text-success' :
+                      stack.payoffMonths < 6 ? 'text-success' :
+                      stack.payoffMonths < 12 ? 'text-warning' :
+                      stack.payoffMonths < 24 ? 'text-warning' : 'text-destructive';
                     const showBreakdown = stack.breakdown && stack.breakdown.length > 1;
 
                     return (
-                      <tr key={stack.provider} className={`border-b border-gray-800/50 ${idx === 0 ? 'bg-indigo-900/10' : ''}`}>
+                      <tr key={stack.provider} className={`border-b border-border/50 ${idx === 0 ? 'bg-accent/5' : ''}`}>
                         <td className="py-3 px-3">
                           <a
                             href={apiProviders.sources?.[stack.provider]}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="font-medium text-white hover:text-blue-400 transition-colors"
+                            className="font-medium text-foreground hover:text-accent transition-colors"
                           >
                             {stack.provider}
                           </a>
                           {/* Tier breakdown */}
-                          <div className="text-xs text-gray-500 mt-1">
+                          <div className="text-xs text-muted-foreground mt-1">
                             {stack.breakdown.map((b, i) => (
                               <span key={b.tier}>
                                 {b.model}: ${b.blendedPer1M.toFixed(2)}/1M
@@ -1027,20 +1027,20 @@ export default function PayoffCalculator() {
                             ))}
                           </div>
                         </td>
-                        <td className="text-right py-3 px-2 font-mono text-gray-400">
+                        <td className="text-right py-3 px-2 font-mono text-muted-foreground">
                           ${stack.inputPer1M.toFixed(2)}
                         </td>
-                        <td className="text-right py-3 px-2 font-mono text-gray-400">
+                        <td className="text-right py-3 px-2 font-mono text-muted-foreground">
                           ${stack.outputPer1M.toFixed(2)}
                         </td>
-                        <td className="text-right py-3 px-2 bg-purple-900/10 font-mono text-purple-400">
+                        <td className="text-right py-3 px-2 bg-purple-900/10 font-mono text-accent">
                           ${stack.blendedPer1M.toFixed(2)}
-                          {showBreakdown && <span className="text-xs text-gray-500 block">weighted</span>}
+                          {showBreakdown && <span className="text-xs text-muted-foreground block">weighted</span>}
                         </td>
-                        <td className="text-right py-3 px-2 bg-red-900/10 font-mono text-red-400">
+                        <td className="text-right py-3 px-2 bg-red-900/10 font-mono text-destructive">
                           ${stack.dailyCost.toFixed(2)}
                         </td>
-                        <td className="text-right py-3 px-2 font-mono text-red-400">
+                        <td className="text-right py-3 px-2 font-mono text-destructive">
                           ${stack.monthlyCost.toFixed(0)}
                         </td>
                         <td className={`text-right py-3 px-3 bg-green-900/10 font-bold ${payoffColor}`}>
@@ -1053,9 +1053,9 @@ export default function PayoffCalculator() {
               </table>
             </div>
 
-            <div className="mt-4 bg-indigo-900/20 border border-indigo-800/30 rounded-lg p-4">
-              <div className="font-medium text-indigo-300 mb-1">How this works</div>
-              <div className="text-indigo-200/70 text-sm">
+            <div className="mt-4 bg-accent/10 border border-accent/30  p-4">
+              <div className="font-medium text-accent mb-1">How this works</div>
+              <div className="text-accent/80/70 text-sm">
                 Each row shows what it would cost to run your exact workload using that provider's comparable models.
                 {calculations.proprietaryAlternatives[0]?.breakdown?.length > 1 && (
                   <> Your workload spans {calculations.proprietaryAlternatives[0].breakdown.length} tiers, so each provider uses multiple models.</>
@@ -1067,17 +1067,17 @@ export default function PayoffCalculator() {
 
         {/* Summary */}
         {calculations.canRun && (filteredProviders.length > 0 || filteredApiProviders.length > 0 || calculations.proprietaryAlternatives?.length > 0 || isTrainingMode) && (
-          <div className={`mt-6 rounded-xl p-5 ${isTrainingMode ? 'bg-orange-900/20 border border-orange-800/50' : 'bg-blue-900/20 border border-blue-800/50'}`}>
-              <h3 className={`font-semibold mb-3 ${isTrainingMode ? 'text-orange-300' : 'text-blue-300'}`}>
+          <div className={`mt-6  p-5 ${isTrainingMode ? 'bg-warning/10 border border-warning/50' : 'bg-accent/10 border border-accent/50'}`}>
+              <h3 className={`font-semibold mb-3 ${isTrainingMode ? 'text-warning' : 'text-accent'}`}>
                 Bottom Line {isTrainingMode && `(${TRAINING_MODES[trainingMode]?.name})`}
               </h3>
-              <div className={`space-y-2 text-sm ${isTrainingMode ? 'text-orange-200/80' : 'text-blue-200/80'}`}>
+              <div className={`space-y-2 text-sm ${isTrainingMode ? 'text-warning/80/80' : 'text-accent/80/80'}`}>
                 <p>
                   {isTrainingMode ? 'Training' : 'Running'} <strong>{workload.length} model{workload.length > 1 ? 's' : ''}</strong> for <strong>{dailyHours}h/day</strong> on <strong>{calculations.localName}</strong>:
                 </p>
                 <div className={`grid grid-cols-1 ${isTrainingMode ? 'md:grid-cols-2' : 'md:grid-cols-3'} gap-4 mt-3`}>
-                  <div className="bg-black/20 rounded-lg p-3">
-                    <div className="text-green-400 font-medium mb-1">Local Hardware</div>
+                  <div className="bg-black/20  p-3">
+                    <div className="text-success font-medium mb-1">Local Hardware</div>
                     {isTrainingMode ? (
                       <>
                         <div>{memoryInfo.totalRAM}GB RAM ({TRAINING_MODES[trainingMode]?.multiplier}× inference)</div>
@@ -1092,8 +1092,8 @@ export default function PayoffCalculator() {
                   </div>
                   {isTrainingMode ? (
                     // Training mode: show training provider comparison
-                    <div className="bg-black/20 rounded-lg p-3">
-                      <div className="text-orange-400 font-medium mb-1">
+                    <div className="bg-black/20  p-3">
+                      <div className="text-warning font-medium mb-1">
                         Training Provider ({trainingProviders.providers[0]?.name})
                       </div>
                       {(() => {
@@ -1116,14 +1116,14 @@ export default function PayoffCalculator() {
                   ) : (
                     // Inference mode: show GPU rental and API
                     <>
-                      <div className="bg-black/20 rounded-lg p-3">
-                        <div className="text-orange-400 font-medium mb-1">GPU Rental ({cheapest?.provider})</div>
+                      <div className="bg-black/20  p-3">
+                        <div className="text-warning font-medium mb-1">GPU Rental ({cheapest?.provider})</div>
                         <div>{formatHours(cheapest?.cloudHoursNeeded)}/day @ {cheapest?.cloudTPS} tok/s</div>
                         <div>${cheapest?.dailyCost.toFixed(2)}/day = ${cheapest?.monthlyCost.toFixed(0)}/mo</div>
                       </div>
                       {filteredApiProviders[0] && (
-                        <div className="bg-black/20 rounded-lg p-3">
-                          <div className="text-purple-400 font-medium mb-1">API ({filteredApiProviders[0].name})</div>
+                        <div className="bg-black/20  p-3">
+                          <div className="text-accent font-medium mb-1">API ({filteredApiProviders[0].name})</div>
                           <div>${filteredApiProviders[0].blendedPer1M.toFixed(2)}/1M tokens</div>
                           <div>${filteredApiProviders[0].dailyCost.toFixed(2)}/day = ${filteredApiProviders[0].monthlyCost.toFixed(0)}/mo</div>
                         </div>
@@ -1148,7 +1148,7 @@ export default function PayoffCalculator() {
                     const payoffMonths = payoffDays / 30;
 
                     return (
-                      <p className={payoffMonths < 12 ? 'text-green-300 mt-3' : 'text-yellow-300 mt-3'}>
+                      <p className={payoffMonths < 12 ? 'text-success mt-3' : 'text-warning mt-3'}>
                         {payoffMonths < 12
                           ? `✓ Hardware pays off in ${Math.ceil(payoffDays)} days (${formatPayoff(payoffMonths)}) vs cloud training (${provider?.name}). After that, training is essentially free.`
                           : `⚠ Hardware takes ${formatPayoff(payoffMonths)} to pay off vs cloud training (${provider?.name}) at this utilization level.`
@@ -1170,7 +1170,7 @@ export default function PayoffCalculator() {
                     : { name: cheapest?.provider, type: 'GPU', cost: gpuCost };
 
                   return (
-                    <p className={payoffMonths < 12 ? 'text-green-300 mt-3' : 'text-yellow-300 mt-3'}>
+                    <p className={payoffMonths < 12 ? 'text-success mt-3' : 'text-warning mt-3'}>
                       {payoffMonths < 12
                         ? `✓ Hardware pays off in ${Math.ceil(payoffDays)} days (${formatPayoff(payoffMonths)}) vs ${bestCloud.type} (${bestCloud.name}). After that, inference is essentially free.`
                         : `⚠ Hardware takes ${formatPayoff(payoffMonths)} to pay off vs ${bestCloud.type} (${bestCloud.name}) at this utilization level.`
@@ -1183,8 +1183,8 @@ export default function PayoffCalculator() {
         )}
 
         {!calculations.canRun && (
-          <div className="bg-red-900/20 border border-red-800/50 rounded-xl p-5">
-            <h3 className="font-semibold text-red-300 mb-2">Cannot Run Workload</h3>
+          <div className="bg-red-900/20 border border-red-800/50  p-5">
+            <h3 className="font-semibold text-destructive mb-2">Cannot Run Workload</h3>
             <p className="text-sm text-red-200/70">
               {calculations.memoryInfo?.deficit > 0
                 ? `This workload requires ${calculations.memoryInfo?.totalRAM}GB RAM but only ${calculations.memoryInfo?.availableRAM}GB available. Reduce workload or increase RAM.`
@@ -1197,30 +1197,30 @@ export default function PayoffCalculator() {
         )}
 
         {/* ANS-517: Footer with Data Sources & Methodology */}
-        <div className="mt-4 bg-gray-900/50 rounded-xl p-5 border border-gray-800">
-          <h3 className="text-sm font-semibold text-gray-300 mb-3">Data Sources & Methodology</h3>
+        <div className="mt-4 bg-secondary/50  p-5 border border-border">
+          <h3 className="text-sm font-semibold text-foreground mb-3">Data Sources & Methodology</h3>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs text-gray-500">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs text-muted-foreground">
             {/* Calculation Methodology */}
             <div>
-              <h4 className="text-gray-400 font-medium mb-2">How We Calculate</h4>
+              <h4 className="text-muted-foreground font-medium mb-2">How We Calculate</h4>
               <ul className="space-y-1.5">
-                <li><strong className="text-gray-400">Payoff:</strong> Hardware cost ÷ daily cloud savings = days to break even</li>
-                <li><strong className="text-gray-400">Cloud hours:</strong> Adjusted to match local token output using throughput ratios</li>
-                <li><strong className="text-gray-400">API costs:</strong> 50% input + 50% output tokens (blended rate)</li>
-                <li><strong className="text-gray-400">Memory:</strong> Model weights + KV cache overhead; training modes add optimizer states</li>
+                <li><strong className="text-muted-foreground">Payoff:</strong> Hardware cost ÷ daily cloud savings = days to break even</li>
+                <li><strong className="text-muted-foreground">Cloud hours:</strong> Adjusted to match local token output using throughput ratios</li>
+                <li><strong className="text-muted-foreground">API costs:</strong> 50% input + 50% output tokens (blended rate)</li>
+                <li><strong className="text-muted-foreground">Memory:</strong> Model weights + KV cache overhead; training modes add optimizer states</li>
               </ul>
             </div>
 
             {/* Data Sources */}
             <div>
-              <h4 className="text-gray-400 font-medium mb-2">Data Sources</h4>
+              <h4 className="text-muted-foreground font-medium mb-2">Data Sources</h4>
               <ul className="space-y-1.5">
                 <li>
-                  <strong className="text-gray-400">Benchmarks:</strong>{' '}
+                  <strong className="text-muted-foreground">Benchmarks:</strong>{' '}
                   {models.sources.slice(0, 3).map((s, i) => (
                     <span key={s.id}>
-                      <a href={s.url} className="text-blue-400 hover:underline" target="_blank" rel="noopener noreferrer">
+                      <a href={s.url} className="text-accent hover:underline" target="_blank" rel="noopener noreferrer">
                         {s.name}
                       </a>
                       {i < 2 && ', '}
@@ -1229,10 +1229,10 @@ export default function PayoffCalculator() {
                   {models.sources.length > 3 && ` +${models.sources.length - 3} more`}
                 </li>
                 <li>
-                  <strong className="text-gray-400">GPU rental:</strong>{' '}
+                  <strong className="text-muted-foreground">GPU rental:</strong>{' '}
                   {cloudProviders.providers.slice(0, 3).map((p, i) => (
                     <span key={p.id}>
-                      <a href={cloudProviders.sources?.[p.name]} className="text-blue-400 hover:underline" target="_blank" rel="noopener noreferrer">
+                      <a href={cloudProviders.sources?.[p.name]} className="text-accent hover:underline" target="_blank" rel="noopener noreferrer">
                         {p.name}
                       </a>
                       {i < 2 && ', '}
@@ -1241,10 +1241,10 @@ export default function PayoffCalculator() {
                   {cloudProviders.providers.length > 3 && ` +${cloudProviders.providers.length - 3} more`}
                 </li>
                 <li>
-                  <strong className="text-gray-400">API pricing:</strong>{' '}
+                  <strong className="text-muted-foreground">API pricing:</strong>{' '}
                   {Object.keys(apiProviders.sources || {}).slice(0, 4).map((name, i, arr) => (
                     <span key={name}>
-                      <a href={apiProviders.sources[name]} className="text-blue-400 hover:underline" target="_blank" rel="noopener noreferrer">
+                      <a href={apiProviders.sources[name]} className="text-accent hover:underline" target="_blank" rel="noopener noreferrer">
                         {name}
                       </a>
                       {i < arr.length - 1 && ', '}
@@ -1256,10 +1256,10 @@ export default function PayoffCalculator() {
             </div>
           </div>
 
-          <div className="mt-3 pt-3 border-t border-gray-800 text-xs text-gray-600">
-            <strong className="text-gray-500">Last updated:</strong> {apiProviders.updatedAt} •{' '}
-            <strong className="text-gray-500">Mac prices:</strong> CAD converted at {cadToUsd} USD •{' '}
-            <strong className="text-gray-500">GPU type:</strong> {cloudProviders.gpuType}
+          <div className="mt-3 pt-3 border-t border-border text-xs text-muted-foreground">
+            <strong className="text-muted-foreground">Last updated:</strong> {apiProviders.updatedAt} •{' '}
+            <strong className="text-muted-foreground">Mac prices:</strong> CAD converted at {cadToUsd} USD •{' '}
+            <strong className="text-muted-foreground">GPU type:</strong> {cloudProviders.gpuType}
           </div>
         </div>
       </div>
