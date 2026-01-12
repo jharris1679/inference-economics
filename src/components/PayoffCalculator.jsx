@@ -122,6 +122,7 @@ import {
   computeWorkloadComparison,
   calculateWorkloadMemory,
   formatPayoff,
+  formatPayoffParts,
   formatTokens,
   formatHours,
   getDeveloperList,
@@ -696,13 +697,15 @@ export default function PayoffCalculator() {
                 {isTrainingMode ? (
                   <StatCard
                     label="Payoff Time"
-                    value={cheapest ? formatPayoff(cheapest.payoffMonths) : 'N/A'}
+                    value={cheapest ? formatPayoffParts(cheapest.payoffMonths).value : 'N/A'}
+                    unit={cheapest ? formatPayoffParts(cheapest.payoffMonths).unit : ''}
                     description="Break-even vs cheapest cloud"
                   />
                 ) : (
                   <StatCard
                     label="Payoff Time"
-                    value={filteredApiProviders[0] ? formatPayoff(filteredApiProviders[0].payoffMonths) : 'N/A'}
+                    value={filteredApiProviders[0] ? formatPayoffParts(filteredApiProviders[0].payoffMonths).value : 'N/A'}
+                    unit={filteredApiProviders[0] ? formatPayoffParts(filteredApiProviders[0].payoffMonths).unit : ''}
                     description="Break-even vs cheapest API"
                   />
                 )}
@@ -856,7 +859,8 @@ export default function PayoffCalculator() {
         {calculations.canRun && calculations.apiProviders.length > 0 && !isTrainingMode && (
           <div className="mb-8">
             <div className="mb-2 mb-6">
-              <h2 className="font-headline text-xl font-bold text-foreground mb-2">API Providers</h2>
+              <h2 className="font-headline text-xl font-bold text-foreground mb-2">Open Source Model APIs</h2>
+              <p className="text-sm text-muted-foreground">Run open-weight models via inference providers like Together, Groq, and DeepInfra</p>
               <p className="text-sm text-muted-foreground">
                 Pay per token with zero infrastructure. The simplest path to production—but costs scale directly with usage.
               </p>
@@ -1083,12 +1087,10 @@ export default function PayoffCalculator() {
         {/* Proprietary API Alternatives - Provider Stacks - Only shown in inference mode */}
         {calculations.canRun && calculations.proprietaryAlternatives?.length > 0 && !isTrainingMode && (
           <div className="mb-8">
-            <div className="flex items-center justify-between mb-2">
-              <h2 className="text-lg font-semibold text-foreground">Proprietary API Alternatives</h2>
+            <div className="mb-6">
+              <h2 className="font-headline text-xl font-bold text-foreground mb-2">Proprietary Model APIs</h2>
+              <p className="text-sm text-muted-foreground">Closed-weight models from OpenAI, Anthropic, Google, and other labs</p>
             </div>
-            <p className="text-sm text-muted-foreground mb-4">
-              Equivalent workload using each provider's comparable models — {formatTokens(calculations.tokensPerDay)} tokens/day
-            </p>
 
             <div className="overflow-x-auto">
               <table className="w-full text-sm">

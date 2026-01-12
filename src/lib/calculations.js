@@ -98,6 +98,23 @@ export function formatPayoff(months) {
   return `${days} day${days === 1 ? '' : 's'}`;
 }
 
+/**
+ * Returns payoff as separate value and unit for StatCard display
+ */
+export function formatPayoffParts(months) {
+  if (!isFinite(months) || isNaN(months)) return { value: 'N/A', unit: '' };
+  if (months >= 12) {
+    const years = (months / 12).toFixed(1);
+    return { value: years, unit: years === '1.0' ? 'year' : 'years' };
+  }
+  if (months >= 1) {
+    const mo = months.toFixed(1);
+    return { value: mo, unit: mo === '1.0' ? 'month' : 'months' };
+  }
+  const days = Math.ceil(months * 30);
+  return { value: days.toString(), unit: days === 1 ? 'day' : 'days' };
+}
+
 export function formatTokens(num) {
   if (num >= 1_000_000_000) return `${(num / 1_000_000_000).toFixed(2)}B`;
   if (num >= 1_000_000) return `${(num / 1_000_000).toFixed(1)}M`;
