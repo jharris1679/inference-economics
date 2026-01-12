@@ -247,36 +247,85 @@ export default function PayoffCalculator() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      {/* Hero Section */}
-      <div className="border-b border-border">
-        <div className="max-w-6xl mx-auto px-6 py-12">
-          <ArticleHeader
-            kicker="Interactive Analysis"
-            headline="Hardware vs. Cloud Payoff Calculator"
-            subheadline="Compare local hardware costs against cloud GPU rental and API pricing using real benchmark data. Cloud hours are adjusted to match your local token output."
-            date={`Data updated: ${apiProviders.updatedAt}`}
-            variant="default"
-          />
+      {/* Hero Section - Editorial style with strong visual hierarchy */}
+      <div className="bg-secondary border-b border-border">
+        <div className="max-w-4xl mx-auto px-6 py-16 text-center">
+          <div className="uppercase tracking-wider text-accent mb-4" style={{ fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.15em' }}>
+            The Economics of AI Infrastructure
+          </div>
+          <h1 className="font-headline text-foreground mb-6" style={{ fontSize: '3rem', fontWeight: 700, lineHeight: 1.1, letterSpacing: '-0.02em' }}>
+            Should I Buy the Hardware?
+          </h1>
+          <p className="text-xl text-muted-foreground font-serif max-w-2xl mx-auto mb-8" style={{ lineHeight: 1.6 }}>
+            As GPU prices fall and open-source models mature, the buy-vs-rent calculus for AI infrastructure is shifting. But supply chain risks and geopolitical tensions add new uncertainty to my equation.
+          </p>
+          <div className="text-sm text-muted-foreground">
+            Data updated {apiProviders.updatedAt} • Interactive analysis
+          </div>
         </div>
       </div>
 
-      {/* Introduction Prose */}
-      <div className="max-w-3xl mx-auto px-6 py-8">
-        <p className="text-lg leading-relaxed text-muted-foreground font-serif mb-4">
-          The economics of running large language models have shifted dramatically. In 2023, cloud GPU rental was often the only viable option for serious inference workloads. Today, consumer hardware like Apple's M-series chips and NVIDIA's DGX Spark offer a compelling alternative: pay once, run forever.
+      {/* Opening Argument */}
+      <div className="max-w-3xl mx-auto px-6 py-12">
+        <p className="text-lg leading-relaxed text-foreground font-serif mb-6" style={{ lineHeight: 1.8 }}>
+          <span className="float-left text-5xl font-headline font-bold mr-3 mt-1 text-accent" style={{ lineHeight: 0.85 }}>I</span>
+          've been wrestling with a decision that many teams face today: should I invest in local AI hardware, or continue renting from the cloud? The economics have shifted dramatically since 2023, when cloud GPU rental was often the only viable option. Today, consumer hardware like Apple's M-series chips and NVIDIA's DGX Spark offer a compelling alternative: pay once, run forever.
         </p>
-        <p className="text-lg leading-relaxed text-muted-foreground font-serif">
-          But the calculus isn't simple. Cloud providers offer raw speed—an H100 cluster can process tokens 2-4× faster than local hardware. API providers eliminate infrastructure entirely. The question isn't which is "best," but which makes sense for <em>your</em> specific workload and time horizon.
+        <p className="text-lg leading-relaxed text-muted-foreground font-serif mb-6" style={{ lineHeight: 1.8 }}>
+          But my calculus isn't simple. Cloud providers offer raw speed—an H100 cluster can process tokens 2-4× faster than my local hardware. API providers eliminate infrastructure entirely. The question isn't which is "best," but which makes sense for <em>my</em> specific workload and time horizon.
+        </p>
+        <p className="text-lg leading-relaxed text-muted-foreground font-serif" style={{ lineHeight: 1.8 }}>
+          I built this calculator to model that decision with real pricing data. But first, it's worth understanding the forces reshaping this market—and why the conventional wisdom about ever-cheaper compute may be incomplete.
         </p>
       </div>
 
-      {/* Stats Overview */}
+      {/* Section: The Supply Chain Reality - Placed early to set context */}
+      <div className="bg-secondary border-y border-border">
+        <div className="max-w-3xl mx-auto px-6 py-12">
+          <div className="border-l-4 border-accent pl-6 mb-8">
+            <h2 className="font-headline text-2xl font-bold text-foreground mb-2">The Supply Chain Reality</h2>
+            <p className="text-muted-foreground font-serif italic">Why my assumption of ever-cheaper compute may be wrong</p>
+          </div>
+
+          <p className="text-base leading-relaxed text-muted-foreground font-serif mb-6" style={{ lineHeight: 1.8 }}>
+            The conventional wisdom holds that GPU costs will continue their downward trajectory indefinitely. But a closer look at semiconductor supply chains reveals a more complex picture—one where demand is accelerating faster than supply can expand.
+          </p>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 my-8">
+            <div className="border-l-2 border-accent/30 pl-4">
+              <p className="text-sm text-muted-foreground font-serif">
+                <strong className="text-foreground block mb-1">Demand outpacing supply</strong>
+                TSMC's CEO predicts chip shortages through 2026. HBM memory faces 6-12 month lead times.
+              </p>
+            </div>
+            <div className="border-l-2 border-accent/30 pl-4">
+              <p className="text-sm text-muted-foreground font-serif">
+                <strong className="text-foreground block mb-1">Geopolitical concentration</strong>
+                Over 90% of advanced chips are manufactured in Taiwan. A single point of failure.
+              </p>
+            </div>
+            <div className="border-l-2 border-accent/30 pl-4">
+              <p className="text-sm text-muted-foreground font-serif">
+                <strong className="text-foreground block mb-1">Years to expand</strong>
+                New fabs announced in 2025 won't come online until 2027 or later.
+              </p>
+            </div>
+          </div>
+
+          <p className="text-sm text-muted-foreground bg-background p-4 border border-border">
+            <strong className="text-foreground">My takeaway:</strong> Locking in hardware today at current prices provides a hedge against supply disruption. If shortages materialize, both cloud rental rates and API costs could rise—shortening my payoff period retroactively.
+          </p>
+        </div>
+      </div>
+
+      {/* Stats Overview - Now with editorial context */}
       {calculations.canRun && (
-        <div className="bg-secondary">
-          <div className="max-w-6xl mx-auto px-6 py-8">
-            <h5 className="mb-6 uppercase tracking-wider text-foreground" style={{ fontSize: '0.6875rem', fontWeight: 700, letterSpacing: '0.08em' }}>
-              Key Metrics at a Glance
-            </h5>
+        <div className="bg-secondary border-y border-border">
+          <div className="max-w-6xl mx-auto px-6 py-10">
+            <div className="max-w-3xl mx-auto text-center mb-8">
+              <h2 className="font-headline text-2xl font-bold text-foreground mb-3">Your Configuration at a Glance</h2>
+              <p className="text-muted-foreground font-serif">Based on your selected hardware and workload, here's how the numbers break down.</p>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               <StatCard
                 label="Local Hardware"
@@ -325,6 +374,15 @@ export default function PayoffCalculator() {
           </div>
         </div>
       )}
+
+      {/* Transition to Calculator */}
+      <div className="max-w-3xl mx-auto px-6 py-12 text-center">
+        <h2 className="font-headline text-2xl font-bold text-foreground mb-4">Configure Your Scenario</h2>
+        <p className="text-muted-foreground font-serif" style={{ lineHeight: 1.7 }}>
+          Select your hardware configuration, define your workload, and see how the costs compare across providers.
+          The numbers update in real-time as you adjust parameters.
+        </p>
+      </div>
 
       {/* Main Content */}
       <div className="max-w-6xl mx-auto px-6 py-8">
@@ -675,11 +733,17 @@ export default function PayoffCalculator() {
           </div>
         </div>
 
-        {/* Cloud Comparison */}
+        {/* Cloud GPU Comparison */}
         {calculations.canRun && (
           <div className="mb-8">
+            <div className="border-l-4 border-accent pl-4 mb-6">
+              <h2 className="font-headline text-xl font-bold text-foreground mb-2">Cloud GPU Rental</h2>
+              <p className="text-sm text-muted-foreground">
+                Rent raw compute by the hour. Faster than local hardware, but you pay for every minute of runtime.
+              </p>
+            </div>
             <div className="flex items-center justify-between mb-2">
-              <h2 className="text-lg font-semibold text-foreground">Cloud Alternatives</h2>
+              <h3 className="text-base font-semibold text-foreground">Provider Comparison</h3>
               <MultiSelectDropdown
                 options={cloudProviders.providers}
                 selected={cloudGPUFilters}
@@ -782,7 +846,7 @@ export default function PayoffCalculator() {
               <div className="bg-secondary border border-border p-4">
                 <div className="font-medium text-foreground mb-1">Hours needed</div>
                 <div className="text-muted-foreground">
-                  Cloud is {cheapest?.speedRatio.toFixed(1)}× faster, so you only need {formatHours(cheapest?.cloudHoursNeeded)}
+                  Cloud is {cheapest?.speedRatio.toFixed(1)}× faster, so you only need {formatHours(cheapest?.cloudHoursNeeded)}{' '}
                   to match {dailyHours}h of local output.
                 </div>
               </div>
@@ -810,11 +874,49 @@ export default function PayoffCalculator() {
           </div>
         )}
 
+        {/* Prose: Security & Why Local Matters - Shown between GPU and API sections */}
+        {calculations.canRun && !isTrainingMode && (
+          <div className="max-w-3xl mx-auto my-12 px-6">
+            <div className="border-l-4 border-accent pl-6 mb-6">
+              <h2 className="font-headline text-xl font-bold text-foreground mb-2">Why I'm Considering Local</h2>
+              <p className="text-muted-foreground font-serif italic">Beyond the economics: security, sovereignty, and control</p>
+            </div>
+            <p className="text-base leading-relaxed text-muted-foreground font-serif mb-4" style={{ lineHeight: 1.8 }}>
+              For my use case, the payoff calculation is only part of the story. Data sovereignty is becoming the dominant paradigm—governments worldwide are mandating local storage and restricting cross-border transfers. Europe has issued over €5.65 billion in GDPR fines since 2018, with the EU AI Act adding new obligations in 2026.
+            </p>
+            <p className="text-base leading-relaxed text-muted-foreground font-serif mb-4" style={{ lineHeight: 1.8 }}>
+              Local inference keeps my data entirely on-premises. No API logs, no third-party training pipelines, no policy changes from providers. For regulated industries—healthcare, finance, legal—this isn't optimization. It's compliance.
+            </p>
+          </div>
+        )}
+
+        {/* Prose: Open Source Context - Before API providers */}
+        {calculations.canRun && !isTrainingMode && (
+          <div className="max-w-3xl mx-auto my-12 px-6">
+            <div className="border-l-4 border-accent pl-6 mb-6">
+              <h2 className="font-headline text-xl font-bold text-foreground mb-2">The Open Source Option</h2>
+              <p className="text-muted-foreground font-serif italic">When open-weight models match proprietary performance</p>
+            </div>
+            <p className="text-base leading-relaxed text-muted-foreground font-serif mb-4" style={{ lineHeight: 1.8 }}>
+              The API providers below offer access to both proprietary and open-source models. What's changed is that open models now compete on quality. Meta's Llama 3.3 70B delivers performance comparable to models 5× larger. Mistral achieves 92% of GPT-5's benchmark scores at 15% of the cost.
+            </p>
+            <p className="text-base leading-relaxed text-muted-foreground font-serif" style={{ lineHeight: 1.8 }}>
+              For many applications—summarization, extraction, code generation—the gap has effectively closed. My choice isn't about quality anymore. It's about cost, latency, and control.
+            </p>
+          </div>
+        )}
+
         {/* API Provider Comparison - Only shown in inference mode */}
         {calculations.canRun && calculations.apiProviders.length > 0 && !isTrainingMode && (
           <div className="mb-8">
+            <div className="border-l-4 border-accent pl-4 mb-6">
+              <h2 className="font-headline text-xl font-bold text-foreground mb-2">API Providers</h2>
+              <p className="text-sm text-muted-foreground">
+                Pay per token with zero infrastructure. The simplest path to production—but costs scale directly with usage.
+              </p>
+            </div>
             <div className="flex items-center justify-between mb-2">
-              <h2 className="text-lg font-semibold text-foreground">API Provider Comparison</h2>
+              <h3 className="text-base font-semibold text-foreground">Provider Comparison</h3>
               <MultiSelectDropdown
                 options={Object.keys(ossAPIFilters).map(name => ({ id: name, name }))}
                 selected={ossAPIFilters}
@@ -1254,36 +1356,34 @@ export default function PayoffCalculator() {
           </div>
         )}
 
-        {/* Market Context Prose */}
-        <div className="max-w-3xl mx-auto my-12">
-          <h2 className="font-headline text-2xl font-bold text-foreground mb-6">The Shifting Economics of Compute</h2>
+        {/* Prose: Right-Sizing - After results */}
+        {calculations.canRun && (
+          <div className="max-w-3xl mx-auto my-12 px-6">
+            <div className="border-l-4 border-accent pl-6 mb-6">
+              <h2 className="font-headline text-xl font-bold text-foreground mb-2">Right-Sizing My Models</h2>
+              <p className="text-muted-foreground font-serif italic">When smaller models outperform giants</p>
+            </div>
+            <p className="text-base leading-relaxed text-muted-foreground font-serif mb-4" style={{ lineHeight: 1.8 }}>
+              One insight that changed my thinking: bigger isn't always better. A 350M parameter model fine-tuned for tool calling achieved 77.55% on ToolBench—outperforming ChatGPT (26%) by nearly 3×. NVIDIA showed a fine-tuned Llama 3 8B beat models 40× larger on code review.
+            </p>
+            <p className="text-base leading-relaxed text-muted-foreground font-serif mb-4" style={{ lineHeight: 1.8 }}>
+              With techniques like LoRA, I can fine-tune a model for my specific domain with modest compute. Studies show fine-tuned models outperform GPT-4 on 85% of specialized tasks—while running on hardware that fits under my desk.
+            </p>
+            <div className="bg-secondary border border-border p-4 mt-6">
+              <p className="text-sm text-muted-foreground">
+                <strong className="text-foreground">The market signal:</strong> Small language models grew from $6.5B in 2024 to a projected $20.7B by 2030. Organizations report 300-400% ROI from fine-tuning their own models.
+              </p>
+            </div>
+          </div>
+        )}
 
-          <p className="text-base leading-relaxed text-muted-foreground font-serif mb-4">
-            GPU compute costs have followed a dramatic trajectory. In early 2023, H100 rentals commanded $4-5 per GPU-hour when available at all. Today, competition among cloud providers like Lambda, RunPod, and Denvr has driven prices below $2.50/GPU-hour—a 40% reduction in under two years.
-          </p>
-
-          <p className="text-base leading-relaxed text-muted-foreground font-serif mb-4">
-            Meanwhile, API pricing has collapsed even faster. OpenAI's GPT-4 launched at $30 per million output tokens; today, open-source alternatives from Together and Fireworks serve comparable models at $0.20-1.00/million—a 30-150× cost reduction. This price pressure shows no signs of abating.
-          </p>
-
-          <h3 className="font-headline text-xl font-bold text-foreground mt-8 mb-4">Key Assumptions</h3>
-
-          <p className="text-base leading-relaxed text-muted-foreground font-serif mb-4">
-            This calculator makes several simplifying assumptions worth noting. We assume consistent daily usage over time—actual workloads are often bursty. We use a 50/50 input/output token ratio for API costs, though your application may differ significantly. Hardware depreciation and electricity costs are excluded, which favors the local hardware case. Cloud providers may impose minimum commitments or availability constraints not reflected here.
-          </p>
-
-          <h3 className="font-headline text-xl font-bold text-foreground mt-8 mb-4">Future Scenarios</h3>
-
-          <p className="text-base leading-relaxed text-muted-foreground font-serif mb-4">
-            <strong>If compute prices continue falling:</strong> The payoff period extends. Today's 6-month payoff could become 12 months if API prices halve again. For light-to-moderate usage, cloud options may remain perpetually cheaper than hardware ownership.
-          </p>
-
-          <p className="text-base leading-relaxed text-muted-foreground font-serif mb-4">
-            <strong>If you need cutting-edge models:</strong> Local hardware can't run the largest frontier models. A 405B parameter model requires 800GB+ of memory—well beyond any consumer device. For these workloads, cloud or API access remains mandatory.
-          </p>
-
-          <p className="text-base leading-relaxed text-muted-foreground font-serif mb-6">
-            <strong>If privacy matters:</strong> Local inference keeps data entirely on-premises. For healthcare, legal, or proprietary applications, this may justify a longer payoff period. No data leaves your machine.
+        {/* Section: Key Assumptions */}
+        <div className="max-w-3xl mx-auto my-12 px-6">
+          <div className="border-l-4 border-border pl-6 mb-6">
+            <h2 className="font-headline text-xl font-bold text-foreground mb-2">My Assumptions</h2>
+          </div>
+          <p className="text-base leading-relaxed text-muted-foreground font-serif mb-4" style={{ lineHeight: 1.8 }}>
+            This calculator makes several simplifying assumptions. I assume consistent daily usage—my actual workloads are often bursty. I use a 50/50 input/output token ratio for API costs, though my application may differ. Hardware depreciation and electricity costs are excluded, which favors local hardware. Cloud providers may impose minimum commitments not reflected here.
           </p>
         </div>
 
