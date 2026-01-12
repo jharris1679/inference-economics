@@ -257,7 +257,7 @@ export default function PayoffCalculator() {
             Should I Buy the Hardware?
           </h1>
           <p className="text-xl text-muted-foreground font-serif max-w-2xl mx-auto mb-8" style={{ lineHeight: 1.6 }}>
-            As GPU prices fall and open-source models mature, the buy-vs-rent calculus for AI infrastructure is shifting. But supply chain risks and geopolitical tensions add new uncertainty to my equation.
+            As GPU prices fall and open-source models mature, the buy-vs-rent calculus for AI infrastructure is shifting. For companies running AI on their own infrastructure, the question is becoming urgent.
           </p>
           {/* Author Byline */}
           <div className="flex items-center justify-center gap-3 mt-8">
@@ -284,14 +284,14 @@ export default function PayoffCalculator() {
       {/* Opening Argument */}
       <div className="max-w-6xl mx-auto px-6 py-12">
         <p className="text-lg leading-relaxed text-foreground font-serif mb-6" style={{ lineHeight: 1.8 }}>
-          <span className="float-left text-5xl font-headline font-bold mr-3 mt-1 text-accent" style={{ lineHeight: 0.85 }}>I</span>
-          've been wrestling with a decision that many teams face today: should I invest in local AI hardware, or continue renting from the cloud? The economics have shifted dramatically since 2023, when cloud GPU rental was often the only viable option. Today, consumer hardware like Apple's M-series chips and NVIDIA's DGX Spark offer a compelling alternative: pay once, run forever.
+          <span className="float-left text-5xl font-headline font-bold mr-3 mt-1 text-accent" style={{ lineHeight: 0.85 }}>M</span>
+          any teams are wrestling with a decision that defines their AI strategy: buy dedicated hardware, or rent from the cloud? The economics have shifted dramatically since 2023, when cloud GPU rental was often the only viable option. Today, consumer hardware like Apple's M-series chips and NVIDIA's DGX Spark offer a compelling alternative: pay once, run forever.
         </p>
         <p className="text-lg leading-relaxed text-muted-foreground font-serif mb-6" style={{ lineHeight: 1.8 }}>
-          But the calculus isn't simple. Cloud providers offer raw speed—an H100 cluster can process tokens 2-4× faster than consumer hardware. API providers eliminate infrastructure entirely. The question isn't which is "best," but which makes sense for <em>my</em> specific workload and time horizon.
+          At <a href="https://answerlayer.com" className="text-accent hover:underline" target="_blank" rel="noopener noreferrer">AnswerLayer</a>, we deploy on customer infrastructure—which means we think constantly about how to maximize value from whatever hardware our customers own or plan to buy. The calculus isn't simple. Cloud providers offer raw speed—an H100 cluster can process tokens 2-4× faster than consumer hardware. API providers eliminate infrastructure entirely. The question isn't which is "best," but which makes sense for a company's specific workload and time horizon.
         </p>
         <p className="text-lg leading-relaxed text-muted-foreground font-serif" style={{ lineHeight: 1.8 }}>
-          I built this calculator to model that decision with real pricing data. But first, it's worth understanding the forces reshaping this market—and why the conventional wisdom about ever-cheaper compute may be incomplete.
+          I built this calculator to model that decision with real pricing data—for our customers and anyone else evaluating the hardware investment. But first, it's worth understanding the forces reshaping this market—and why the conventional wisdom about ever-cheaper compute may be incomplete.
         </p>
       </div>
 
@@ -329,7 +329,7 @@ export default function PayoffCalculator() {
           </div>
 
           <p className="text-sm text-muted-foreground bg-background p-4 border border-border">
-            <strong className="text-foreground">My takeaway:</strong> Locking in hardware today at current prices provides a hedge against supply disruption. If shortages materialize, both cloud rental rates and API costs could rise—shortening my payoff period retroactively.
+            <strong className="text-foreground">The strategic implication:</strong> Locking in hardware at today's prices provides a hedge against supply disruption. If shortages materialize, both cloud rental rates and API costs could rise—retroactively shortening the payoff period for those who bought early.
           </p>
         </div>
       </div>
@@ -339,7 +339,7 @@ export default function PayoffCalculator() {
         <div className="bg-secondary border-y border-border">
           <div className="max-w-6xl mx-auto px-6 py-10">
             <div className="max-w-3xl mx-auto text-center mb-8">
-              <h2 className="font-headline text-2xl font-bold text-foreground mb-3">My Configuration at a Glance</h2>
+              <h2 className="font-headline text-2xl font-bold text-foreground mb-3">Your Configuration at a Glance</h2>
               <p className="text-muted-foreground font-serif">Based on your selected hardware and workload, here's how the numbers break down.</p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -1412,10 +1412,10 @@ export default function PayoffCalculator() {
         {/* Section: Key Assumptions */}
         <div className="my-12">
           <div className="border-l-4 border-border pl-6 mb-6">
-            <h2 className="font-headline text-xl font-bold text-foreground mb-2">My Assumptions</h2>
+            <h2 className="font-headline text-xl font-bold text-foreground mb-2">Key Assumptions</h2>
           </div>
           <p className="text-base leading-relaxed text-muted-foreground font-serif mb-4" style={{ lineHeight: 1.8 }}>
-            This calculator makes several simplifying assumptions. I assume consistent daily usage—my actual workloads are often bursty. I use a 4:1 input-to-output token ratio for API costs, reflecting that most LLM applications send more context than they receive—though your application may differ. Hardware depreciation and electricity costs are excluded, which favors local hardware. Cloud providers may impose minimum commitments not reflected here.
+            This calculator makes several simplifying assumptions. It assumes consistent daily usage—real workloads are often bursty. The 4:1 input-to-output token ratio for API costs reflects that most LLM applications send more context than they receive, though specific applications may differ. Hardware depreciation and electricity costs are excluded, which favors local hardware. Cloud providers may impose minimum commitments not reflected here.
           </p>
         </div>
 
