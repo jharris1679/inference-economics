@@ -259,8 +259,8 @@ export default function PayoffCalculator() {
           <p className="text-xl text-muted-foreground font-serif max-w-2xl mx-auto mb-8" style={{ lineHeight: 1.6 }}>
             As GPU prices fall and open-source models mature, the buy-vs-rent calculus for AI infrastructure is shifting. But supply chain risks and geopolitical tensions add new uncertainty to my equation.
           </p>
-          {/* Byline */}
-          <div className="flex items-center justify-center gap-3 mt-8 pt-6 border-t border-border">
+          {/* Author Byline */}
+          <div className="flex items-center justify-center gap-3 mt-8">
             <img
               src="https://media.licdn.com/dms/image/v2/C5603AQHqNsJKPJqHVg/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1516331090768?e=2147483647&v=beta&t=dKHj-Cd5tSsYlMv5hZHLjK4CxqmqMPjmkk_LWiDdaWo"
               alt="Josh Harris"
@@ -269,11 +269,14 @@ export default function PayoffCalculator() {
             <div className="text-left">
               <div className="text-sm font-medium text-foreground">By Josh Harris</div>
               <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                <span>Data updated {apiProviders.updatedAt}</span>
                 <a href="https://www.linkedin.com/in/josh-harris-86188983/" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">LinkedIn</a>
                 <a href="https://x.com/dynemetis" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">𝕏</a>
               </div>
             </div>
+          </div>
+          {/* Data timestamp */}
+          <div className="text-sm text-muted-foreground mt-6 pt-4 border-t border-border">
+            Data updated {apiProviders.updatedAt} • Interactive analysis
           </div>
         </div>
       </div>
@@ -285,7 +288,7 @@ export default function PayoffCalculator() {
           've been wrestling with a decision that many teams face today: should I invest in local AI hardware, or continue renting from the cloud? The economics have shifted dramatically since 2023, when cloud GPU rental was often the only viable option. Today, consumer hardware like Apple's M-series chips and NVIDIA's DGX Spark offer a compelling alternative: pay once, run forever.
         </p>
         <p className="text-lg leading-relaxed text-muted-foreground font-serif mb-6" style={{ lineHeight: 1.8 }}>
-          But my calculus isn't simple. Cloud providers offer raw speed—an H100 cluster can process tokens 2-4× faster than my local hardware. API providers eliminate infrastructure entirely. The question isn't which is "best," but which makes sense for <em>my</em> specific workload and time horizon.
+          But the calculus isn't simple. Cloud providers offer raw speed—an H100 cluster can process tokens 2-4× faster than consumer hardware. API providers eliminate infrastructure entirely. The question isn't which is "best," but which makes sense for <em>my</em> specific workload and time horizon.
         </p>
         <p className="text-lg leading-relaxed text-muted-foreground font-serif" style={{ lineHeight: 1.8 }}>
           I built this calculator to model that decision with real pricing data. But first, it's worth understanding the forces reshaping this market—and why the conventional wisdom about ever-cheaper compute may be incomplete.
@@ -297,7 +300,7 @@ export default function PayoffCalculator() {
         <div className="max-w-6xl mx-auto px-6 py-12">
           <div className="border-l-4 border-accent pl-6 mb-8">
             <h2 className="font-headline text-2xl font-bold text-foreground mb-2">The Supply Chain Reality</h2>
-            <p className="text-muted-foreground font-serif italic">Why my assumption of ever-cheaper compute may be wrong</p>
+            <p className="text-muted-foreground font-serif italic">Why the assumption of ever-cheaper compute may not hold</p>
           </div>
 
           <p className="text-base leading-relaxed text-muted-foreground font-serif mb-6" style={{ lineHeight: 1.8 }}>
@@ -308,7 +311,7 @@ export default function PayoffCalculator() {
             <div className="border-l-2 border-accent/30 pl-4">
               <p className="text-sm text-muted-foreground font-serif">
                 <strong className="text-foreground block mb-1">Demand outpacing supply</strong>
-                <a href="https://www.theregister.com/2024/07/18/tsmc_ceo_predicts_ai_chip/" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">TSMC's CEO</a> predicts chip shortages through 2026. HBM memory faces 6-12 month lead times.
+                <a href="https://www.tomshardware.com/tech-industry/semiconductors/tsmc-csays-advanced-node-capacity-falls-short-of-ai-demand" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">TSMC's CEO</a> says capacity is "three times short" of demand. HBM memory faces 6-12 month lead times.
               </p>
             </div>
             <div className="border-l-2 border-accent/30 pl-4">
@@ -336,7 +339,7 @@ export default function PayoffCalculator() {
         <div className="bg-secondary border-y border-border">
           <div className="max-w-6xl mx-auto px-6 py-10">
             <div className="max-w-3xl mx-auto text-center mb-8">
-              <h2 className="font-headline text-2xl font-bold text-foreground mb-3">Your Configuration at a Glance</h2>
+              <h2 className="font-headline text-2xl font-bold text-foreground mb-3">My Configuration at a Glance</h2>
               <p className="text-muted-foreground font-serif">Based on your selected hardware and workload, here's how the numbers break down.</p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -1337,20 +1340,20 @@ export default function PayoffCalculator() {
           </div>
         )}
 
-        {/* Prose: Why I'm Considering Local - After results */}
+        {/* Prose: Why Local Matters - After results */}
         {calculations.canRun && !isTrainingMode && (
           <div className="my-12">
             <div className="border-l-4 border-accent pl-6 mb-6">
-              <h2 className="font-headline text-xl font-bold text-foreground mb-2">Why I'm Considering Local</h2>
+              <h2 className="font-headline text-xl font-bold text-foreground mb-2">Why Local Matters</h2>
               <p className="text-muted-foreground font-serif italic">Beyond the economics: security, sovereignty, and control</p>
             </div>
             <p className="text-base leading-relaxed text-muted-foreground font-serif mb-4" style={{ lineHeight: 1.8 }}>
-              For my use case, the payoff calculation is only part of the story. Data sovereignty is becoming the dominant paradigm—governments worldwide are mandating local storage and restricting cross-border transfers. Europe has issued over{' '}
+              At <a href="https://answerlayer.com" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">AnswerLayer</a>, our customers in healthcare, finance, and legal can't send their data to third-party APIs. Data sovereignty is becoming the dominant paradigm—governments worldwide are mandating local storage and restricting cross-border transfers. Europe has issued over{' '}
               <a href="https://www.enforcementtracker.com/" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">€5.65 billion in GDPR fines</a> since 2018, with the{' '}
               <a href="https://artificialintelligenceact.eu/" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">EU AI Act</a> adding new obligations in 2026.
             </p>
             <p className="text-base leading-relaxed text-muted-foreground font-serif" style={{ lineHeight: 1.8 }}>
-              Local inference keeps my data entirely on-premises. No API logs, no third-party training pipelines, no policy changes from providers. For regulated industries—healthcare, finance, legal—this isn't optimization. It's compliance.
+              Local inference keeps sensitive data entirely on-premises. No API logs, no third-party training pipelines, no policy changes from providers. For regulated industries, this isn't optimization—it's compliance.
             </p>
           </div>
         )}
@@ -1363,12 +1366,17 @@ export default function PayoffCalculator() {
               <p className="text-muted-foreground font-serif italic">When open-weight models match proprietary performance</p>
             </div>
             <p className="text-base leading-relaxed text-muted-foreground font-serif mb-4" style={{ lineHeight: 1.8 }}>
-              The API providers above offer access to both proprietary and open-source models. What's changed is that open models now compete on quality. Meta's{' '}
-              <a href="https://ai.meta.com/blog/llama-3-3/" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">Llama 3.3 70B</a> delivers performance comparable to models 5× larger.{' '}
-              <a href="https://mistral.ai/news" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">Mistral</a> achieves competitive benchmark scores at a fraction of the cost.
+              The API providers above offer access to both proprietary and open-source models. What's changed is that open models now compete on quality.{' '}
+              <a href="https://techcrunch.com/2024/12/06/meta-unveils-a-new-more-efficient-llama-model/" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">Meta's Llama 3.3 70B</a>{' '}
+              delivers performance comparable to the 405B model at a fraction of the cost. For many applications—summarization, extraction, code generation—the gap with proprietary models has effectively closed.
+            </p>
+            <p className="text-base leading-relaxed text-muted-foreground font-serif mb-4" style={{ lineHeight: 1.8 }}>
+              There's another factor to consider: today's API prices are{' '}
+              <a href="https://www.uptechstudio.com/blog/the-true-cost-of-ai-when-the-subsidies-run-out" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">heavily subsidized by VC funding</a>.
+              {' '}OpenAI has raised over $78B and Anthropic over $33B—much of it deployed to capture market share at below-cost pricing. When these subsidies end (and they will), API costs could rise significantly. Google's pricing is an exception—not VC-dependent—but still subject to competitive pressure that may not last.
             </p>
             <p className="text-base leading-relaxed text-muted-foreground font-serif" style={{ lineHeight: 1.8 }}>
-              For many applications—summarization, extraction, code generation—the gap has effectively closed. My choice isn't about quality anymore. It's about cost, latency, and control.
+              For applications where data stays local anyway, the choice isn't about quality anymore. It's about cost predictability, latency, and control.
             </p>
           </div>
         )}
@@ -1377,25 +1385,25 @@ export default function PayoffCalculator() {
         {calculations.canRun && (
           <div className="my-12">
             <div className="border-l-4 border-accent pl-6 mb-6">
-              <h2 className="font-headline text-xl font-bold text-foreground mb-2">Right-Sizing My Models</h2>
+              <h2 className="font-headline text-xl font-bold text-foreground mb-2">Right-Sizing Models</h2>
               <p className="text-muted-foreground font-serif italic">When smaller models outperform giants</p>
             </div>
             <p className="text-base leading-relaxed text-muted-foreground font-serif mb-4" style={{ lineHeight: 1.8 }}>
-              One insight that changed my thinking: bigger isn't always better. A{' '}
-              <a href="https://arxiv.org/abs/2307.16789" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">350M parameter model fine-tuned for tool calling</a>{' '}
-              achieved 77.55% on ToolBench—outperforming ChatGPT (26%) by nearly 3×. NVIDIA showed a{' '}
-              <a href="https://developer.nvidia.com/blog/how-to-get-better-outputs-from-your-large-language-model/" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">fine-tuned Llama 3 8B beat models 40× larger</a>{' '}
-              on code review.
+              One insight worth highlighting: bigger isn't always better.{' '}
+              <a href="https://arxiv.org/html/2406.08660v1" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">Research shows</a>{' '}
+              that fine-tuned smaller models significantly outperform zero-shot generative AI models like ChatGPT and Claude on text classification tasks.{' '}
+              <a href="https://www.together.ai/blog/fine-tune-small-open-source-llms-outperform-closed-models" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">Together AI documented</a>{' '}
+              a case where a fine-tuned Gemma 3 27B outperformed Claude Sonnet by 60% on healthcare scribing—at 10-100× lower inference cost.
             </p>
             <p className="text-base leading-relaxed text-muted-foreground font-serif mb-4" style={{ lineHeight: 1.8 }}>
               With techniques like{' '}
-              <a href="https://huggingface.co/docs/peft/conceptual_guides/lora" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">LoRA</a>, I can fine-tune a model for my specific domain with modest compute. Research shows fine-tuned models can outperform larger general-purpose models on specialized tasks—while running on hardware that fits under my desk.
+              <a href="https://huggingface.co/docs/peft/conceptual_guides/lora" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">LoRA</a>, teams can fine-tune models for specific domains with modest compute. The pattern is consistent: task-specific training data often beats raw parameter count—and these specialized models can run on hardware that fits under a desk.
             </p>
             <div className="bg-secondary border border-border p-4 mt-6">
               <p className="text-sm text-muted-foreground">
                 <strong className="text-foreground">The market signal:</strong>{' '}
-                <a href="https://www.marketsandmarkets.com/Market-Reports/small-language-model-market-100002254.html" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">Small language models</a>{' '}
-                grew from $6.5B in 2024 to a projected $20.7B by 2030.
+                <a href="https://galileo.ai/blog/small-language-models-nvidia" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">NVIDIA research</a>{' '}
+                shows that with ~100 labeled examples, a well-tuned small model reaches parity with large LLMs on specialized tasks.
               </p>
             </div>
           </div>

@@ -3,8 +3,8 @@
   "gpuType": "H100",
   "sources": {
     "RunPod": "https://www.runpod.io/gpu-instance/pricing",
-    "Denvr": "https://www.denvr.cloud/pricing",
-    "Lambda": "https://lambdalabs.com/service/gpu-cloud",
+    "Denvr": "https://www.denvr.com/pricing",
+    "Lambda": "https://lambda.ai/pricing",
     "GCP": "https://cloud.google.com/compute/gpus-pricing",
     "AWS": "https://aws.amazon.com/ec2/instance-types/p5/"
   },
