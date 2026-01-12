@@ -1303,31 +1303,29 @@ export default function PayoffCalculator() {
               <ul className="space-y-2">
                 <li>
                   <strong>Benchmarks:</strong>{' '}
-                  {models.sources.slice(0, 3).map((s, i) => (
+                  {models.sources.map((s, i, arr) => (
                     <span key={s.id}>
                       <a href={s.url} className="text-accent hover:underline" target="_blank" rel="noopener noreferrer">
                         {s.name}
                       </a>
-                      {i < 2 && ', '}
+                      {i < arr.length - 1 && ', '}
                     </span>
                   ))}
-                  {models.sources.length > 3 && ` +${models.sources.length - 3} more`}
                 </li>
                 <li>
                   <strong>GPU rental:</strong>{' '}
-                  {cloudProviders.providers.slice(0, 3).map((p, i) => (
+                  {cloudProviders.providers.map((p, i, arr) => (
                     <span key={p.id}>
                       <a href={cloudProviders.sources?.[p.name]} className="text-accent hover:underline" target="_blank" rel="noopener noreferrer">
                         {p.name}
                       </a>
-                      {i < 2 && ', '}
+                      {i < arr.length - 1 && ', '}
                     </span>
                   ))}
-                  {cloudProviders.providers.length > 3 && ` +${cloudProviders.providers.length - 3} more`}
                 </li>
                 <li>
                   <strong>API pricing:</strong>{' '}
-                  {Object.keys(apiProviders.sources || {}).slice(0, 4).map((name, i, arr) => (
+                  {Object.keys(apiProviders.sources || {}).map((name, i, arr) => (
                     <span key={name}>
                       <a href={apiProviders.sources[name]} className="text-accent hover:underline" target="_blank" rel="noopener noreferrer">
                         {name}
@@ -1335,7 +1333,6 @@ export default function PayoffCalculator() {
                       {i < arr.length - 1 && ', '}
                     </span>
                   ))}
-                  {Object.keys(apiProviders.sources || {}).length > 4 && ` +${Object.keys(apiProviders.sources).length - 4} more`}
                 </li>
               </ul>
             </div>
