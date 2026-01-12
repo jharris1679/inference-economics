@@ -697,47 +697,17 @@ export default function PayoffCalculator() {
                   <StatCard
                     label="Payoff Time"
                     value={cheapest ? formatPayoff(cheapest.payoffMonths) : 'N/A'}
+                    unit="months"
                     description="Break-even vs cheapest cloud"
                   />
                 ) : (
                   <StatCard
                     label="Payoff Time"
                     value={filteredApiProviders[0] ? formatPayoff(filteredApiProviders[0].payoffMonths) : 'N/A'}
+                    unit="months"
                     description="Break-even vs cheapest API"
                   />
                 )}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Workload Summary */}
-        {calculations.canRun && (
-          <div className="bg-secondary p-4 mb-6 border border-border">
-            <div className="text-sm text-muted-foreground mb-2">
-              Daily workload:{' '}
-              <span className="text-foreground font-medium">
-                {calculations.workloadSummary?.length > 1
-                  ? `${calculations.workloadSummary.length} models`
-                  : calculations.workloadSummary?.[0]?.name || 'Unknown'}
-              </span>
-              {calculations.workloadSummary?.length > 1 && (
-                <span className="text-muted-foreground">
-                  {' '}({calculations.workloadSummary.map(w =>
-                    `${w.quantity > 1 ? w.quantity + '× ' : ''}${w.name}`
-                  ).join(', ')})
-                </span>
-              )}
-            </div>
-            <div className="flex flex-wrap items-center gap-4">
-              <div className="text-center">
-                <div className="text-xl font-bold text-foreground">{dailyHours}h × {calculations.localTPS} tok/s</div>
-                <div className="text-xs text-muted-foreground">runtime × combined throughput</div>
-              </div>
-              <div className="text-xl text-muted-foreground">=</div>
-              <div className="text-center">
-                <div className="text-xl font-bold text-accent">{formatTokens(calculations.tokensPerDay)}</div>
-                <div className="text-xs text-muted-foreground">tokens/day</div>
               </div>
             </div>
           </div>
@@ -1422,7 +1392,9 @@ export default function PayoffCalculator() {
             <p className="text-base leading-relaxed text-muted-foreground font-serif mb-4" style={{ lineHeight: 1.8 }}>
               The API providers above offer access to both proprietary and open-source models. What's changed is that open models now compete on quality.{' '}
               <a href="https://ai.meta.com/blog/llama-4-multimodal-intelligence/" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">Meta's Llama 4</a>{' '}
-              delivers frontier-class performance with models ranging from Scout (17B active parameters) to Behemoth (288B active). For many applications—summarization, extraction, code generation—the gap with proprietary models has effectively closed.
+              delivers frontier-class performance with models ranging from Scout (17B active) to Behemoth (288B active).{' '}
+              <a href="https://blog.google/technology/developers/gemma-3/" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">Google's Gemma 3</a>{' '}
+              offers strong performance at smaller sizes (1B to 27B). For many applications—summarization, extraction, code generation—the gap with proprietary models has effectively closed.
             </p>
             <p className="text-base leading-relaxed text-muted-foreground font-serif mb-4" style={{ lineHeight: 1.8 }}>
               There's another factor to consider: today's API prices are{' '}
