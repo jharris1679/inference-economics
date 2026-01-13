@@ -8,4 +8,9 @@ export default defineConfig({
   base: '/inference-economics',
   integrations: [react(), tailwind()],
   output: 'static',
+  vite: {
+    server: {
+      allowedHosts: ['intel', 'intel.tail0b4a76.ts.net', 'dev.local'],
+    },
+  },
 });

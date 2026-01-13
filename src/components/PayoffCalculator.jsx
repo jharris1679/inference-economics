@@ -153,13 +153,13 @@ export default function PayoffCalculator() {
   // Workload state (ANS-504) - array of models to run
   const [workload, setWorkload] = useState(() => [
     {
-      id: crypto.randomUUID(),
+      id: Math.random().toString(36).slice(2),
       developerId: 'openai',
       modelId: 'gpt-oss-120b',
       quantity: 4,
     },
     {
-      id: crypto.randomUUID(),
+      id: Math.random().toString(36).slice(2),
       developerId: 'openai',
       modelId: 'gpt-oss-20b',
       quantity: 8,
@@ -198,7 +198,7 @@ export default function PayoffCalculator() {
   // Workload management functions
   const addModelToWorkload = () => {
     setWorkload(prev => [...prev, {
-      id: crypto.randomUUID(),
+      id: Math.random().toString(36).slice(2),
       developerId: 'meta',
       modelId: 'llama-3.1-8b',
       quantity: 1,
@@ -289,8 +289,8 @@ export default function PayoffCalculator() {
       {/* Opening Argument */}
       <div className="max-w-6xl mx-auto px-6 py-12">
         <p className="text-lg leading-relaxed text-foreground font-serif mb-6" style={{ lineHeight: 1.8 }}>
-          <span className="float-left text-5xl font-headline font-bold mr-3 mt-1 text-accent" style={{ lineHeight: 0.85 }}>C</span>
-          ompute is the new capex decision. How you source it defines your AI economics. Until recently, the answer was straightforward: rent from the cloud. But the economics have shifted dramatically in recent years. Today, consumer hardware like Apple's M-series chips and NVIDIA's DGX Spark offer a compelling alternative: pay once, run forever.
+          <span className="float-left text-5xl font-headline font-bold mr-3 mt-1 text-accent" style={{ lineHeight: 0.85 }}>E</span>
+          very team building with LLMs faces the question of how to buy compute. For most workloads, the answer has long been straightforward—rent from the cloud. But LLM inference changed the calculus. It's expensive, in high demand, and often involves sensitive data. Meanwhile, consumer hardware like Apple's M-series chips and NVIDIA's DGX Spark has become surprisingly capable—easy to run, easy to secure, and sometimes more convenient than renting compute.
         </p>
         <p className="text-lg leading-relaxed text-foreground font-serif mb-6" style={{ lineHeight: 1.8 }}>
           At <a href="https://getanswerlayer.com" className="text-accent hover:underline" target="_blank" rel="noopener noreferrer">AnswerLayer</a>, we deploy on customer infrastructure—which means we think constantly about how to maximize value from whatever compute power our customers own or plan to buy. The calculus isn't simple. Cloud providers offer raw speed—an H100 cluster can process tokens 2-4× faster than consumer hardware. API providers abstract infrastructure entirely. The question isn't which is "best," but which makes sense for a company's specific workload and time horizon.
@@ -1423,7 +1423,7 @@ export default function PayoffCalculator() {
             <h2 className="font-headline text-xl font-bold text-foreground mb-2">Key Assumptions</h2>
           </div>
           <p className="text-base leading-relaxed text-muted-foreground font-serif mb-4" style={{ lineHeight: 1.8 }}>
-            This calculator makes several simplifying assumptions. It assumes consistent daily usage—real workloads are often bursty. The 4:1 input-to-output token ratio for API costs reflects that most LLM applications send more context than they receive, though specific applications may differ. Hardware depreciation and electricity costs are excluded, which favors local hardware. Cloud providers may impose minimum commitments not reflected here.
+            This calculator makes several simplifying assumptions. It assumes consistent daily usage—real workloads are often bursty. The 4:1 input-to-output token ratio for API costs reflects that most LLM applications send more context than they receive, though specific applications may differ. Hardware depreciation and electricity costs are excluded, which favors local hardware. Cloud providers may impose minimum commitments not reflected here. We focus on the Mac Studio and DGX Spark because they're readily available—traditional GPU workstations (RTX 4090/5090) face ongoing supply constraints that make them difficult to source at reasonable prices.
           </p>
         </div>
 
