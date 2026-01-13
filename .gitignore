@@ -11,12 +11,18 @@ dist/
 .env
 .env.*
 
+# Local config (copy from astro.config.example.mjs)
+astro.config.mjs
+
 # IDE
 .vscode/
 .idea/
 *.swp
 *.swo
 .DS_Store
+
+# Claude Code
+.claude/
 
 # Logs
 *.log

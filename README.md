@@ -23,6 +23,9 @@ A decision-making tool for compute purchases. Demand for AI compute is growing f
 ## Quick Start
 
 ```bash
+# Copy config template
+cp astro.config.example.mjs astro.config.mjs
+
 # Install dependencies
 npm install
 
