@@ -610,71 +610,6 @@ export default function PayoffCalculator() {
             </div>
           </div>
 
-          {/* ANS-542: Input/Output Ratio with log scale */}
-          <div className="bg-secondary p-4 border border-border">
-            <label className="block text-sm font-medium text-muted-foreground mb-3">
-              Token ratio (input:output): <span className="text-foreground font-bold">
-                {(() => {
-                  // Convert inputRatio to human-readable ratio
-                  const outputRatio = 1 - inputRatio;
-                  if (Math.abs(inputRatio - outputRatio) < 0.03) return '1:1';
-                  if (inputRatio > outputRatio) {
-                    const ratio = inputRatio / outputRatio;
-                    return ratio >= 10 ? `${Math.round(ratio)}:1` : `${ratio.toFixed(1)}:1`;
-                  } else {
-                    const ratio = outputRatio / inputRatio;
-                    return ratio >= 10 ? `1:${Math.round(ratio)}` : `1:${ratio.toFixed(1)}`;
-                  }
-                })()}
-              </span>
-            </label>
-            {(() => {
-              // Log scale: slider position (0-1) maps to inputRatio (0.01-0.99) logarithmically
-              const LOG_MIN = Math.log(0.01 / 0.99); // ln(1/99)
-              const LOG_MAX = Math.log(0.99 / 0.01); // ln(99)
-              const LOG_RANGE = LOG_MAX - LOG_MIN;
-
-              const inputRatioToSlider = (ir) => {
-                const ratio = ir / (1 - ir);
-                return (Math.log(ratio) - LOG_MIN) / LOG_RANGE;
-              };
-
-              const sliderToInputRatio = (s) => {
-                const logRatio = LOG_MIN + s * LOG_RANGE;
-                const ratio = Math.exp(logRatio);
-                return ratio / (1 + ratio);
-              };
-
-              // Calculate label positions (symmetric on log scale)
-              const pos1to4 = inputRatioToSlider(0.2) * 100;  // 1:4 = 20% input
-              const pos4to1 = inputRatioToSlider(0.8) * 100;  // 4:1 = 80% input
-
-              return (
-                <>
-                  <input
-                    type="range"
-                    min={0}
-                    max={1}
-                    step="any"
-                    value={inputRatioToSlider(inputRatio)}
-                    onChange={(e) => setInputRatio(sliderToInputRatio(Number(e.target.value)))}
-                    className="w-full h-2 bg-muted appearance-none cursor-pointer accent-accent"
-                  />
-                  <div className="relative h-5 mt-2 text-xs text-muted-foreground">
-                    <span className="absolute left-0">1:99</span>
-                    <span className="absolute" style={{ left: `${pos1to4}%`, transform: 'translateX(-50%)' }}>1:4</span>
-                    <span className="absolute" style={{ left: '50%', transform: 'translateX(-50%)' }}>1:1</span>
-                    <span className="absolute" style={{ left: `${pos4to1}%`, transform: 'translateX(-50%)' }}>4:1</span>
-                    <span className="absolute right-0">99:1</span>
-                  </div>
-                </>
-              );
-            })()}
-            <p className="text-xs text-muted-foreground mt-2">
-              Affects API costs. Code generation uses more output; RAG/summarization uses more input.
-            </p>
-          </div>
-
           {/* ANS-514: Training Mode Selector with Category/Variant */}
           <div className="bg-secondary p-4 border border-border lg:col-span-2">
             <label className="block text-sm font-medium text-muted-foreground mb-3">
@@ -741,6 +676,73 @@ export default function PayoffCalculator() {
               )}
             </div>
           </div>
+
+          {/* ANS-542: Input/Output Ratio with log scale - only shown in inference mode */}
+          {!isTrainingMode && (
+            <div className="bg-secondary p-4 border border-border">
+              <label className="block text-sm font-medium text-muted-foreground mb-3">
+                Token ratio (input:output): <span className="text-foreground font-bold">
+                  {(() => {
+                    // Convert inputRatio to human-readable ratio
+                    const outputRatio = 1 - inputRatio;
+                    if (Math.abs(inputRatio - outputRatio) < 0.03) return '1:1';
+                    if (inputRatio > outputRatio) {
+                      const ratio = inputRatio / outputRatio;
+                      return ratio >= 10 ? `${Math.round(ratio)}:1` : `${ratio.toFixed(1)}:1`;
+                    } else {
+                      const ratio = outputRatio / inputRatio;
+                      return ratio >= 10 ? `1:${Math.round(ratio)}` : `1:${ratio.toFixed(1)}`;
+                    }
+                  })()}
+                </span>
+              </label>
+              {(() => {
+                // Log scale: slider position (0-1) maps to inputRatio (0.01-0.99) logarithmically
+                const LOG_MIN = Math.log(0.01 / 0.99); // ln(1/99)
+                const LOG_MAX = Math.log(0.99 / 0.01); // ln(99)
+                const LOG_RANGE = LOG_MAX - LOG_MIN;
+
+                const inputRatioToSlider = (ir) => {
+                  const ratio = ir / (1 - ir);
+                  return (Math.log(ratio) - LOG_MIN) / LOG_RANGE;
+                };
+
+                const sliderToInputRatio = (s) => {
+                  const logRatio = LOG_MIN + s * LOG_RANGE;
+                  const ratio = Math.exp(logRatio);
+                  return ratio / (1 + ratio);
+                };
+
+                // Calculate label positions (symmetric on log scale)
+                const pos1to4 = inputRatioToSlider(0.2) * 100;  // 1:4 = 20% input
+                const pos4to1 = inputRatioToSlider(0.8) * 100;  // 4:1 = 80% input
+
+                return (
+                  <>
+                    <input
+                      type="range"
+                      min={0}
+                      max={1}
+                      step="any"
+                      value={inputRatioToSlider(inputRatio)}
+                      onChange={(e) => setInputRatio(sliderToInputRatio(Number(e.target.value)))}
+                      className="w-full h-2 bg-muted appearance-none cursor-pointer accent-accent"
+                    />
+                    <div className="relative h-5 mt-2 text-xs text-muted-foreground">
+                      <span className="absolute left-0">1:99</span>
+                      <span className="absolute" style={{ left: `${pos1to4}%`, transform: 'translateX(-50%)' }}>1:4</span>
+                      <span className="absolute" style={{ left: '50%', transform: 'translateX(-50%)' }}>1:1</span>
+                      <span className="absolute" style={{ left: `${pos4to1}%`, transform: 'translateX(-50%)' }}>4:1</span>
+                      <span className="absolute right-0">99:1</span>
+                    </div>
+                  </>
+                );
+              })()}
+              <p className="text-xs text-muted-foreground mt-2">
+                Affects API costs. Code generation uses more output; RAG/summarization uses more input.
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Stats Overview - Your Configuration at a Glance */}
