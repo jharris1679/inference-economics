@@ -65,10 +65,11 @@ export function calculatePayoffDays(hardwarePrice, dailyCost) {
   return hardwarePrice / dailyCost;
 }
 
-export function calculateBlendedRate(inputPer1M, outputPer1M) {
-  // 4:1 input to output ratio (typical for most LLM applications)
-  // Input: 80%, Output: 20%
-  return (inputPer1M * 0.8) + (outputPer1M * 0.2);
+export function calculateBlendedRate(inputPer1M, outputPer1M, inputRatio = 0.8) {
+  // inputRatio: fraction of tokens that are input (default 0.8 = 4:1 input:output)
+  // Output ratio is the remainder
+  const outputRatio = 1 - inputRatio;
+  return (inputPer1M * inputRatio) + (outputPer1M * outputRatio);
 }
 
 export function calculateApiDailyCost(tokensPerDay, blendedRatePer1M) {
@@ -145,7 +146,8 @@ export function computeProprietaryAlternatives({
   models,
   dailyHours,
   localPrice,
-  apiProviders
+  apiProviders,
+  inputRatio = 0.8,
 }) {
   const allTiers = apiProviders.proprietaryAlternatives || {};
 
@@ -211,7 +213,7 @@ export function computeProprietaryAlternatives({
         return;
       }
 
-      const blendedRate = calculateBlendedRate(proprietaryModel.inputPer1M, proprietaryModel.outputPer1M);
+      const blendedRate = calculateBlendedRate(proprietaryModel.inputPer1M, proprietaryModel.outputPer1M, inputRatio);
       const tierCost = calculateApiDailyCost(tierData.tokens, blendedRate);
 
       totalDailyCost += tierCost;
@@ -241,7 +243,7 @@ export function computeProprietaryAlternatives({
     const avgTokPerSec = totalTokens > 0 ? weightedTokPerSec / totalTokens : 100;
     const avgInputPer1M = totalTokens > 0 ? weightedInputRate / totalTokens : 0;
     const avgOutputPer1M = totalTokens > 0 ? weightedOutputRate / totalTokens : 0;
-    const avgBlendedPer1M = calculateBlendedRate(avgInputPer1M, avgOutputPer1M);
+    const avgBlendedPer1M = calculateBlendedRate(avgInputPer1M, avgOutputPer1M, inputRatio);
     const monthlyCost = totalDailyCost * 30;
     const payoffDays = calculatePayoffDays(localPrice, totalDailyCost);
 
@@ -656,6 +658,7 @@ export function computeWorkloadComparison({
   cloudProviders,
   apiProviders,
   trainingMode = 'inference',
+  inputRatio = 0.8,
 }) {
   const isMac = selectedHardware === 'mac';
   const singleBoxMemory = isMac ? macRAM : hardware.dgxSpark.memory;
@@ -779,7 +782,7 @@ export function computeWorkloadComparison({
       const model = getModel(models, entry.developerId, entry.modelId);
       const tps = isMac ? model.localTokPerSec : model.dgxSparkTokPerSec;
       const modelTokensPerDay = calculateTokensPerDay(tps * entry.quantity, dailyHours);
-      const blendedRate = calculateBlendedRate(api.inputPer1M, api.outputPer1M);
+      const blendedRate = calculateBlendedRate(api.inputPer1M, api.outputPer1M, inputRatio);
       const dailyCost = calculateApiDailyCost(modelTokensPerDay, blendedRate);
 
       apiCostsByProvider[api.name].totalDailyCost += dailyCost;
@@ -812,7 +815,7 @@ export function computeWorkloadComparison({
       const weightedOutput = totalTokens > 0
         ? p.details.reduce((sum, d) => sum + (d.outputPer1M * d.tokensPerDay), 0) / totalTokens
         : p.details[0]?.outputPer1M || 0;
-      const weightedBlended = calculateBlendedRate(weightedInput, weightedOutput);
+      const weightedBlended = calculateBlendedRate(weightedInput, weightedOutput, inputRatio);
 
       return {
         name: p.name,
@@ -836,6 +839,7 @@ export function computeWorkloadComparison({
     dailyHours,
     localPrice,
     apiProviders,
+    inputRatio,
   });
 
   return {
