@@ -178,6 +178,9 @@ export default function PayoffCalculator() {
     Cerebras: true, OpenAI: true, Moonshot: true, 'Amazon Bedrock': true
   });
 
+  // ANS-543: Reserved pricing toggle for cloud GPU rental
+  const [useReservedPricing, setUseReservedPricing] = useState(false);
+
   // Memory info for workload (ANS-514: now includes training mode)
   const memoryInfo = useMemo(() => {
     const singleBoxMemory = selectedHardware === 'mac' ? macRAM : hardware.dgxSpark.memory;
@@ -231,7 +234,8 @@ export default function PayoffCalculator() {
     apiProviders,
     trainingMode,
     inputRatio,
-  }), [workload, dailyHours, macRAM, selectedHardware, hardwareQuantity, trainingMode, inputRatio]);
+    useReservedPricing,
+  }), [workload, dailyHours, macRAM, selectedHardware, hardwareQuantity, trainingMode, inputRatio, useReservedPricing]);
 
   // Filter results by provider selection (ANS-511)
   // Map provider names to IDs for filtering
@@ -263,7 +267,7 @@ export default function PayoffCalculator() {
             Interactive Analysis: The Economics of AI Infrastructure
           </div>
           <h1 className="font-headline text-foreground mb-6" style={{ fontSize: '3rem', fontWeight: 700, lineHeight: 1.1, letterSpacing: '-0.02em' }}>
-            Should I Buy the Hardware?
+            How Should We Buy LLM Compute?
           </h1>
           <p className="text-xl text-muted-foreground font-serif max-w-2xl mx-auto mb-8" style={{ lineHeight: 1.6 }}>
             As GPU prices fall and open-source models mature, the buy-vs-rent calculus for AI infrastructure is shifting. For more and more organizations, the question is becoming relevant.
@@ -315,7 +319,7 @@ export default function PayoffCalculator() {
           </div>
 
           <p className="text-base leading-relaxed text-foreground font-serif mb-6" style={{ lineHeight: 1.8 }}>
-            The calculator below assumes today's pricing holds steady. The consensus view is that compute costs will continue falling as they have historically. But there are structural factors in semiconductor supply chains that could push prices higher. Understanding these risks helps frame the buy-vs-rent decision.
+            The calculator below assumes today's pricing holds steady. The consensus view is that compute costs will continue falling as they have historically. What if that's not the case? Understanding the risks to that view helps frame the buy-vs-rent decision.
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 my-8">
@@ -334,7 +338,7 @@ export default function PayoffCalculator() {
             <div className="bg-background p-4 border border-border">
               <p className="text-sm text-muted-foreground font-serif">
                 <strong className="text-foreground block mb-1">Geopolitical concentration</strong>
-                <a href="https://focustaiwan.tw/business/202509060012" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">TSMC commands 70%</a> of the global foundry market and produces virtually all leading-edge chips. A single point of failure for global AI infrastructure.
+                <a href="https://focustaiwan.tw/business/202509060012" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">TSMC commands 70%</a> of the global foundry market and produces virtually all leading-edge chips. Impacts would be felt at the margins of highest performance and new capacity, increasing demand for existing supply.
               </p>
             </div>
             <div className="bg-background p-4 border border-border">
@@ -363,6 +367,9 @@ export default function PayoffCalculator() {
           Select your hardware configuration, define your workload, and see how the costs compare across providers.
           The numbers update in real-time as you adjust parameters.
         </p>
+        <a href="#key-assumptions" className="inline-block mt-3 text-xs text-accent hover:underline">
+          See key assumptions
+        </a>
       </div>
 
       {/* Main Content */}
@@ -813,17 +820,33 @@ export default function PayoffCalculator() {
             </div>
             <div className="flex items-center justify-between mb-2">
               <h3 className="text-base font-semibold text-foreground">Provider Comparison</h3>
-              <MultiSelectDropdown
-                options={cloudProviders.providers}
-                selected={cloudGPUFilters}
-                onChange={setCloudGPUFilters}
-                getKey={(p) => p.id}
-                getLabel={(p) => p.name}
-                getDetail={(p) => `$${p.ratePerGPUHour}/hr`}
-              />
+              <div className="flex items-center gap-3">
+                {/* ANS-543: Reserved pricing toggle */}
+                <button
+                  onClick={() => setUseReservedPricing(!useReservedPricing)}
+                  className={`flex items-center gap-2 px-3 py-1.5 text-sm font-medium transition-all border ${
+                    useReservedPricing
+                      ? 'bg-accent text-white border-accent'
+                      : 'bg-muted text-muted-foreground border-border hover:bg-border hover:text-foreground'
+                  }`}
+                >
+                  {useReservedPricing ? '1-Year Reserved' : 'On-Demand'}
+                </button>
+                <MultiSelectDropdown
+                  options={cloudProviders.providers}
+                  selected={cloudGPUFilters}
+                  onChange={setCloudGPUFilters}
+                  getKey={(p) => p.id}
+                  getLabel={(p) => p.name}
+                  getDetail={(p) => `$${useReservedPricing ? p.reservedRatePerGPUHour : p.ratePerGPUHour}/hr`}
+                />
+              </div>
             </div>
             <p className="text-sm text-muted-foreground mb-4">
               Hours adjusted to produce {formatTokens(calculations.tokensPerDay)} tokens/day — same as local
+              {useReservedPricing && (
+                <span className="ml-2 text-accent">• 1-year commitment pricing (20-50% off on-demand)</span>
+              )}
             </p>
 
             {filteredProviders.length > 0 ? (
@@ -1491,12 +1514,12 @@ export default function PayoffCalculator() {
         )}
 
         {/* Section: Key Assumptions */}
-        <div className="my-12">
+        <div className="my-12" id="key-assumptions">
           <div className="mb-2 mb-6">
             <h2 className="font-headline text-xl font-bold text-foreground mb-2">Key Assumptions</h2>
           </div>
           <p className="text-base leading-relaxed text-muted-foreground font-serif mb-4" style={{ lineHeight: 1.8 }}>
-            This calculator makes several simplifying assumptions. It assumes consistent daily usage—real workloads are often bursty. The input-to-output token ratio for API costs (adjustable above, defaulting to 4:1) reflects that most LLM applications send more context than they receive, though specific applications may differ significantly. Hardware depreciation and electricity costs are excluded, which favors local hardware. Cloud providers may impose minimum commitments not reflected here. We focus on the Mac Studio and DGX Spark because they're readily available—traditional GPU workstations (RTX 4090/5090) face ongoing supply constraints that make them difficult to source at reasonable prices. The calculator shows throughput (tokens/second) but not time-to-first-token latency, which matters for interactive applications.
+            This calculator makes several simplifying assumptions. It assumes consistent daily usage—real workloads are often bursty. Hardware depreciation and electricity costs are excluded, which favors local hardware. Cloud providers may impose minimum commitments not reflected here. We focus on the Mac Studio and DGX Spark because they're readily available—traditional GPU workstations (RTX 4090/5090) face ongoing supply constraints that make them difficult to source at reasonable prices. The calculator shows throughput (tokens/second) but not time-to-first-token latency, which matters for interactive applications.
           </p>
         </div>
 

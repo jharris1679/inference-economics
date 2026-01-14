@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-01-09",
+  "updatedAt": "2026-01-14",
   "gpuType": "H100",
   "sources": {
     "RunPod": "https://www.runpod.io/gpu-instance/pricing",
@@ -8,11 +8,12 @@
     "GCP": "https://cloud.google.com/compute/gpus-pricing",
     "AWS": "https://aws.amazon.com/ec2/instance-types/p5/"
   },
+  "reservedNote": "Reserved rates assume 1-year commitment. Actual discounts vary by provider and term length.",
   "providers": [
-    { "id": "runpod", "name": "RunPod", "ratePerGPUHour": 2.49 },
-    { "id": "denvr", "name": "Denvr", "ratePerGPUHour": 2.10 },
-    { "id": "lambda", "name": "Lambda", "ratePerGPUHour": 2.99 },
-    { "id": "gcp", "name": "GCP", "ratePerGPUHour": 3.00 },
-    { "id": "aws", "name": "AWS", "ratePerGPUHour": 3.90 }
+    { "id": "runpod", "name": "RunPod", "ratePerGPUHour": 2.49, "reservedRatePerGPUHour": 1.99, "reservedDiscount": 0.20 },
+    { "id": "denvr", "name": "Denvr", "ratePerGPUHour": 2.10, "reservedRatePerGPUHour": 1.68, "reservedDiscount": 0.20 },
+    { "id": "lambda", "name": "Lambda", "ratePerGPUHour": 2.99, "reservedRatePerGPUHour": 2.09, "reservedDiscount": 0.30 },
+    { "id": "gcp", "name": "GCP", "ratePerGPUHour": 3.00, "reservedRatePerGPUHour": 1.50, "reservedDiscount": 0.50 },
+    { "id": "aws", "name": "AWS", "ratePerGPUHour": 3.90, "reservedRatePerGPUHour": 2.34, "reservedDiscount": 0.40 }
   ]
 }

@@ -659,6 +659,7 @@ export function computeWorkloadComparison({
   apiProviders,
   trainingMode = 'inference',
   inputRatio = 0.8,
+  useReservedPricing = false,
 }) {
   const isMac = selectedHardware === 'mac';
   const singleBoxMemory = isMac ? macRAM : hardware.dgxSpark.memory;
@@ -743,7 +744,11 @@ export function computeWorkloadComparison({
   const rentedGPUs = Math.ceil(totalCloudGPUs);
 
   const cloudResults = cloudProviders.providers.map(provider => {
-    const hourlyRate = provider.ratePerGPUHour * rentedGPUs;
+    // ANS-543: Use reserved pricing when enabled
+    const ratePerGPU = useReservedPricing && provider.reservedRatePerGPUHour
+      ? provider.reservedRatePerGPUHour
+      : provider.ratePerGPUHour;
+    const hourlyRate = ratePerGPU * rentedGPUs;
     const cloudHoursNeeded = calculateCloudHoursNeeded(totalTokensPerDay, weightedCloudTPS);
     const dailyCost = calculateDailyCost(cloudHoursNeeded, hourlyRate);
     const monthlyCost = dailyCost * 30;
@@ -753,7 +758,7 @@ export function computeWorkloadComparison({
       provider: provider.name,
       gpus: rentedGPUs,
       cloudTPS: weightedCloudTPS,
-      hourlyRatePerGPU: provider.ratePerGPUHour,
+      hourlyRatePerGPU: ratePerGPU,
       hourlyRateTotal: hourlyRate,
       cloudHoursNeeded,
       dailyCost,
