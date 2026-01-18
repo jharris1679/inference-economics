@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-01-01",
+  "updatedAt": "2026-01-18",
   "methodology": "Q4_K_M quantization unless noted, batch=1 decode speed, interactive use case",
   "developers": {
     "openai": {
@@ -71,6 +71,32 @@
           "quantization": "FP8",
           "tier": "frontier",
           "notes": "~200GB weights, 8× H100"
+        },
+        "llama-4-scout": {
+          "name": "Llama 4 Scout",
+          "params": "109B",
+          "activeParams": "17B",
+          "minRAM": 64,
+          "localTokPerSec": 22,
+          "dgxSparkTokPerSec": 18,
+          "cloudTokPerSec": 135,
+          "cloudGPUs": 1,
+          "quantization": "Q4_K_M",
+          "tier": "large",
+          "notes": "MoE 16 experts, 10M context, fits single H100"
+        },
+        "llama-4-maverick": {
+          "name": "Llama 4 Maverick",
+          "params": "400B",
+          "activeParams": "17B",
+          "minRAM": 240,
+          "localTokPerSec": 25,
+          "dgxSparkTokPerSec": 0,
+          "cloudTokPerSec": 55,
+          "cloudGPUs": 8,
+          "quantization": "Q4_K_M",
+          "tier": "frontier",
+          "notes": "MoE 128 experts, 1M context, beats GPT-4o"
         }
       }
     },
@@ -142,6 +168,56 @@
           "quantization": "Q4_K_M",
           "tier": "frontier",
           "notes": "MoE, 671B total / 37B active"
+        },
+        "deepseek-v3.2": {
+          "name": "DeepSeek V3.2",
+          "params": "685B",
+          "activeParams": "37B",
+          "minRAM": 400,
+          "localTokPerSec": 22,
+          "dgxSparkTokPerSec": 0,
+          "cloudTokPerSec": 30,
+          "cloudGPUs": 8,
+          "quantization": "Q4_K_M",
+          "tier": "frontier",
+          "notes": "MoE, DSA attention, surpasses GPT-5 on reasoning"
+        },
+        "deepseek-r1": {
+          "name": "DeepSeek R1",
+          "params": "671B",
+          "activeParams": "37B",
+          "minRAM": 384,
+          "localTokPerSec": 18,
+          "dgxSparkTokPerSec": 0,
+          "cloudTokPerSec": 22,
+          "cloudGPUs": 8,
+          "quantization": "Q4_K_M",
+          "tier": "frontier",
+          "notes": "MoE reasoning model, o1-level performance"
+        },
+        "deepseek-r1-32b": {
+          "name": "DeepSeek R1 32B",
+          "params": "32B",
+          "minRAM": 24,
+          "localTokPerSec": 28,
+          "dgxSparkTokPerSec": 15,
+          "cloudTokPerSec": 45,
+          "cloudGPUs": 0.25,
+          "quantization": "Q4_K_M",
+          "tier": "medium",
+          "notes": "Distilled from R1, o1-mini level"
+        },
+        "deepseek-r1-8b": {
+          "name": "DeepSeek R1 8B",
+          "params": "8B",
+          "minRAM": 8,
+          "localTokPerSec": 85,
+          "dgxSparkTokPerSec": 42,
+          "cloudTokPerSec": 110,
+          "cloudGPUs": 0.1,
+          "quantization": "Q4_K_M",
+          "tier": "small",
+          "notes": "Distilled from R1, efficient reasoning"
         }
       }
     },
@@ -183,6 +259,43 @@
           "quantization": "Q4_K_M",
           "tier": "large",
           "notes": "~40GB weights, TP=2"
+        },
+        "qwen3-8b": {
+          "name": "Qwen3 8B",
+          "params": "8B",
+          "minRAM": 8,
+          "localTokPerSec": 88,
+          "dgxSparkTokPerSec": 44,
+          "cloudTokPerSec": 115,
+          "cloudGPUs": 0.1,
+          "quantization": "Q4_K_M",
+          "tier": "small",
+          "notes": "Dense, 128K context, hybrid reasoning"
+        },
+        "qwen3-32b": {
+          "name": "Qwen3 32B",
+          "params": "32B",
+          "minRAM": 24,
+          "localTokPerSec": 30,
+          "dgxSparkTokPerSec": 16,
+          "cloudTokPerSec": 48,
+          "cloudGPUs": 0.25,
+          "quantization": "Q4_K_M",
+          "tier": "medium",
+          "notes": "Dense, 128K context, hybrid reasoning"
+        },
+        "qwen3-235b-a22b": {
+          "name": "Qwen3 235B-A22B",
+          "params": "235B",
+          "activeParams": "22B",
+          "minRAM": 150,
+          "localTokPerSec": 20,
+          "dgxSparkTokPerSec": 0,
+          "cloudTokPerSec": 40,
+          "cloudGPUs": 4,
+          "quantization": "Q4_K_M",
+          "tier": "frontier",
+          "notes": "MoE, 128K context, hybrid reasoning"
         }
       }
     },
@@ -291,6 +404,41 @@
       "id": "valdi-h100",
       "name": "VALDI H100 Performance Docs",
       "url": "https://docs.valdi.ai/llms/performance/gpu/H100/llama3.1-inference-testing/"
+    },
+    {
+      "id": "deepseek-v3.2-release",
+      "name": "DeepSeek V3.2 Release Notes",
+      "url": "https://api-docs.deepseek.com/news/news251201"
+    },
+    {
+      "id": "deepseek-r1-github",
+      "name": "DeepSeek R1 GitHub",
+      "url": "https://github.com/deepseek-ai/DeepSeek-R1"
+    },
+    {
+      "id": "llama-4-blog",
+      "name": "Meta Llama 4 Announcement",
+      "url": "https://ai.meta.com/blog/llama-4-multimodal-intelligence/"
+    },
+    {
+      "id": "hardware-corner-llama4",
+      "name": "Llama 4 Mac Studio Benchmarks",
+      "url": "https://www.hardware-corner.net/llama-4-on-mac-m3-ultra-speed/"
+    },
+    {
+      "id": "nvidia-llama4",
+      "name": "NVIDIA Llama 4 Inference Benchmarks",
+      "url": "https://developer.nvidia.com/blog/nvidia-accelerates-inference-on-meta-llama-4-scout-and-maverick/"
+    },
+    {
+      "id": "qwen3-github",
+      "name": "Qwen3 GitHub",
+      "url": "https://github.com/QwenLM/Qwen3"
+    },
+    {
+      "id": "macstories-qwen3",
+      "name": "Qwen3 235B Mac Studio Benchmarks",
+      "url": "https://www.macstories.net/notes/notes-on-early-mac-studio-ai-benchmarks-with-qwen3-235b-a22b-and-qwen2-5-vl-72b/"
     }
   ]
 }

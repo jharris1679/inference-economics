@@ -283,8 +283,9 @@ export default function PayoffCalculator() {
               <div className="text-sm font-medium text-foreground">By Josh Harris</div>
               <div className="text-sm text-muted-foreground">CEO of <a href="https://getanswerlayer.com" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">AnswerLayer</a></div>
               <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                <a href="https://www.linkedin.com/in/josh-harris-86188983/" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">LinkedIn</a>
-                <a href="https://bsky.app/profile/jodaha.bsky.social" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">Bluesky</a>
+                <a href="https://github.com/jharris1679" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">&lt;/&gt;</a>
+                <a href="https://www.linkedin.com/in/josh-harris-86188983/" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">in</a>
+                <a href="https://bsky.app/profile/jodaha.bsky.social" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">🦋</a>
                 <a href="https://x.com/dynemetis" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">𝕏</a>
               </div>
             </div>
