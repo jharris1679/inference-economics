@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-01-14",
+  "updatedAt": "2026-01-18",
   "note": "Prices per 1M tokens. Blended rate assumes 50% input, 50% output.",
   "sources": {
     "OpenAI": "https://openai.com/api/pricing/",
@@ -34,6 +34,18 @@
       { "name": "DeepInfra", "inputPer1M": 1.79, "outputPer1M": 1.79 },
       { "name": "Amazon Bedrock", "inputPer1M": 2.40, "outputPer1M": 2.40 }
     ],
+    "llama-4-scout": [
+      { "name": "Groq", "inputPer1M": 0.11, "outputPer1M": 0.34 },
+      { "name": "Together", "inputPer1M": 0.18, "outputPer1M": 0.59 },
+      { "name": "Fireworks", "inputPer1M": 0.20, "outputPer1M": 0.60 },
+      { "name": "DeepInfra", "inputPer1M": 0.08, "outputPer1M": 0.30 }
+    ],
+    "llama-4-maverick": [
+      { "name": "Together", "inputPer1M": 0.27, "outputPer1M": 0.85 },
+      { "name": "Groq", "inputPer1M": 0.50, "outputPer1M": 0.77 },
+      { "name": "Fireworks", "inputPer1M": 0.45, "outputPer1M": 1.35 },
+      { "name": "DeepInfra", "inputPer1M": 0.15, "outputPer1M": 0.60 }
+    ],
     "qwen2.5-7b": [
       { "name": "Together", "inputPer1M": 0.30, "outputPer1M": 0.30 },
       { "name": "Fireworks", "inputPer1M": 0.20, "outputPer1M": 0.20 }
@@ -48,13 +60,53 @@
       { "name": "Fireworks", "inputPer1M": 0.90, "outputPer1M": 0.90 },
       { "name": "DeepInfra", "inputPer1M": 0.40, "outputPer1M": 0.45 }
     ],
+    "qwen3-8b": [
+      { "name": "Together", "inputPer1M": 0.20, "outputPer1M": 0.20 },
+      { "name": "Fireworks", "inputPer1M": 0.15, "outputPer1M": 0.15 },
+      { "name": "DeepInfra", "inputPer1M": 0.05, "outputPer1M": 0.08 },
+      { "name": "Groq", "inputPer1M": 0.08, "outputPer1M": 0.08 }
+    ],
+    "qwen3-32b": [
+      { "name": "Together", "inputPer1M": 0.60, "outputPer1M": 0.60 },
+      { "name": "Fireworks", "inputPer1M": 0.45, "outputPer1M": 0.45 },
+      { "name": "DeepInfra", "inputPer1M": 0.12, "outputPer1M": 0.18 },
+      { "name": "Groq", "inputPer1M": 0.29, "outputPer1M": 0.59 }
+    ],
+    "qwen3-235b-a22b": [
+      { "name": "Together", "inputPer1M": 0.20, "outputPer1M": 0.60 },
+      { "name": "Fireworks", "inputPer1M": 0.22, "outputPer1M": 0.88 },
+      { "name": "DeepInfra", "inputPer1M": 0.18, "outputPer1M": 0.54 },
+      { "name": "Cerebras", "inputPer1M": 0.60, "outputPer1M": 1.20 }
+    ],
     "deepseek-coder-33b": [
       { "name": "DeepInfra", "inputPer1M": 0.30, "outputPer1M": 0.30 }
     ],
     "deepseek-v3": [
       { "name": "Together", "inputPer1M": 0.60, "outputPer1M": 1.25 },
-      { "name": "DeepInfra", "inputPer1M": 0.90, "outputPer1M": 0.90 },
-      { "name": "Fireworks", "inputPer1M": 0.90, "outputPer1M": 0.90 }
+      { "name": "DeepInfra", "inputPer1M": 0.32, "outputPer1M": 0.89 },
+      { "name": "Fireworks", "inputPer1M": 0.56, "outputPer1M": 1.68 }
+    ],
+    "deepseek-v3.2": [
+      { "name": "Together", "inputPer1M": 0.60, "outputPer1M": 1.25 },
+      { "name": "Fireworks", "inputPer1M": 0.56, "outputPer1M": 1.68 },
+      { "name": "DeepInfra", "inputPer1M": 0.32, "outputPer1M": 0.89 }
+    ],
+    "deepseek-r1": [
+      { "name": "Together", "inputPer1M": 3.00, "outputPer1M": 7.00 },
+      { "name": "Fireworks", "inputPer1M": 1.35, "outputPer1M": 5.40 },
+      { "name": "DeepInfra", "inputPer1M": 0.50, "outputPer1M": 2.15 }
+    ],
+    "deepseek-r1-32b": [
+      { "name": "Together", "inputPer1M": 0.80, "outputPer1M": 0.80 },
+      { "name": "Fireworks", "inputPer1M": 0.50, "outputPer1M": 0.50 },
+      { "name": "DeepInfra", "inputPer1M": 0.15, "outputPer1M": 0.45 },
+      { "name": "Groq", "inputPer1M": 0.29, "outputPer1M": 0.59 }
+    ],
+    "deepseek-r1-8b": [
+      { "name": "Together", "inputPer1M": 0.20, "outputPer1M": 0.20 },
+      { "name": "Fireworks", "inputPer1M": 0.20, "outputPer1M": 0.20 },
+      { "name": "DeepInfra", "inputPer1M": 0.05, "outputPer1M": 0.08 },
+      { "name": "Groq", "inputPer1M": 0.05, "outputPer1M": 0.08 }
     ],
     "gemma-3-2b": [
       { "name": "Groq", "inputPer1M": 0.04, "outputPer1M": 0.04 },
