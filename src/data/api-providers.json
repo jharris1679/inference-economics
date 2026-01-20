@@ -69,13 +69,13 @@
     "qwen3-32b": [
       { "name": "Together", "inputPer1M": 0.60, "outputPer1M": 0.60 },
       { "name": "Fireworks", "inputPer1M": 0.45, "outputPer1M": 0.45 },
-      { "name": "DeepInfra", "inputPer1M": 0.12, "outputPer1M": 0.18 },
+      { "name": "DeepInfra", "inputPer1M": 0.08, "outputPer1M": 0.28 },
       { "name": "Groq", "inputPer1M": 0.29, "outputPer1M": 0.59 }
     ],
     "qwen3-235b-a22b": [
       { "name": "Together", "inputPer1M": 0.20, "outputPer1M": 0.60 },
       { "name": "Fireworks", "inputPer1M": 0.22, "outputPer1M": 0.88 },
-      { "name": "DeepInfra", "inputPer1M": 0.18, "outputPer1M": 0.54 },
+      { "name": "DeepInfra", "inputPer1M": 0.071, "outputPer1M": 0.463 },
       { "name": "Cerebras", "inputPer1M": 0.60, "outputPer1M": 1.20 }
     ],
     "deepseek-coder-33b": [
