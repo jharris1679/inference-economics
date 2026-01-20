@@ -305,8 +305,11 @@ export default function PayoffCalculator() {
         <p className="text-lg leading-relaxed text-foreground font-serif mb-6" style={{ lineHeight: 1.8 }}>
           At <a href="https://getanswerlayer.com" className="text-accent hover:underline" target="_blank" rel="noopener noreferrer">AnswerLayer</a>, we deploy on customer infrastructure—which means we think constantly about how to maximize value from whatever compute power our customers own or plan to buy. The calculus isn't simple. Cloud providers offer raw speed—an H100 cluster can <a href="https://github.com/XiongjieDai/GPU-Benchmarks-on-LLM-Inference" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">process tokens 2-4× faster</a> than consumer hardware. API providers abstract infrastructure entirely. The question isn't which is "best," but which makes sense for a company's specific workload and time horizon.
         </p>
-        <p className="text-lg leading-relaxed text-foreground font-serif" style={{ lineHeight: 1.8 }}>
+        <p className="text-lg leading-relaxed text-foreground font-serif mb-6" style={{ lineHeight: 1.8 }}>
           I built this calculator to answer a simplified question: <em>how many tokens does it take to make buying hardware worthwhile?</em> The answer depends on your workload, your time horizon, and your assumptions about future pricing—which is where supply chain dynamics come in.
+        </p>
+        <p className="text-lg leading-relaxed text-muted-foreground font-serif italic" style={{ lineHeight: 1.8 }}>
+          Note: This calculator presents a heuristic for thinking about the cost of compute—one important factor in the buying decision, but not the only one. Other considerations include latency requirements, data privacy, operational complexity, and organizational capacity to manage infrastructure.
         </p>
       </div>
 
@@ -368,7 +371,7 @@ export default function PayoffCalculator() {
           The numbers update in real-time as you adjust parameters.
         </p>
         <a href="#key-assumptions" className="inline-block mt-3 text-xs text-accent hover:underline">
-          See key assumptions
+          Assumptions and References
         </a>
       </div>
 
